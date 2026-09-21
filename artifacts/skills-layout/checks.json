@@ -1,0 +1,37 @@
+[
+  {
+    "name": "desktop",
+    "errors": [],
+    "overflow": false,
+    "aboutOverflow": false,
+    "text": "학습·사용 기술\nHTML\nCSS\nJavaScript\nReact\nNext.js\nTailwind CSS"
+  },
+  {
+    "name": "mobile",
+    "errors": [],
+    "overflow": false,
+    "aboutOverflow": false,
+    "text": "학습·사용 기술\nHTML\nCSS\nJavaScript\nReact\nNext.js\nTailwind CSS"
+  },
+  {
+    "name": "small",
+    "errors": [],
+    "overflow": false,
+    "aboutOverflow": false,
+    "text": "학습·사용 기술\nHTML\nCSS\nJavaScript\nReact\nNext.js\nTailwind CSS"
+  },
+  {
+    "name": "large",
+    "errors": [],
+    "overflow": false,
+    "aboutOverflow": false,
+    "text": "학습·사용 기술\nHTML\nCSS\nJavaScript\nReact\nNext.js\nTailwind CSS"
+  },
+  {
+    "name": "tablet",
+    "errors": [],
+    "overflow": false,
+    "aboutOverflow": false,
+    "text": "학습·사용 기술\nHTML\nCSS\nJavaScript\nReact\nNext.js\nTailwind CSS"
+  }
+]

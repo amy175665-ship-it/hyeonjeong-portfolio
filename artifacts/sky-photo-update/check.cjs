@@ -1,0 +1,2 @@
+﻿const {chromium}=require(process.env.LOCALAPPDATA+'/npm-cache/_npx/e41f203b7505f1fb/node_modules/playwright-core');
+(async()=>{const b=await chromium.launch();const p=await b.newPage({viewport:{width:1440,height:900}});await p.goto('http://localhost:3107',{waitUntil:'networkidle'});const photo=p.locator('figure img').first();console.log(await photo.evaluate(e=>({src:e.currentSrc,loaded:e.complete&&e.naturalWidth>0})));await p.screenshot({path:'artifacts/sky-photo-update/desktop.png'});await b.close()})().catch(e=>{console.error(e);process.exit(1)});

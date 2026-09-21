@@ -1,0 +1,130 @@
+[
+  {
+    "name": "desktop",
+    "width": 1440,
+    "height": 900,
+    "errors": [],
+    "scrollWidth": 1440,
+    "viewport": 1440,
+    "brokenImages": [],
+    "overflow": [
+      {
+        "tag": "DIV",
+        "class": "Hero_cloudOne__l4Q5a"
+      },
+      {
+        "tag": "DIV",
+        "class": "Hero_cloudTwo__SrwwG"
+      },
+      {
+        "tag": "path",
+        "class": {}
+      },
+      {
+        "tag": "FIGURE",
+        "class": "Hero_photo__QJFyX"
+      },
+      {
+        "tag": "SPAN",
+        "class": "Hero_tape__nxJYW"
+      },
+      {
+        "tag": "IMG",
+        "class": ""
+      },
+      {
+        "tag": "FIGCAPTION",
+        "class": ""
+      }
+    ]
+  },
+  {
+    "name": "mobile",
+    "width": 390,
+    "height": 844,
+    "errors": [],
+    "scrollWidth": 390,
+    "viewport": 390,
+    "brokenImages": [],
+    "overflow": [
+      {
+        "tag": "DIV",
+        "class": "Hero_cloudOne__l4Q5a"
+      },
+      {
+        "tag": "DIV",
+        "class": "Hero_cloudTwo__SrwwG"
+      },
+      {
+        "tag": "path",
+        "class": {}
+      }
+    ]
+  },
+  {
+    "name": "small-mobile",
+    "width": 320,
+    "height": 720,
+    "errors": [],
+    "scrollWidth": 320,
+    "viewport": 320,
+    "brokenImages": [],
+    "overflow": [
+      {
+        "tag": "DIV",
+        "class": "Hero_cloudOne__l4Q5a"
+      },
+      {
+        "tag": "DIV",
+        "class": "Hero_cloudTwo__SrwwG"
+      },
+      {
+        "tag": "path",
+        "class": {}
+      }
+    ]
+  },
+  {
+    "name": "large-mobile",
+    "width": 480,
+    "height": 900,
+    "errors": [],
+    "scrollWidth": 480,
+    "viewport": 480,
+    "brokenImages": [],
+    "overflow": [
+      {
+        "tag": "DIV",
+        "class": "Hero_cloudOne__l4Q5a"
+      },
+      {
+        "tag": "DIV",
+        "class": "Hero_cloudTwo__SrwwG"
+      },
+      {
+        "tag": "path",
+        "class": {}
+      },
+      {
+        "tag": "FIGURE",
+        "class": "Hero_photo__QJFyX"
+      },
+      {
+        "tag": "SPAN",
+        "class": "Hero_tape__nxJYW"
+      },
+      {
+        "tag": "IMG",
+        "class": ""
+      },
+      {
+        "tag": "FIGCAPTION",
+        "class": ""
+      },
+      {
+        "tag": "BR",
+        "class": ""
+      }
+    ]
+  }
+]

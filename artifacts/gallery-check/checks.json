@@ -1,0 +1,37 @@
+[
+  {
+    "name": "desktop",
+    "errors": [],
+    "overflow": false,
+    "aboutOverflow": false,
+    "text": "디자인\n\n준비 중입니다"
+  },
+  {
+    "name": "mobile",
+    "errors": [],
+    "overflow": false,
+    "aboutOverflow": false,
+    "text": "디자인\n\n준비 중입니다"
+  },
+  {
+    "name": "small",
+    "errors": [],
+    "overflow": false,
+    "aboutOverflow": false,
+    "text": "디자인\n\n준비 중입니다"
+  },
+  {
+    "name": "large",
+    "errors": [],
+    "overflow": false,
+    "aboutOverflow": false,
+    "text": "디자인\n\n준비 중입니다"
+  },
+  {
+    "name": "tablet",
+    "errors": [],
+    "overflow": false,
+    "aboutOverflow": false,
+    "text": "디자인\n\n준비 중입니다"
+  }
+]
