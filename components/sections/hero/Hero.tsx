@@ -29,9 +29,7 @@ export default function Hero() {
         <HeroBrowserDemo />
       </div>
       <div className={styles.heroBottom}>
-        <p className={styles.cornerNote}>DESIGN INTO CODE.<br />ONE DETAIL AT A TIME.</p>
         <a href="/#about" className={styles.scrollLink}><span aria-hidden="true">⌄</span> SCROLL TO EXPLORE</a>
-        <p className={styles.cornerNote}>SMALL DETAILS<br />MAKE A BIG DIFFERENCE.</p>
       </div>
       <div className={styles.voice}><VoiceIntro /></div>
     </section>

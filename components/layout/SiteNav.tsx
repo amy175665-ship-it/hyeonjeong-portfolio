@@ -1,14 +1,18 @@
 ﻿"use client";
 
 import Link from "next/link";
+import Image from "next/image";
+import { motion, useReducedMotion } from "framer-motion";
 
 import { useEffect, useRef, useState } from "react";
 import { navLinks, navCta, navProfile } from "@/data/navigation";
 
 export default function SiteNav() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [hoveredLink, setHoveredLink] = useState<string | null>(null);
   const headerRef = useRef<HTMLElement>(null);
   const toggleRef = useRef<HTMLButtonElement>(null);
+  const prefersReducedMotion = useReducedMotion();
 
   useEffect(() => {
     if (!menuOpen) return;
@@ -34,17 +38,29 @@ export default function SiteNav() {
   }, [menuOpen]);
 
   const linkStyle = "flex min-h-11 items-center justify-center rounded-full px-4 text-[13px] font-medium text-portfolio-ink transition-colors hover:bg-portfolio-sky/40 focus-visible:!outline-portfolio-ink motion-reduce:transition-none";
+  const desktopLinkStyle = "relative flex min-h-11 items-center justify-center rounded-full px-4 text-[13px] font-medium text-portfolio-ink focus-visible:!outline-portfolio-ink";
 
   return (
     <header ref={headerRef} onBlur={(event) => {
       if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setMenuOpen(false);
     }} className="fixed left-1/2 top-4 z-50 w-[calc(100%-2rem)] max-w-[720px] -translate-x-1/2 sm:top-6">
       <nav aria-label="주 메뉴" className="flex min-h-14 items-center justify-between gap-1 rounded-full border border-white/50 bg-white/65 px-2 py-1.5 backdrop-blur-md">
-        <Link href={navProfile.href} aria-label={`${navProfile.name} 홈`} onClick={() => setMenuOpen(false)} className="flex min-h-11 shrink-0 items-center justify-center rounded-full bg-portfolio-sky/90 px-5 text-[13px] font-medium text-[#285987] transition-colors hover:bg-portfolio-sky focus-visible:!outline-portfolio-ink motion-reduce:transition-none">
-          Home
+        <Link href={navProfile.href} aria-label={`${navProfile.name} 홈`} onClick={() => setMenuOpen(false)} className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full transition-transform hover:scale-105 focus-visible:!outline-portfolio-ink motion-reduce:transition-none">
+          <Image src={navProfile.image} alt="" width={44} height={44} className="h-full w-full rounded-full object-cover" priority />
         </Link>
-        <div className="hidden flex-1 items-center justify-evenly gap-1 lg:flex">
-          {navLinks.map((link) => <a key={link.href} href={link.href} className={linkStyle}>{link.label}</a>)}
+        <div className="hidden flex-1 items-center justify-evenly gap-1 lg:flex" onMouseLeave={() => setHoveredLink(null)}>
+          {navLinks.map((link) => (
+            <a key={link.href} href={link.href} className={desktopLinkStyle} onMouseEnter={() => setHoveredLink(link.href)} onFocus={() => setHoveredLink(link.href)} onBlur={() => setHoveredLink(null)}>
+              {hoveredLink === link.href && (
+                <motion.span
+                  layoutId="nav-hover-pill"
+                  className="absolute inset-0 rounded-full bg-portfolio-sky/40"
+                  transition={prefersReducedMotion ? { duration: 0 } : { type: "spring", stiffness: 500, damping: 35 }}
+                />
+              )}
+              <span className="relative z-10">{link.label}</span>
+            </a>
+          ))}
         </div>
         <div className="flex items-center gap-2">
           <button ref={toggleRef} type="button" aria-label={menuOpen ? "메뉴 닫기" : "메뉴 열기"} aria-expanded={menuOpen} aria-controls="mobile-navigation" onClick={() => setMenuOpen(!menuOpen)} className="flex h-11 w-11 items-center justify-center rounded-full text-portfolio-ink transition-colors hover:bg-portfolio-sky/40 focus-visible:!outline-portfolio-ink motion-reduce:transition-none lg:hidden">

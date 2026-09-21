@@ -8,4 +8,4 @@ export const navLinks: NavLink[] = [
 ];
 
 export const navCta: NavLink = { label: "Work with me", href: "/#contact" };
-export const navProfile = { name: "백현정", href: "/", image: "/images/avatar-placeholder.svg" };
+export const navProfile = { name: "백현정", href: "/", image: "/images/avatar.png" };

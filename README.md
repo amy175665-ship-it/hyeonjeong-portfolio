@@ -47,7 +47,7 @@ npm.cmd run dev -- --port 3001
 
 | 영역 | 현재 구성 |
 | --- | --- |
-| 헤더 | 반투명 캡슐 메뉴, 하늘색 Home, 메일 아이콘이 있는 Work with me 버튼, 모바일 접이식 메뉴 |
+| 헤더 | 반투명 캡슐 메뉴, 원형 프로필 아이콘(홈 링크), 메일 아이콘이 있는 Work with me 버튼, 모바일 접이식 메뉴 |
 | Hero | 하늘 사진, 영문 제목, HTML·CSS·JavaScript·React 단계별 데모, 음성 소개 플레이어 |
 | 소개 | PC 사진·정보 좌우 배치, 모바일 세로 배치, 교육·자격 정보 분리 |
 | 기술 | 기존 기술명 6개를 카드로 표시, PC·태블릿 3열 / 모바일 2열 |
@@ -106,6 +106,7 @@ artifacts/                    화면 캡처와 로컬 확인 결과
 | 수정 항목 | 위치 |
 | --- | --- |
 | 메뉴 이름·링크 | `data/navigation.ts` |
+| 헤더 프로필 아이콘 사진 | `data/navigation.ts`의 `navProfile.image` (`public/images/avatar.webp` 권장, 정사각형 크롭) |
 | Hero 제목·문구 | `components/sections/hero/Hero.tsx` |
 | 하늘 사진 | `public/images/sky-photo.webp` |
 | 이름·사진·소개글·교육·자격증 | `components/sections/About.tsx`의 `profile` |

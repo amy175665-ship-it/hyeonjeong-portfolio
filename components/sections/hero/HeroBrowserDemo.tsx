@@ -23,7 +23,6 @@ export default function HeroBrowserDemo() {
             <div className={styles.startScreen}>
               <span className={styles.codeMark} aria-hidden="true">&lt; / &gt;</span>
               <p lang="en">Let’s build<br />something.</p>
-              <span className={styles.screenHint}>아래 버튼을 눌러 시작해 보세요.</span>
             </div>
           ) : step === 0 ? (
             <div className={styles.wireframe}><span>&lt;article&gt;</span><div>이미지 영역</div><strong>작은 아이디어의 시작</strong><p>구조부터 차근차근 쌓아갑니다.</p><span>&lt;/article&gt;</span></div>
@@ -44,8 +43,8 @@ export default function HeroBrowserDemo() {
           {steps.map((label, index) => <button key={label} type="button" aria-pressed={step === index} aria-controls="hero-browser-preview" onClick={() => { setStep(index); setAnimationKey((key) => key + 1); }}>{label}</button>)}
         </div>
       </div>
-      <p className={styles.demoStatus} role="status">{step === null ? "작은 아이디어가 웹이 되는 과정" : descriptions[step]}</p>
-      <div className={styles.stickyNote} aria-hidden="true">Keep<br />Building :)<span>↗</span></div>
+      <p className={styles.demoStatus} role="status">{step !== null && descriptions[step]}</p>
+      <div className={styles.stickyNote} aria-hidden="true"><span>↗</span></div>
     </div>
   );
 }
