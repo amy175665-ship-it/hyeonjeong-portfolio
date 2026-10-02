@@ -1,37 +1,51 @@
-﻿import Image from "next/image";
+import Image from "next/image";
+import sandImage from "@/public/images/hero/hero-sand-bg.webp";
 import HeroBrowserDemo from "./HeroBrowserDemo";
-import skyPhoto from "@/public/images/sky-photo.webp";
+import SandStream from "./SandStream";
 import VoiceIntro from "./VoiceIntro";
+import HeroAvatar from "./HeroAvatar";
+import GrowthScene from "./GrowthScene";
 import styles from "./Hero.module.css";
 
-export default function Hero() {
+function Letters({ text }: { text: string }) {
   return (
-    <section className={styles.hero} aria-labelledby="hero-title">
-      <div className={styles.cloudOne} aria-hidden="true" />
-      <div className={styles.cloudTwo} aria-hidden="true" />
-      <svg className={styles.scribble} viewBox="0 0 1400 800" fill="none" aria-hidden="true">
-        <path d="M-30 390C150 280 295 360 280 510S330 735 470 700M1130 200C1220 40 1410 70 1450 160" />
-        <path strokeDasharray="6 10" d="M790 820C820 620 1140 745 1090 500" />
-        <path d="m755 173 9-19m9 33 22-9m-17 26 21 1M1270 650v35m-17-18h35m-30-13 25 25m-25 0 25-25" />
-      </svg>
+    <>
+      {text.split("").map((char, index) => (
+        <span key={index} className={styles.letter}>{char === " " ? "\u00a0" : char}</span>
+      ))}
+    </>
+  );
+}
+
+export default function Hero({ showExtras = true, showTitle = true, desert = false }: { showExtras?: boolean; showTitle?: boolean; desert?: boolean }) {
+  return (
+    <>
+    <section className={`${styles.hero} ${!showTitle ? styles.editorial : ""} ${desert ? styles.desert : ""}`} aria-labelledby="hero-title">
       <div className={styles.composition}>
-        <figure className={styles.photo}>
-          <span className={styles.tape} aria-hidden="true" />
-          <Image src={skyPhoto} alt="파란 하늘에 피어난 흰 구름" sizes="(min-width: 1100px) 22vw, (min-width: 700px) 200px, 140px" priority />
-          <figcaption>Good interface.<br />Brighter tomorrow.<span aria-hidden="true">☺</span></figcaption>
-        </figure>
+        <div className={styles.atmosphere} aria-hidden="true" />
+        <HeroAvatar />
         <div className={styles.intro}>
+          <h1 id="hero-title" className={`${styles.title} ${showTitle ? "" : styles.titleHidden}`} lang="en" aria-label="ABSORB. BUILD. GROW.">
+            <span aria-hidden="true"><Letters text="ABSORB." /></span>
+            <span aria-hidden="true"><Letters text="BUILD." /></span>
+            <span aria-hidden="true"><em><Letters text="GROW." /></em></span>
+          </h1>
+          <p className={styles.coverSubtitle}>배운 것을 흡수하고, 직접 구현하며 성장하는<br className={styles.subtitleBreak} /> 웹퍼블리셔 백현정입니다.</p>
+        </div>
+        {!showTitle && <GrowthScene />}
+        <SandStream />
+        <Image src={sandImage} alt="" aria-hidden="true" className={styles.sand} priority unoptimized />
+      </div>
+      {showExtras && <div className={styles.extras}>
+        <div className={styles.extrasIntro}>
           <p className={styles.eyebrow}><span aria-hidden="true" /> HELLO, I’M HYUNJUNG.</p>
-          <h1 id="hero-title" className={styles.title} lang="en"><span>Turning</span><span>Design</span><span><em>into</em> Web.</span></h1>
-          <p className={styles.disciplines} lang="en">WEB PUBLISHING · UI FRONTEND · CREATIVE INTERACTION</p>
-          <a href="/#project" className={styles.workLink}>VIEW MY WORK <span aria-hidden="true">↗</span></a>
+          <p className={styles.disciplines} lang="en">WEB PUBLISHING / FRONTEND / INTERACTION</p>
+          <div className={styles.voice}><VoiceIntro /></div>
+          <a href="/#about" className={styles.scrollLink}><span aria-hidden="true">⌄</span> SCROLL TO EXPLORE</a>
         </div>
         <HeroBrowserDemo />
-      </div>
-      <div className={styles.heroBottom}>
-        <a href="/#about" className={styles.scrollLink}><span aria-hidden="true">⌄</span> SCROLL TO EXPLORE</a>
-      </div>
-      <div className={styles.voice}><VoiceIntro /></div>
+      </div>}
     </section>
+    </>
   );
 }

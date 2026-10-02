@@ -6,19 +6,19 @@ const config: Config = {
     extend: {
       colors: {
         portfolio: {
-          cream: "#FFF9F1",
-          surface: "#F6F3EC",
+          cream: "#F7FBFE",
+          surface: "#EEF5FA",
           sky: "#B9DBF6",
           ink: "#202731",
           muted: "#58636E",
-          line: "#DDD9D0",
+          line: "#DBE5ED",
         },
-        paper: "#F6F3EC",
+        paper: "#F7FBFE",
         ink: "#1C1B18",
         forest: "#223B30",
         "forest-light": "#2F5140",
         gold: "#B8912F",
-        line: "#DCD5C4",
+        line: "#DBE5ED",
       },
       fontFamily: {
         sans: ["var(--font-pretendard)", "-apple-system", "BlinkMacSystemFont", "system-ui", "sans-serif"],

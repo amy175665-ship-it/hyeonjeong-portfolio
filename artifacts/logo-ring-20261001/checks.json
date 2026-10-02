@@ -1,0 +1,61 @@
+{
+  "samples": [
+    {
+      "t": 0,
+      "deg": 0,
+      "x": 0,
+      "scale": 1
+    },
+    {
+      "t": 87,
+      "deg": -8,
+      "x": -1.5,
+      "scale": 1.04
+    },
+    {
+      "t": 186,
+      "deg": 8,
+      "x": 1.5,
+      "scale": 1.04
+    },
+    {
+      "t": 298,
+      "deg": -7,
+      "x": -1,
+      "scale": 1.03
+    },
+    {
+      "t": 397,
+      "deg": 6,
+      "x": 1,
+      "scale": 1.02
+    },
+    {
+      "t": 508,
+      "deg": -1.5,
+      "x": 0,
+      "scale": 1
+    },
+    {
+      "t": 620,
+      "deg": 0,
+      "x": 0,
+      "scale": 1
+    }
+  ],
+  "noStack": {
+    "count": 1,
+    "same": true,
+    "time": 100
+  },
+  "settled": {
+    "transform": "none",
+    "running": 0
+  },
+  "boxSame": true,
+  "replaysOnNextHover": 1,
+  "menuOpens": "true",
+  "escapeCloses": "false",
+  "reducedMotionAnims": 0,
+  "errors": []
+}

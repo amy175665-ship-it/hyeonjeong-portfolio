@@ -1,0 +1,16 @@
+/* Positioned by transform from CustomCursor.tsx; the images are centered on the pointer. */
+.cursor { position: fixed; left: 0; top: 0; z-index: 2147483000; width: 0; height: 0; pointer-events: none; opacity: 0; transition: opacity .2s ease; will-change: transform; }
+.cursor[data-visible="true"] { opacity: 1; }
+.body { position: absolute; left: 0; top: 0; width: 0; height: 0; }
+.drop, .sphere { position: absolute; left: 0; top: 0; height: auto; max-width: none; user-select: none; transition: opacity .24s ease, transform .26s cubic-bezier(.25, .8, .3, 1); }
+.drop { width: 26px; transform: translate(-50%, -50%); }
+.sphere { width: 26px; opacity: 0; transform: translate(-50%, -50%) scale(.7) rotate(-8deg); }
+/* Over links and buttons the drop swells into a clear sphere. */
+.cursor[data-hover="true"] .drop { opacity: 0; transform: translate(-50%, -50%) scale(1.25); }
+.cursor[data-hover="true"] .sphere { opacity: .92; transform: translate(-50%, -50%) scale(1.45) rotate(0deg); }
+.layer { position: fixed; inset: 0; z-index: 2147482999; pointer-events: none; overflow: hidden; }
+.burst { position: absolute; width: 58px; height: auto; max-width: none; transform: translate(-50%, -50%) scale(.6); user-select: none; }
+@media (prefers-reduced-motion: reduce) {
+  .drop, .sphere { transition: opacity .15s ease; }
+  .cursor[data-hover="true"] .drop, .cursor[data-hover="true"] .sphere { transform: translate(-50%, -50%) scale(1.3); }
+}

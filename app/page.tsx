@@ -1,24 +1,43 @@
-﻿import Hero from "@/components/sections/hero/Hero";
-import About from "@/components/sections/About";
-import Skills from "@/components/sections/Skills";
+import Hero from "@/components/sections/hero/Hero";
+import ScrollHero from "@/components/sections/hero/ScrollHero";
+import ConceptScenes from "@/components/sections/concept/ConceptScenes";
+import AboutStory from "@/components/sections/AboutStory";
+import WorkStory from "@/components/sections/WorkStory";
+
+
 import DesignGallery from "@/components/sections/DesignGallery";
 import { designItems } from "@/data/design";
-import WorkGrid from "@/components/sections/WorkGrid";
+import ProjectCarousel from "@/components/sections/ProjectCarousel";
 import SideProjects from "@/components/sections/SideProjects";
 import SiteFooter from "@/components/layout/SiteFooter";
+
+// 하단 콘텐츠를 다시 표시하려면 true로 변경합니다.
+const showLowerSections = false;
+// true: 히어로 → 모래 전환·선인장 컨셉 장면 → 소개·기술 → 프로젝트.
+// false: 이전 구성(히어로 → 날아오는 데모 → 소개·기술 → 프로젝트).
+const showConceptIntro = true;
 
 export default function Home() {
   return (
     <>
       <main>
-        <Hero />
-        <About />
-        <Skills />
-        <WorkGrid />
+        {showConceptIntro ? <>
+        <ConceptScenes><Hero showExtras={false} showTitle={false} desert /></ConceptScenes>
+        <AboutStory />
+        <WorkStory />
+        </> : <>
+        <ScrollHero><Hero showExtras={false} showTitle={false} /></ScrollHero>
+        <ProjectCarousel />
+        </>}
+        {showLowerSections && <>
+
+
+
         <SideProjects />
         <DesignGallery designItems={designItems} />
+        </>}
       </main>
-      <SiteFooter />
+      {showLowerSections && <SiteFooter />}
     </>
   );
 }

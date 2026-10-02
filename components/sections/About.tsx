@@ -10,7 +10,7 @@ type Profile = {
   certificates?: { year: string; name: string; issuer: string }[];
 };
 
-const profile: Profile = {
+export const profile: Profile = {
   name: "백현정",
   photo: undefined,
   education: [{ year: "수료일 입력 예정", school: "교육기관 입력 예정", program: "6개월 부트캠프 · 과정명 입력 예정", status: "수료" }],
@@ -40,7 +40,7 @@ export default function About() {
           <div className="min-w-0 break-words">
             <div className="border-b border-portfolio-line pb-7 md:pb-8">
               <h3 className="text-[28px] font-semibold leading-tight md:text-[32px]">{profile.name}</h3>
-              <p className="mt-3 text-base font-medium leading-[1.7]">신입 웹 퍼블리셔</p>
+              <p className="mt-3 text-base font-medium leading-[1.7]">포트폴리오</p>
               {profile.introduction && <p className="mt-5 max-w-prose whitespace-pre-line text-base leading-[1.7] text-portfolio-muted">{profile.introduction}</p>}
               {profile.birth && <p className="mt-3 text-sm leading-[1.7] text-portfolio-muted">생년월일 · {profile.birth}</p>}
             </div>

@@ -5,7 +5,7 @@ type Skill = {
   description?: string;
 };
 
-const skills: Skill[] = [
+export const skills: Skill[] = [
   { name: "HTML" },
   { name: "CSS" },
   { name: "JavaScript" },

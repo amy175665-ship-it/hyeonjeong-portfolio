@@ -1,0 +1,22 @@
+[
+  {
+    "width": 1440,
+    "errors": [],
+    "passed": true
+  },
+  {
+    "width": 1024,
+    "errors": [],
+    "passed": true
+  },
+  {
+    "width": 1920,
+    "errors": [],
+    "passed": true
+  },
+  {
+    "width": 390,
+    "errors": [],
+    "passed": true
+  }
+]

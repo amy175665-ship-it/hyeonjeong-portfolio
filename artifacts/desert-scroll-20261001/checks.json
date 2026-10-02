@@ -1,0 +1,22 @@
+{
+  "390": {
+    "docHeight": 1938,
+    "sandTop": -88,
+    "sandBottom": 1938,
+    "natural": "924x1702",
+    "scrollSections": 0,
+    "overflowX": false,
+    "bottomPixel": 0,
+    "errors": []
+  },
+  "1440": {
+    "docHeight": 2507,
+    "sandTop": -146,
+    "sandBottom": 2507,
+    "natural": "924x1702",
+    "scrollSections": 0,
+    "overflowX": false,
+    "bottomPixel": 0,
+    "errors": []
+  }
+}

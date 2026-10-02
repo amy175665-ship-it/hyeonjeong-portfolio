@@ -1,0 +1,47 @@
+{
+  "1440x900": {
+    "top": 663,
+    "bottom": 1143,
+    "heroBottom": 900,
+    "coversBottom": true,
+    "z": "2",
+    "overflow": false,
+    "errors": []
+  },
+  "1024x768": {
+    "top": 576,
+    "bottom": 943,
+    "heroBottom": 768,
+    "coversBottom": true,
+    "z": "2",
+    "overflow": false,
+    "errors": []
+  },
+  "1920x1080": {
+    "top": 780,
+    "bottom": 1420,
+    "heroBottom": 1080,
+    "coversBottom": true,
+    "z": "2",
+    "overflow": false,
+    "errors": []
+  },
+  "390x844": {
+    "top": 530,
+    "bottom": 896,
+    "heroBottom": 776,
+    "coversBottom": true,
+    "z": "2",
+    "overflow": false,
+    "errors": []
+  },
+  "320x640": {
+    "top": 420,
+    "bottom": 787,
+    "heroBottom": 640,
+    "coversBottom": true,
+    "z": "2",
+    "overflow": false,
+    "errors": []
+  }
+}

@@ -1,0 +1,72 @@
+[
+  {
+    "width": 1440,
+    "errors": [],
+    "overflow": false,
+    "backgrounds": [
+      {
+        "id": "body",
+        "color": "rgb(247, 251, 254)"
+      },
+      {
+        "id": "about",
+        "color": "rgb(247, 251, 254)"
+      },
+      {
+        "id": "skill",
+        "color": "rgb(247, 251, 254)"
+      },
+      {
+        "id": "project",
+        "color": "rgb(247, 251, 254)"
+      },
+      {
+        "id": "design",
+        "color": "rgb(247, 251, 254)"
+      },
+      {
+        "id": "contact",
+        "color": "rgb(247, 251, 254)"
+      }
+    ]
+  },
+  {
+    "width": 1440,
+    "detail": "rgb(247, 251, 254)"
+  },
+  {
+    "width": 390,
+    "errors": [],
+    "overflow": false,
+    "backgrounds": [
+      {
+        "id": "body",
+        "color": "rgb(247, 251, 254)"
+      },
+      {
+        "id": "about",
+        "color": "rgb(247, 251, 254)"
+      },
+      {
+        "id": "skill",
+        "color": "rgb(247, 251, 254)"
+      },
+      {
+        "id": "project",
+        "color": "rgb(247, 251, 254)"
+      },
+      {
+        "id": "design",
+        "color": "rgb(247, 251, 254)"
+      },
+      {
+        "id": "contact",
+        "color": "rgb(247, 251, 254)"
+      }
+    ]
+  },
+  {
+    "width": 390,
+    "detail": "rgb(247, 251, 254)"
+  }
+]

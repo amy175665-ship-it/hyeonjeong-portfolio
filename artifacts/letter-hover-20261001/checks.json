@@ -1,0 +1,49 @@
+{
+  "chars": [
+    "A:ok",
+    "B:ok",
+    "S:ok",
+    "O:ok",
+    "R:ok",
+    "B:ok",
+    ".:ok",
+    "B:ok",
+    "U:ok",
+    "I:ok",
+    "L:ok",
+    "D:ok",
+    ".:ok",
+    "G:ok",
+    "R:ok",
+    "O:ok",
+    "W:ok",
+    ".:ok"
+  ],
+  "boxes1440": [
+    "ABSORB. x68 r488 y94 b236",
+    "BUILD. x517 r766 y417 b502",
+    "GROW. x58 r672 y630 b837"
+  ],
+  "restored1440": true,
+  "failures1440": [],
+  "errors1440": [],
+  "transition": "color 0.24s",
+  "boxes1024": [
+    "ABSORB. x48 r347 y88 b188",
+    "BUILD. x367 r544 y356 b417",
+    "GROW. x41 r478 y567 b714"
+  ],
+  "restored1024": true,
+  "failures1024": [],
+  "errors1024": [],
+  "boxes1920": [
+    "ABSORB. x91 r651 y107 b296",
+    "BUILD. x689 r1021 y499 b613",
+    "GROW. x77 r896 y728 b1004"
+  ],
+  "restored1920": true,
+  "failures1920": [],
+  "errors1920": [],
+  "mobileWords": 0,
+  "mobileOverflow": false
+}

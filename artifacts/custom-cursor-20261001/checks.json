@@ -1,0 +1,60 @@
+{
+  "enabled": true,
+  "nativeCursor": [
+    "none",
+    "none"
+  ],
+  "beforeMove": {
+    "visible": "false",
+    "hover": "false",
+    "x": 0,
+    "y": 0,
+    "drop": "1.00",
+    "sphere": "0.00",
+    "bursts": 0
+  },
+  "afterMove": {
+    "visible": "true",
+    "hover": "false",
+    "x": 299,
+    "y": 518,
+    "drop": "1.00",
+    "sphere": "0.00",
+    "bursts": 0
+  },
+  "onLink": {
+    "visible": "true",
+    "hover": "true",
+    "x": 718,
+    "y": 64,
+    "drop": "0.02",
+    "sphere": "0.90",
+    "bursts": 0
+  },
+  "onButton": "true",
+  "backToDefault": {
+    "visible": "true",
+    "hover": "false",
+    "x": 405,
+    "y": 557,
+    "drop": "1.00",
+    "sphere": "0.00",
+    "bursts": 0
+  },
+  "duringBurst": {
+    "visible": "true",
+    "hover": "false",
+    "x": 400,
+    "y": 560,
+    "drop": "1.00",
+    "sphere": "0.00",
+    "bursts": 1
+  },
+  "afterBurst": 0,
+  "letterHoverColor": "rgb(127, 150, 87)",
+  "errors": [],
+  "mobile": {
+    "enabled": false,
+    "bodyCursor": "auto"
+  }
+}

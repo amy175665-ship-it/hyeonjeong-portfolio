@@ -1,0 +1,18 @@
+{
+  "styles": [
+    "default/none/default/auto"
+  ],
+  "wordStyles": [
+    "default/none",
+    "default/none",
+    "default/none"
+  ],
+  "selectedText": "\"\"",
+  "hoverS": {
+    "color": "rgb(143, 196, 71)",
+    "t": "matrix(0.996195, -0.0871557, 0.0871557, 0.996195, -2.34101, -3.81047)"
+  },
+  "othersUnchanged": true,
+  "otherTextSelectable": "auto",
+  "errors": []
+}

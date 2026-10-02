@@ -1,9 +1,13 @@
 # Dependencies
-/node_modules/
+node_modules/
 
 # Next.js build output
-/.next/
+.next/
 /out/
+
+# Temporary verification workspaces (keep screenshots and check scripts)
+/artifacts/**/workspace/
+/artifacts/**/verify/
 
 # Generated TypeScript files
 *.tsbuildinfo
@@ -25,3 +29,10 @@ yarn-error.log*
 # OS files
 .DS_Store
 Thumbs.db
+
+# Screenshots are local comparison captures (re-create them with the check scripts)
+/artifacts/**/*.png
+
+# Stray temp folder and debug log
+/Users*Temp/
+debug.log

@@ -1,0 +1,36 @@
+{
+  "390": {
+    "geo": {
+      "top": 1992,
+      "height": 4220
+    },
+    "rows": [
+      "desert-end stageTop:844 sandTop:-338 phrase:0",
+      "concept-0 stageTop:0 sandTop:-1182 phrase:0",
+      "rise-done stageTop:0 sandTop:-186 phrase:0",
+      "build-30 stageTop:0 sandTop:-186 phrase:1",
+      "build-70 stageTop:0 sandTop:-186 phrase:1",
+      "build-95 stageTop:0 sandTop:-186 phrase:0.50158",
+      "scene3 stageTop:0 sandTop:-186 phrase:0"
+    ],
+    "overflowX": false,
+    "errors": []
+  },
+  "1440": {
+    "geo": {
+      "top": 2507,
+      "height": 4500
+    },
+    "rows": [
+      "desert-end stageTop:900 sandTop:-852 phrase:0",
+      "concept-0 stageTop:0 sandTop:-1752 phrase:0",
+      "rise-done stageTop:0 sandTop:-370 phrase:0",
+      "build-30 stageTop:0 sandTop:-370 phrase:1",
+      "build-70 stageTop:0 sandTop:-370 phrase:1",
+      "build-95 stageTop:0 sandTop:-370 phrase:0.5",
+      "scene3 stageTop:0 sandTop:-370 phrase:0"
+    ],
+    "overflowX": false,
+    "errors": []
+  }
+}

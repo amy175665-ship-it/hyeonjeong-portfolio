@@ -1,0 +1,24 @@
+[
+  {
+    "width": 1024,
+    "bg": {
+      "size": "cover",
+      "position": "50% 50%",
+      "repeat": "no-repeat",
+      "src": "http://localhost:3107/images/hero/hero-sunlight-bg.webp"
+    },
+    "canvases": 1,
+    "errors": []
+  },
+  {
+    "width": 390,
+    "bg": {
+      "size": "cover",
+      "position": "50% 50%",
+      "repeat": "no-repeat",
+      "src": "http://localhost:3107/images/hero/hero-sunlight-bg.webp"
+    },
+    "canvases": 1,
+    "errors": []
+  }
+]

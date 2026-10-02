@@ -1,4 +1,0 @@
-﻿const {chromium}=require(process.env.LOCALAPPDATA+'/npm-cache/_npx/e41f203b7505f1fb/node_modules/playwright-core');
-(async()=>{const b=await chromium.launch();for(const [name,width,height] of [['desktop',1440,900],['mobile',390,844],['small',320,720]]){const p=await b.newPage({viewport:{width,height}});await p.goto('http://localhost:3107',{waitUntil:'networkidle'});await p.screenshot({path:`artifacts/header-cta-restore/${name}.png`});console.log(name,await p.evaluate(()=>({overflow:document.documentElement.scrollWidth>innerWidth,links:[...document.querySelectorAll('header a')].map(a=>a.getAttribute('href'))})));if(width<1024){await p.locator('header button').click();console.log('menu open',await p.locator('#mobile-navigation').isVisible());await p.keyboard.press('Escape');console.log('escape closed',!await p.locator('#mobile-navigation').isVisible());}await p.close()}await b.close()})().catch(e=>{console.error(e);process.exit(1)});
-
-

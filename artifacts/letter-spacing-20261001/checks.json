@@ -1,0 +1,111 @@
+{
+  "float1440": [
+    {
+      "word": "ABSORB.",
+      "duration": 4500,
+      "delay": 0,
+      "easing": "linear",
+      "direction": "alternate",
+      "iterations": null,
+      "translates": [
+        "0px -4px",
+        "0px",
+        "0px 4px"
+      ],
+      "keepsRotation": true
+    },
+    {
+      "word": "BUILD.",
+      "duration": 5200,
+      "delay": -1800,
+      "easing": "linear",
+      "direction": "alternate",
+      "iterations": null,
+      "translates": [
+        "0px 3.0274px",
+        "0px 4.24669px",
+        "0px -3.0274px"
+      ],
+      "keepsRotation": true
+    },
+    {
+      "word": "GROW.",
+      "duration": 5800,
+      "delay": -3400,
+      "easing": "linear",
+      "direction": "alternate",
+      "iterations": null,
+      "translates": [
+        "0px 5.27783px",
+        "0px -3.31408px",
+        "0px -5.27783px"
+      ],
+      "keepsRotation": true
+    }
+  ],
+  "growLowestBottom1440": "787 / 900",
+  "hoverFails1440": [],
+  "errors1440": [],
+  "boxes1440": [
+    "ABSORB. x68 y95 b239",
+    "BUILD. x517 y385 b470",
+    "GROW. x58 y584 b792"
+  ],
+  "float1024": [
+    {
+      "word": "ABSORB.",
+      "duration": 4500,
+      "delay": 0,
+      "easing": "linear",
+      "direction": "alternate",
+      "iterations": null,
+      "translates": [
+        "0px -4px",
+        "0px",
+        "0px 4px"
+      ],
+      "keepsRotation": true
+    },
+    {
+      "word": "BUILD.",
+      "duration": 5200,
+      "delay": -1800,
+      "easing": "linear",
+      "direction": "alternate",
+      "iterations": null,
+      "translates": [
+        "0px 3.0274px",
+        "0px 4.24669px",
+        "0px -3.0274px"
+      ],
+      "keepsRotation": true
+    },
+    {
+      "word": "GROW.",
+      "duration": 5800,
+      "delay": -3400,
+      "easing": "linear",
+      "direction": "alternate",
+      "iterations": null,
+      "translates": [
+        "0px 5.27783px",
+        "0px -3.31408px",
+        "0px -5.27783px"
+      ],
+      "keepsRotation": true
+    }
+  ],
+  "growLowestBottom1024": "671 / 768",
+  "hoverFails1024": [],
+  "errors1024": [],
+  "boxes1024": [
+    "ABSORB. x48 y83 b185",
+    "BUILD. x367 y329 b390",
+    "GROW. x41 y534 b682"
+  ],
+  "reduced": [
+    "0 none",
+    "0 none",
+    "0 none"
+  ]
+}

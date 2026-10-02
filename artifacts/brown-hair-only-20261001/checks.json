@@ -1,0 +1,362 @@
+[
+  {
+    "width": 1440,
+    "neutral": {
+      "rotation": [
+        0,
+        0
+      ],
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "meshes": [
+        {
+          "name": "Female_Bob_Haircut_1",
+          "visible": true,
+          "isHair": true,
+          "material": "Hair_Web",
+          "type": "MeshStandardMaterial",
+          "color": "6b4938",
+          "map": false,
+          "normalMap": true,
+          "opacity": 0.2545454502105713,
+          "toneMapped": true,
+          "roughness": 0.581818163394928,
+          "metalness": 0,
+          "side": 2
+        },
+        {
+          "name": "Female_Bob_Haircut001_1",
+          "visible": false,
+          "isHair": false,
+          "material": "Hair_Web.001",
+          "type": "MeshStandardMaterial",
+          "color": "ffffff",
+          "map": true,
+          "normalMap": true,
+          "opacity": 0.2545454502105713,
+          "toneMapped": true,
+          "roughness": 0.581818163394928,
+          "metalness": 0.23636363446712494,
+          "side": 2
+        },
+        {
+          "name": "Sphere",
+          "visible": true,
+          "isHair": false,
+          "material": "Material.003",
+          "type": "MeshStandardMaterial",
+          "color": "ffffff",
+          "map": true,
+          "normalMap": true,
+          "opacity": 1,
+          "toneMapped": true,
+          "roughness": 1,
+          "metalness": 0,
+          "side": 2
+        },
+        {
+          "name": "Sphere_1",
+          "visible": true,
+          "isHair": false,
+          "material": "",
+          "type": "MeshStandardMaterial",
+          "color": "ffffff",
+          "map": false,
+          "normalMap": false,
+          "opacity": 1,
+          "toneMapped": true,
+          "roughness": 1,
+          "metalness": 1,
+          "side": 0
+        },
+        {
+          "name": "Sphere_2",
+          "visible": true,
+          "isHair": false,
+          "material": "Material.004",
+          "type": "MeshStandardMaterial",
+          "color": "ffffff",
+          "map": true,
+          "normalMap": true,
+          "opacity": 1,
+          "toneMapped": true,
+          "roughness": 1,
+          "metalness": 0,
+          "side": 2
+        },
+        {
+          "name": "Sphere001",
+          "visible": true,
+          "isHair": false,
+          "material": "Material.001",
+          "type": "MeshStandardMaterial",
+          "color": "ffffff",
+          "map": true,
+          "normalMap": true,
+          "opacity": 1,
+          "toneMapped": true,
+          "roughness": 1,
+          "metalness": 0,
+          "side": 2
+        },
+        {
+          "name": "Sphere001_1",
+          "visible": true,
+          "isHair": false,
+          "material": "",
+          "type": "MeshStandardMaterial",
+          "color": "ffffff",
+          "map": false,
+          "normalMap": false,
+          "opacity": 1,
+          "toneMapped": true,
+          "roughness": 1,
+          "metalness": 1,
+          "side": 0
+        },
+        {
+          "name": "Sphere001_2",
+          "visible": true,
+          "isHair": false,
+          "material": "Material.002",
+          "type": "MeshStandardMaterial",
+          "color": "ffffff",
+          "map": true,
+          "normalMap": true,
+          "opacity": 1,
+          "toneMapped": true,
+          "roughness": 1,
+          "metalness": 0,
+          "side": 2
+        },
+        {
+          "name": "Mesh_0",
+          "visible": true,
+          "isHair": false,
+          "material": "Material_0",
+          "type": "MeshStandardMaterial",
+          "color": "ffffff",
+          "map": true,
+          "normalMap": false,
+          "opacity": 1,
+          "toneMapped": true,
+          "roughness": 1,
+          "metalness": 0,
+          "side": 2
+        },
+        {
+          "name": "Mesh_0001",
+          "visible": true,
+          "isHair": false,
+          "material": "Material_0.001",
+          "type": "MeshStandardMaterial",
+          "color": "ffffff",
+          "map": true,
+          "normalMap": false,
+          "opacity": 1,
+          "toneMapped": true,
+          "roughness": 1,
+          "metalness": 0,
+          "side": 2
+        }
+      ],
+      "overflow": false
+    },
+    "turned": [
+      -0.14965767618991815,
+      0.2995653373623362
+    ],
+    "reset": [
+      -0.00001995655197221357,
+      0.00003994643894215355
+    ],
+    "reduced": [
+      0,
+      0
+    ],
+    "errors": []
+  },
+  {
+    "width": 390,
+    "neutral": {
+      "rotation": [
+        0,
+        0
+      ],
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "meshes": [
+        {
+          "name": "Female_Bob_Haircut_1",
+          "visible": true,
+          "isHair": true,
+          "material": "Hair_Web",
+          "type": "MeshStandardMaterial",
+          "color": "6b4938",
+          "map": false,
+          "normalMap": true,
+          "opacity": 0.2545454502105713,
+          "toneMapped": true,
+          "roughness": 0.581818163394928,
+          "metalness": 0,
+          "side": 2
+        },
+        {
+          "name": "Female_Bob_Haircut001_1",
+          "visible": false,
+          "isHair": false,
+          "material": "Hair_Web.001",
+          "type": "MeshStandardMaterial",
+          "color": "ffffff",
+          "map": true,
+          "normalMap": true,
+          "opacity": 0.2545454502105713,
+          "toneMapped": true,
+          "roughness": 0.581818163394928,
+          "metalness": 0.23636363446712494,
+          "side": 2
+        },
+        {
+          "name": "Sphere",
+          "visible": true,
+          "isHair": false,
+          "material": "Material.003",
+          "type": "MeshStandardMaterial",
+          "color": "ffffff",
+          "map": true,
+          "normalMap": true,
+          "opacity": 1,
+          "toneMapped": true,
+          "roughness": 1,
+          "metalness": 0,
+          "side": 2
+        },
+        {
+          "name": "Sphere_1",
+          "visible": true,
+          "isHair": false,
+          "material": "",
+          "type": "MeshStandardMaterial",
+          "color": "ffffff",
+          "map": false,
+          "normalMap": false,
+          "opacity": 1,
+          "toneMapped": true,
+          "roughness": 1,
+          "metalness": 1,
+          "side": 0
+        },
+        {
+          "name": "Sphere_2",
+          "visible": true,
+          "isHair": false,
+          "material": "Material.004",
+          "type": "MeshStandardMaterial",
+          "color": "ffffff",
+          "map": true,
+          "normalMap": true,
+          "opacity": 1,
+          "toneMapped": true,
+          "roughness": 1,
+          "metalness": 0,
+          "side": 2
+        },
+        {
+          "name": "Sphere001",
+          "visible": true,
+          "isHair": false,
+          "material": "Material.001",
+          "type": "MeshStandardMaterial",
+          "color": "ffffff",
+          "map": true,
+          "normalMap": true,
+          "opacity": 1,
+          "toneMapped": true,
+          "roughness": 1,
+          "metalness": 0,
+          "side": 2
+        },
+        {
+          "name": "Sphere001_1",
+          "visible": true,
+          "isHair": false,
+          "material": "",
+          "type": "MeshStandardMaterial",
+          "color": "ffffff",
+          "map": false,
+          "normalMap": false,
+          "opacity": 1,
+          "toneMapped": true,
+          "roughness": 1,
+          "metalness": 1,
+          "side": 0
+        },
+        {
+          "name": "Sphere001_2",
+          "visible": true,
+          "isHair": false,
+          "material": "Material.002",
+          "type": "MeshStandardMaterial",
+          "color": "ffffff",
+          "map": true,
+          "normalMap": true,
+          "opacity": 1,
+          "toneMapped": true,
+          "roughness": 1,
+          "metalness": 0,
+          "side": 2
+        },
+        {
+          "name": "Mesh_0",
+          "visible": true,
+          "isHair": false,
+          "material": "Material_0",
+          "type": "MeshStandardMaterial",
+          "color": "ffffff",
+          "map": true,
+          "normalMap": false,
+          "opacity": 1,
+          "toneMapped": true,
+          "roughness": 1,
+          "metalness": 0,
+          "side": 2
+        },
+        {
+          "name": "Mesh_0001",
+          "visible": true,
+          "isHair": false,
+          "material": "Material_0.001",
+          "type": "MeshStandardMaterial",
+          "color": "ffffff",
+          "map": true,
+          "normalMap": false,
+          "opacity": 1,
+          "toneMapped": true,
+          "roughness": 1,
+          "metalness": 0,
+          "side": 2
+        }
+      ],
+      "overflow": false
+    },
+    "turned": [
+      -0.14957021207288987,
+      0.29831327418194403
+    ],
+    "reset": [
+      -0.00005615818612512724,
+      0.00011200580745945346
+    ],
+    "reduced": [
+      0,
+      0
+    ],
+    "errors": []
+  }
+]

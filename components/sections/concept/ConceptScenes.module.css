@@ -1,0 +1,44 @@
+/* Pinned stage holding the hero and the concept scenes (the hero's cover uses the same height in desert mode). */
+.track { --cover-h: max(600px, 100svh); position: relative; height: calc(var(--cover-h) * 5); }
+.stage { position: sticky; top: 0; height: var(--cover-h); overflow: hidden; overflow: clip; isolation: isolate; }
+/* Layers: sky (+ time-of-day layers) < hero (until the swap) < sand < tint < cactus < gust < pollen < text. */
+.hero { position: absolute; inset: 0; z-index: 1; }
+.sky { position: absolute; inset: 0; z-index: 0; background: #f7fbfe url('/images/hero/hero-sunlight-bg.webp') center / cover no-repeat; }
+/* Same size and centering as Hero's .sand (hidden in desert mode); its vertical position is set from scroll. */
+.sand { position: absolute; top: 0; left: 50%; z-index: 2; width: max(100vw, 1100px); max-width: none; height: auto; transform: translate(-50%, 0); pointer-events: none; user-select: none; will-change: transform; }
+/* Cactus stands on the dunes, in front of the sand. */
+/* Time-of-day layers fade over the daylight sky; nothing flashes, each only crossfades with scroll. */
+.skyLayer { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
+.sunset { background: linear-gradient(180deg, #e98a6e 0%, #f3b07a 45%, #f8d3a0 70%); }
+.night { background: linear-gradient(180deg, #121b33 0%, #24314f 50%, #44506d 75%); }
+.night i { position: absolute; border-radius: 50%; background: #fff7e2; }
+.dawn { background: linear-gradient(180deg, #b9d4ec 0%, #f2d6c4 55%, #f8e3c8 75%); }
+.tint { position: absolute; inset: 0; z-index: 3; pointer-events: none; mix-blend-mode: multiply; }
+.tintSunset { background: #f08a5d; }
+.tintNight { background: #1d2742; }
+.cactus { position: absolute; left: 50%; bottom: 3%; z-index: 4; width: min(46vw, 520px); height: min(66svh, 620px); transform: translateX(-50%); transform-origin: 50% 100%; pointer-events: none; }
+.gust { position: absolute; inset: 0; z-index: 5; display: block; width: 100%; height: 100%; pointer-events: none; }
+/* Scene phrases sit in the open sky (left, about a third down), large enough to read against any time of day. */
+.phrase { position: absolute; left: 15vw; top: 26%; z-index: 7; max-width: 64%; margin: 0; pointer-events: none; color: #202731; font: 600 clamp(36px, 4.4vw, 76px)/1.2 var(--font-editorial), var(--font-hangul-serif), Georgia, serif; letter-spacing: -.035em; word-break: keep-all; }
+.pollen { position: absolute; inset: 0; z-index: 6; display: block; width: 100%; height: 100%; pointer-events: none; }
+/* Desktop: the cactus stands on the right for the whole story (text left, empty desert center, cactus right). */
+@media (min-width: 1024px) {
+  .cactus { left: 70%; transform: translate(-50%, 4svh) scale(1.18); }
+}
+/* SCENE 3 statement: left side, a little below the middle, two tones; the cactus stands lower on the right. */
+.statement { position: absolute; left: 15vw; top: 26%; z-index: 7; display: flex; flex-direction: column; gap: .12em; max-width: 58vw; margin: 0; pointer-events: none; font: 600 clamp(36px, 4.4vw, 76px)/1.25 var(--font-editorial), var(--font-hangul-serif), Georgia, serif; letter-spacing: -.035em; word-break: keep-all; }
+.statementLight { color: #fbf1df; text-shadow: 0 1px 18px #7a3c1e26; }
+/* Closing under the pollen "GROW.": one large line, then a quiet note in the body typeface. */
+.closing { position: absolute; left: 50%; top: calc(33% + 40px); z-index: 7; width: min(92vw, 760px); text-align: center; pointer-events: none; }
+.closingLead { margin: 0; color: #202731; font: 600 clamp(28px, 3vw, 48px)/1.2 var(--font-editorial), var(--font-hangul-serif), Georgia, serif; letter-spacing: -.03em; word-break: keep-all; }
+.closingNote { margin: 10px 0 0; color: #58636e; font: 400 clamp(14px, 1.15vw, 18px)/1.7 var(--font-pretendard), sans-serif; word-break: keep-all; }
+/* Story → next section: the bottom of the dunes melts into flat sand (#e3bf91, sampled from the dune image),
+   and the strip after the pinned stage carries that sand into the next section's background. */
+.groundFade { position: absolute; left: 0; right: 0; bottom: 0; height: 22%; z-index: 3; pointer-events: none; background: linear-gradient(180deg, #e3bf9100, #e3bf91); }
+.handoff { --next-bg: #fbf6ee; height: clamp(160px, 26vh, 300px); background: linear-gradient(180deg, #e3bf91, var(--next-bg)); }
+@media (max-width: 1023px) {
+  .cactus { width: 80vw; height: 58svh; bottom: 8%; }
+  .statement { left: 24px; top: 18%; max-width: calc(100% - 48px); font-size: clamp(30px, 8.4vw, 44px); }
+  .phrase { left: 24px; top: 20%; max-width: calc(100% - 48px); font-size: clamp(30px, 8.6vw, 44px); }
+  .closing { top: calc(30% + 28px); }
+}

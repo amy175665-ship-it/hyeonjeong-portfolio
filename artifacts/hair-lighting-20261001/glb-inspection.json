@@ -1,0 +1,56 @@
+{
+  "sha256": "0729e0a0eb1ad216ab37ab1145c11a8ebca604ad0bebaa8b1a8614c4fced46c2",
+  "hair": {
+    "doubleSided": true,
+    "name": "Hair_Web",
+    "pbrMetallicRoughness": {
+      "baseColorTexture": {
+        "index": 0
+      },
+      "metallicFactor": 0,
+      "roughnessFactor": 0.5
+    }
+  },
+  "images": [
+    {
+      "bufferView": 9,
+      "mimeType": "image/png",
+      "name": "hair_web_color"
+    },
+    {
+      "bufferView": 14,
+      "mimeType": "image/png",
+      "name": "Fabric026_1K_NormalDX"
+    },
+    {
+      "bufferView": 15,
+      "mimeType": "image/png",
+      "name": "Fabric026_1K_Color"
+    },
+    {
+      "bufferView": 16,
+      "mimeType": "image/png",
+      "name": "Fabric026_1K_Roughness"
+    },
+    {
+      "bufferView": 25,
+      "mimeType": "image/png",
+      "name": "Fabric077_1K_NormalDX"
+    },
+    {
+      "bufferView": 26,
+      "mimeType": "image/png",
+      "name": "Fabric077_1K_Color"
+    },
+    {
+      "bufferView": 27,
+      "mimeType": "image/png",
+      "name": "Fabric077_1K_Roughness"
+    },
+    {
+      "bufferView": 32,
+      "mimeType": "image/png",
+      "name": "Image_0"
+    }
+  ]
+}

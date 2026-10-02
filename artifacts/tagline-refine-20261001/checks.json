@@ -1,0 +1,86 @@
+{
+  "1024": {
+    "text": "● HELLO, I’M HYUNJUNG — WEB PUBLISHER",
+    "font": "12px 1.68px",
+    "color": "rgb(32, 39, 49)",
+    "dot": "rgb(233, 163, 58)",
+    "lines": 1,
+    "box": [
+      23,
+      492,
+      332,
+      504
+    ],
+    "gLeft": 41,
+    "gapToGrowCap": 43,
+    "buildBottom": 387,
+    "buildLeft": 367,
+    "overlapBuild": false,
+    "avatarLeft": 635,
+    "anims": 0,
+    "errors": []
+  },
+  "1280": {
+    "text": "● HELLO, I’M HYUNJUNG — WEB PUBLISHER",
+    "font": "12px 1.68px",
+    "color": "rgb(32, 39, 49)",
+    "dot": "rgb(233, 163, 58)",
+    "lines": 1,
+    "box": [
+      28,
+      477,
+      338,
+      489
+    ],
+    "gLeft": 51,
+    "gapToGrowCap": 55,
+    "buildBottom": 414,
+    "buildLeft": 459,
+    "overlapBuild": false,
+    "avatarLeft": 794,
+    "anims": 0,
+    "errors": []
+  },
+  "1440": {
+    "text": "● HELLO, I’M HYUNJUNG — WEB PUBLISHER",
+    "font": "12.24px 1.7136px",
+    "color": "rgb(32, 39, 49)",
+    "dot": "rgb(233, 163, 58)",
+    "lines": 1,
+    "box": [
+      32,
+      538,
+      347,
+      550
+    ],
+    "gLeft": 58,
+    "gapToGrowCap": 63,
+    "buildBottom": 466,
+    "buildLeft": 517,
+    "overlapBuild": false,
+    "avatarLeft": 893,
+    "anims": 0,
+    "errors": []
+  },
+  "1920": {
+    "text": "● HELLO, I’M HYUNJUNG — WEB PUBLISHER",
+    "font": "15px 2.1px",
+    "color": "rgb(32, 39, 49)",
+    "dot": "rgb(233, 163, 58)",
+    "lines": 1,
+    "box": [
+      42,
+      613,
+      429,
+      628
+    ],
+    "gLeft": 77,
+    "gapToGrowCap": 81,
+    "buildBottom": 570,
+    "buildLeft": 689,
+    "overlapBuild": false,
+    "avatarLeft": 1190,
+    "anims": 0,
+    "errors": []
+  }
+}

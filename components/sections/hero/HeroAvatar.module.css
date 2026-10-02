@@ -1,0 +1,41 @@
+.avatar {
+  position: absolute;
+  inset: 100px 0 60px;
+  z-index: 3;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+
+.viewer {
+  display: block;
+  width: min(640px, 90vw);
+  height: min(620px, 72svh);
+  pointer-events: none;
+}
+
+.status {
+  position: absolute;
+  bottom: 16px;
+  max-width: calc(100% - 48px);
+  color: #58636e;
+  font-size: 14px;
+  text-align: center;
+}
+
+@media (min-width: 1024px) {
+  .avatar { inset: auto; left: 62%; top: 24%; width: 25%; height: 47%; grid-template-columns: minmax(0, 1fr); }
+  .viewer { position: absolute; left: 50%; top: 50%; width: 150%; height: 150%; min-width: 0; transform: translate(-50%, -50%); }
+}
+
+@media (max-width: 699px) {
+  .avatar { inset: 110px 0 90px; }
+  .viewer { width: 90vw; height: min(480px, 58svh); }
+}
+
+/* Face entrance: waits a moment after the model loads, then fades and rises in. */
+.entrance { width: 100%; height: 100%; opacity: 0; transform: translateY(18px) scale(.97); transition: opacity 1.8s ease .8s, transform 2.2s cubic-bezier(.2, .7, .2, 1) .8s; }
+.entranceReady { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) {
+  .entrance { transform: none; transition: opacity .3s ease; }
+}

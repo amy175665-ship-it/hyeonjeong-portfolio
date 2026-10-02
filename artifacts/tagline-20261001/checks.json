@@ -1,0 +1,78 @@
+{
+  "1024": {
+    "text": "● LEARN, MAKE, AND KEEP GROWING.",
+    "font": "12px 1.68px",
+    "color": "rgb(32, 39, 49)",
+    "dot": "rgb(233, 163, 58)",
+    "lines": 1,
+    "box": [
+      45,
+      515,
+      313,
+      527
+    ],
+    "gLeft": 41,
+    "gapToGrowCap": 20,
+    "overlapBuild": false,
+    "avatarLeft": 635,
+    "anims": 0,
+    "errors": []
+  },
+  "1280": {
+    "text": "● LEARN, MAKE, AND KEEP GROWING.",
+    "font": "12px 1.68px",
+    "color": "rgb(32, 39, 49)",
+    "dot": "rgb(233, 163, 58)",
+    "lines": 1,
+    "box": [
+      56,
+      510,
+      325,
+      522
+    ],
+    "gLeft": 51,
+    "gapToGrowCap": 22,
+    "overlapBuild": false,
+    "avatarLeft": 794,
+    "anims": 0,
+    "errors": []
+  },
+  "1440": {
+    "text": "● LEARN, MAKE, AND KEEP GROWING.",
+    "font": "12.24px 1.7136px",
+    "color": "rgb(32, 39, 49)",
+    "dot": "rgb(233, 163, 58)",
+    "lines": 1,
+    "box": [
+      63,
+      577,
+      337,
+      590
+    ],
+    "gLeft": 58,
+    "gapToGrowCap": 24,
+    "overlapBuild": false,
+    "avatarLeft": 893,
+    "anims": 0,
+    "errors": []
+  },
+  "1920": {
+    "text": "● LEARN, MAKE, AND KEEP GROWING.",
+    "font": "15px 2.1px",
+    "color": "rgb(32, 39, 49)",
+    "dot": "rgb(233, 163, 58)",
+    "lines": 1,
+    "box": [
+      84,
+      672,
+      420,
+      687
+    ],
+    "gLeft": 77,
+    "gapToGrowCap": 22,
+    "overlapBuild": false,
+    "avatarLeft": 1190,
+    "anims": 0,
+    "errors": []
+  }
+}

@@ -3,11 +3,11 @@
 @tailwind utilities;
 
 :root {
-  --paper: #f6f3ec;
+  --paper: #f7fbfe;
   --ink: #1c1b18;
   --forest: #223b30;
   --gold: #b8912f;
-  --line: #dcd5c4;
+  --line: #dbe5ed;
 }
 
 * {
@@ -72,4 +72,10 @@ button:focus-visible,
   to {
     transform: translateX(-50%);
   }
+}
+
+/* CustomCursor draws the pointer on mouse/trackpad devices; text fields keep the caret cursor. */
+html.has-custom-cursor,
+html.has-custom-cursor *:not(input):not(textarea):not([contenteditable="true"]) {
+  cursor: none !important;
 }

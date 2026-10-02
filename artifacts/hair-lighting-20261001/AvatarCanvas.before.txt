@@ -1,0 +1,92 @@
+"use client";
+
+import { Suspense, useEffect, useMemo, useRef } from "react";
+import { Canvas, useFrame } from "@react-three/fiber";
+import { useGLTF, useProgress } from "@react-three/drei";
+import * as THREE from "three";
+import styles from "./HeroAvatar.module.css";
+
+const MODEL_URL = "/models/avatar6.glb";
+const ROTATION_LIMIT = { x: 0.15, y: 0.30 };
+const ROTATION_SMOOTHING = 6;
+// Normalize the head height, then center it inside the rotating parent.
+const MODEL_HEIGHT = 2.8;
+const MODEL_OFFSET: [number, number, number] = [0, 0, 0];
+
+function Avatar3D() {
+  const { scene } = useGLTF(MODEL_URL);
+  const pivot = useRef<THREE.Group>(null);
+  const target = useRef({ x: 0, y: 0 });
+  const reducedMotion = useRef(false);
+  const model = useMemo(() => {
+    // Clone objects only; leave the cached GLTF geometry and face/hat materials intact.
+    const clone = scene.clone(true);
+    clone.updateMatrixWorld(true);
+    const bounds = new THREE.Box3().setFromObject(clone, true);
+    const center = bounds.getCenter(new THREE.Vector3());
+    const size = bounds.getSize(new THREE.Vector3());
+    const scale = MODEL_HEIGHT / Math.max(size.y, 0.001);
+    return { clone, scale, position: center.multiplyScalar(-scale) };
+  }, [scene]);
+
+  useEffect(() => {
+    const preference = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const reset = () => { target.current = { x: 0, y: 0 }; };
+    const updatePreference = () => { reducedMotion.current = preference.matches; reset(); };
+    const move = (event: PointerEvent) => {
+      if (reducedMotion.current || event.pointerType === "touch") return;
+      target.current = {
+        x: THREE.MathUtils.clamp(event.clientY / innerHeight * 2 - 1, -1, 1) * ROTATION_LIMIT.x,
+        y: THREE.MathUtils.clamp(event.clientX / innerWidth * 2 - 1, -1, 1) * ROTATION_LIMIT.y,
+      };
+    };
+    const leave = (event: PointerEvent) => { if (!event.relatedTarget) reset(); };
+    updatePreference();
+    window.addEventListener("pointermove", move, { passive: true });
+    window.addEventListener("pointerout", leave);
+    window.addEventListener("blur", reset);
+    document.addEventListener("visibilitychange", reset);
+    preference.addEventListener("change", updatePreference);
+    return () => {
+      window.removeEventListener("pointermove", move);
+      window.removeEventListener("pointerout", leave);
+      window.removeEventListener("blur", reset);
+      document.removeEventListener("visibilitychange", reset);
+      preference.removeEventListener("change", updatePreference);
+    };
+  }, []);
+
+  useFrame((_, delta) => {
+    if (!pivot.current) return;
+    const alpha = reducedMotion.current ? 1 : 1 - Math.exp(-ROTATION_SMOOTHING * delta);
+    pivot.current.rotation.x = THREE.MathUtils.lerp(pivot.current.rotation.x, target.current.x, alpha);
+    pivot.current.rotation.y = THREE.MathUtils.lerp(pivot.current.rotation.y, target.current.y, alpha);
+  });
+
+  return (
+    <group ref={pivot} name="avatar-pivot">
+      <group position={MODEL_OFFSET}>
+        <group position={model.position} scale={model.scale}>
+          <primitive object={model.clone} dispose={null} />
+        </group>
+      </group>
+    </group>
+  );
+}
+
+export default function AvatarCanvas() {
+  const { active } = useProgress();
+  return (
+    <>
+      <Canvas camera={{ position: [0, 0, 6], fov: 38 }} dpr={[1, 2]} gl={{ alpha: true, antialias: true }}>
+        <hemisphereLight args={["#ffffff", "#b4c6d5", 2]} />
+        <directionalLight position={[3, 4, 5]} intensity={3} />
+        <directionalLight position={[-3, 1, 3]} intensity={1} />
+        <Suspense fallback={null}><Avatar3D /></Suspense>
+      </Canvas>
+      {active && <p className={styles.status} role="status">얼굴 모델을 불러오는 중입니다.</p>}
+    </>
+  );
+}
+
+useGLTF.preload(MODEL_URL);

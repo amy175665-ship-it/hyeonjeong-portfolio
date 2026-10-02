@@ -1,0 +1,29 @@
+{
+  "390": {
+    "painted": 3016,
+    "xRangeCss": [
+      0,
+      119
+    ],
+    "z": "2",
+    "pe": "none",
+    "beforeSand": true,
+    "overflow": false,
+    "errors": []
+  },
+  "1440": {
+    "painted": 9197,
+    "xRangeCss": [
+      88,
+      323
+    ],
+    "z": "2",
+    "pe": "none",
+    "beforeSand": true,
+    "overflow": false,
+    "zonesFound": 18,
+    "hitOnR": "GrowthScene_glyph___cj",
+    "errors": []
+  },
+  "reducedStatic": true
+}

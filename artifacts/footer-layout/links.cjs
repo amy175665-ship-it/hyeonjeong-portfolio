@@ -1,2 +1,0 @@
-﻿const {chromium}=require(process.env.LOCALAPPDATA+'/npm-cache/_npx/e41f203b7505f1fb/node_modules/playwright-core');
-(async()=>{const b=await chromium.launch();const p=await b.newPage();for(const route of ['/','/work/responsive-cafe']){await p.goto('http://localhost:3110'+route);const a=p.locator('footer a').first();await a.focus();console.log(route,await a.evaluate(e=>({href:e.getAttribute('href'),outline:getComputedStyle(e).outlineStyle,height:e.getBoundingClientRect().height})));}await b.close()})().catch(e=>{console.error(e);process.exit(1)});

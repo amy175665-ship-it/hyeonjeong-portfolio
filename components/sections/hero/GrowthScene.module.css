@@ -1,0 +1,41 @@
+.scene { position: absolute; inset: 0; pointer-events: none; --drift: 0px; }
+.sunlight { position: absolute; top: -12%; right: -3%; width: 47%; height: 92%; background: linear-gradient(145deg, #f7e7af75, #fff2c736 65%, transparent); transform: skewX(-24deg); border-radius: 42% 0 0 6%; }
+.shadow { position: absolute; left: 28%; top: 46%; width: 46%; height: 19%; transform: rotate(-26deg) skewX(-30deg); transform-origin: right; filter: blur(13px); opacity: .15; }
+.shadow i { position: absolute; right: 0; width: 100%; height: 24%; background: #68796d; border-radius: 80%; }
+.shadow i:nth-child(2) { top: 20%; width: 68%; transform: rotate(15deg); }
+.shadow i:nth-child(3) { top: 45%; width: 77%; transform: rotate(-10deg); }
+.absorb, .build, .grow { position: absolute; color: #202731; font-family: var(--font-editorial), Georgia, serif; font-weight: 400; line-height: .8; letter-spacing: -.03em; white-space: nowrap; cursor: default; -webkit-user-select: none; user-select: none; }
+/* Editorial hierarchy by visible width: GROW 100% / ABSORB ~70% / BUILD ~40%. All words stay inside the viewport; GROW stays left of the avatar. */
+.absorb { left: 5.5%; top: 16%; font-size: clamp(80px, 8vw, 160px); transform: translateY(calc(var(--drift) * -.3)) rotate(-7deg); transform-origin: left bottom; }
+.build { left: 36%; top: 31%; font-size: clamp(62px, 6.3vw, 126px); letter-spacing: -.02em; transform: translateY(calc(var(--drift) * -.8)) rotate(-3deg); }
+.grow { left: 4%; bottom: 26%; font-size: clamp(164px, 16vw, 320px); line-height: .9; letter-spacing: -.045em; transform: translateY(calc(var(--drift) * -.5)); }
+.char { pointer-events: auto; cursor: default; transition: color .2s ease; }
+.loose .char, .loose .glyph { display: inline-block; }
+/* Later letters stay on top, so a twisted neighbour never keeps the hover. */
+.loose .char { position: relative; }
+/* Restrained accents on one letter and the period per word. :where keeps them below the hover rule. */
+.absorb :where(.char:first-child, .char:last-child) { color: #e96b5a; }
+.build :where(.char:nth-child(2), .char:last-child) { color: #7f9657; }
+.grow :where(.char:first-child, .char:last-child) { color: #e9a33a; }
+.char:hover { color: #7f9657; }
+/* Each letter loosens in its own direction; the 5-step pattern keeps neighbours from matching. */
+.glyph { transition: transform .22s cubic-bezier(.3, .7, .4, 1); --twist: rotate(-7deg) translate(-1px, -3px); }
+.char:nth-child(5n + 2) .glyph { --twist: rotate(6deg) translate(2px, -2px); }
+.char:nth-child(5n + 3) .glyph { --twist: rotate(-5deg) translate(-2px, -4px); }
+.char:nth-child(5n + 4) .glyph { --twist: rotate(8deg) translate(1px, -3px); }
+.char:nth-child(5n) .glyph { --twist: rotate(-8deg) translate(2px, -2px); }
+.char:hover .glyph { transform: var(--twist); }
+.plant { position: absolute; left: 62%; top: 24%; width: 25%; height: 47%; pointer-events: none; }
+@media (prefers-reduced-motion: reduce) { .char, .glyph { transition: none; } .char:hover .glyph { transform: none; } }
+/* Weightless float on the word wrappers. The separate `translate` property composes with the
+   existing drift/rotation transform, and letter twists stay on the inner .glyph spans. */
+@media (prefers-reduced-motion: no-preference) {
+  .absorb, .build, .grow { animation: wordFloat var(--float-duration) cubic-bezier(.45, 0, .55, 1) var(--float-delay) infinite alternate; }
+  .absorb { --float-duration: 5.6s; --float-delay: 0s; --float-range: 16px; }
+  .build { --float-duration: 6.4s; --float-delay: -2.2s; --float-range: 19px; }
+  .grow { --float-duration: 7.2s; --float-delay: -4.1s; --float-range: 22px; }
+}
+@keyframes wordFloat {
+  from { translate: 0 calc(var(--float-range) * -1); }
+  to { translate: 0 var(--float-range); }
+}

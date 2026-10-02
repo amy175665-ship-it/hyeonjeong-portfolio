@@ -1,0 +1,85 @@
+{
+  "390": {
+    "geo": {
+      "top": 0,
+      "height": 5486,
+      "doc": 7959
+    },
+    "end": {
+      "hero": "hidden",
+      "sandTop": -186,
+      "phrases": "0.00/0.00/1.00",
+      "pollen": 5536
+    },
+    "backTop": {
+      "hero": "visible",
+      "sandTop": -34,
+      "phrases": "0.00/0.00/0.00",
+      "pollen": 0
+    },
+    "build": {
+      "hero": "hidden",
+      "sandTop": -186,
+      "phrases": "1.00/0.00/0.00",
+      "pollen": 0
+    },
+    "afterRapid": {
+      "hero": "visible",
+      "sandTop": -210,
+      "phrases": "0.00/0.00/0.00",
+      "pollen": 0
+    },
+    "sections": "about:5545 skill:6354 project:6954",
+    "overflowX": false,
+    "errors": [
+      "warning: Image with src \"/_next/static/media/hero-sand-bg.6d828e87.webp\" was detected as the Largest Contentful Paint (LCP). Please add the \"priority\" property if this i",
+      "warning: Canvas2D: Multiple readback operations using getImageData are faster with the willReadFrequently attribute set to true. See: https://html.spec.whatwg.org/multip"
+    ]
+  },
+  "1440": {
+    "geo": {
+      "top": 0,
+      "height": 5850,
+      "doc": 8613
+    },
+    "end": {
+      "hero": "hidden",
+      "sandTop": -370,
+      "phrases": "0.00/0.00/1.00",
+      "pollen": 11675
+    },
+    "backTop": {
+      "hero": "visible",
+      "sandTop": -145,
+      "phrases": "0.00/0.00/0.00",
+      "pollen": 0
+    },
+    "build": {
+      "hero": "hidden",
+      "sandTop": -370,
+      "phrases": "1.00/0.00/0.00",
+      "pollen": 0
+    },
+    "afterRapid": {
+      "hero": "visible",
+      "sandTop": -354,
+      "phrases": "0.00/0.00/0.00",
+      "pollen": 0
+    },
+    "sections": "about:6015 skill:6741 project:7372",
+    "nav": {
+      "about": {
+        "hash": "#about",
+        "targetTop": 165
+      },
+      "project": {
+        "hash": "#project",
+        "targetTop": 128
+      }
+    },
+    "overflowX": false,
+    "errors": [
+      "warning: Canvas2D: Multiple readback operations using getImageData are faster with the willReadFrequently attribute set to true. See: https://html.spec.whatwg.org/multip"
+    ]
+  }
+}

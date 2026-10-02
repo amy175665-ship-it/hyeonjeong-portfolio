@@ -1,0 +1,41 @@
+{
+  "390": {
+    "geo": {
+      "top": 0,
+      "height": 4642,
+      "doc": 4642
+    },
+    "rows": [
+      "0-hero stageTop:0 sandTop:-34 hero:visible",
+      "1-rising stageTop:0 sandTop:-456 hero:visible",
+      "2-covered stageTop:0 sandTop:-810 hero:hidden",
+      "3-sinking stageTop:0 sandTop:-476 hero:hidden",
+      "4-build-15 stageTop:0 sandTop:-186 hero:hidden",
+      "4-build-50 stageTop:0 sandTop:-186 hero:hidden",
+      "5-build-95 stageTop:0 sandTop:-186 hero:hidden",
+      "6-adapt stageTop:0 sandTop:-186 hero:hidden"
+    ],
+    "overflowX": false,
+    "errors": []
+  },
+  "1440": {
+    "geo": {
+      "top": 0,
+      "height": 4950,
+      "doc": 4950
+    },
+    "rows": [
+      "0-hero stageTop:0 sandTop:-145 hero:visible",
+      "1-rising stageTop:0 sandTop:-643 hero:visible",
+      "2-covered stageTop:0 sandTop:-1061 hero:hidden",
+      "3-sinking stageTop:0 sandTop:-690 hero:hidden",
+      "4-build-15 stageTop:0 sandTop:-370 hero:hidden",
+      "4-build-50 stageTop:0 sandTop:-370 hero:hidden",
+      "5-build-95 stageTop:0 sandTop:-370 hero:hidden",
+      "6-adapt stageTop:0 sandTop:-370 hero:hidden"
+    ],
+    "overflowX": false,
+    "errors": []
+  },
+  "hoverGrowR": "rgb(127, 150, 87)"
+}

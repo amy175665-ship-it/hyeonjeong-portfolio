@@ -1,0 +1,32 @@
+{
+  "320": {
+    "rows": [
+      "build [{\"text\":\"직접 만들고\",\"box\":[24,128,169,164],\"inView\":true}]",
+      "sunset [{\"text\":\"뜨거운 날도 있지만,저는 \",\"box\":[24,128,296,236],\"inView\":true}]",
+      "night [{\"text\":\"뜨거운 날도 있지만,저는 \",\"box\":[24,128,296,236],\"inView\":true}]",
+      "final [{\"text\":\"웬만해선 시들지 않습니다.\",\"box\":[13,194,307,319],\"inView\":true}]"
+    ],
+    "overflowX": false,
+    "errors": []
+  },
+  "390": {
+    "rows": [
+      "build [{\"text\":\"직접 만들고\",\"box\":[24,169,186,209],\"inView\":true}]",
+      "sunset [{\"text\":\"뜨거운 날도 있지만,저는 \",\"box\":[24,169,364,249],\"inView\":true}]",
+      "night [{\"text\":\"뜨거운 날도 있지만,저는 \",\"box\":[24,169,364,249],\"inView\":true}]",
+      "final [{\"text\":\"웬만해선 시들지 않습니다.\",\"box\":[16,247,374,315],\"inView\":true}]"
+    ],
+    "overflowX": false,
+    "errors": []
+  },
+  "1440": {
+    "rows": [
+      "build [{\"text\":\"직접 만들고\",\"box\":[115,270,422,346],\"inView\":true}]",
+      "sunset [{\"text\":\"뜨거운 날도 있지만,저는 \",\"box\":[115,270,757,422],\"inView\":true}]",
+      "night [{\"text\":\"뜨거운 날도 있지만,저는 \",\"box\":[115,270,757,422],\"inView\":true}]",
+      "final [{\"text\":\"웬만해선 시들지 않습니다.\",\"box\":[340,274,1100,364],\"inView\":true}]"
+    ],
+    "overflowX": false,
+    "errors": []
+  }
+}

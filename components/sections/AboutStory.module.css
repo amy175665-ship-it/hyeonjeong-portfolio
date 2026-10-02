@@ -1,0 +1,44 @@
+/* Continues the desert hand-off: warm cream ground, serif headings (DM Serif + Noto Serif KR), Pretendard body. */
+.page { --cream: #fbf6ee; --ink: #202731; --muted: #58636e; --line: #e7dccb; --coral: #e96b5a; --sand: #e3bf91; background: var(--cream); color: var(--ink); }
+.section { padding: 96px 40px; }
+.inner { max-width: 1120px; margin: 0 auto; }
+.kicker { display: flex; align-items: center; gap: 10px; margin: 0 0 14px; color: var(--muted); font: 400 16px/1 var(--font-editorial), Georgia, serif; letter-spacing: .04em; }
+.dot { width: 8px; height: 8px; border-radius: 50%; background: var(--coral); }
+.title { margin: 0; font: 600 36px/1.2 var(--font-editorial), var(--font-hangul-serif), Georgia, serif; letter-spacing: -.02em; }
+.statement { max-width: 24em; margin: 40px 0 0; font: 600 clamp(30px, 3.6vw, 52px)/1.35 var(--font-editorial), var(--font-hangul-serif), Georgia, serif; letter-spacing: -.035em; word-break: keep-all; }
+
+/* Portrait and facts side by side, separated by a hairline rather than boxes. */
+.profile { display: grid; grid-template-columns: minmax(0, 320px) minmax(0, 1fr); gap: 64px; align-items: end; margin-top: 64px; padding-top: 40px; border-top: 1px solid var(--line); }
+.portrait { position: relative; margin: 0; aspect-ratio: 4 / 5; overflow: hidden; border-radius: 4px; background: linear-gradient(160deg, #f3e6d1, var(--sand)); }
+.photo { object-fit: cover; }
+.placeholder { display: flex; height: 100%; flex-direction: column; align-items: center; justify-content: center; gap: 12px; color: #8a6a43; }
+.placeholder span { font: 400 72px/1 var(--font-editorial), Georgia, serif; letter-spacing: -.04em; }
+.placeholder small { font-size: 14px; }
+.bio { min-width: 0; }
+.name { margin: 0; font: 600 24px/1.3 var(--font-pretendard), sans-serif; }
+.role { margin: 6px 0 0; color: var(--muted); font-size: 14px; }
+.introduction { margin: 24px 0 0; font-size: 16px; line-height: 1.7; word-break: keep-all; }
+.facts { margin: 32px 0 0; }
+.facts > div { display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 4px 24px; padding: 18px 0; border-top: 1px solid var(--line); }
+.facts dt { grid-row: 1 / span 4; color: var(--muted); font-size: 14px; font-weight: 600; }
+.facts dd { margin: 0; font-size: 16px; line-height: 1.7; }
+.facts dd span { display: block; color: var(--muted); font-size: 14px; }
+
+/* Skills: names set large in the serif, three to a row, divided by hairlines. */
+.skills { padding-top: 0; }
+.skillList { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); margin: 40px 0 0; padding: 0; list-style: none; border-top: 1px solid var(--line); }
+.skillList li { padding: 28px 24px 28px 0; border-bottom: 1px solid var(--line); }
+.skillList h3 { margin: 0; font: 400 clamp(24px, 2.4vw, 34px)/1.2 var(--font-editorial), Georgia, serif; letter-spacing: -.02em; overflow-wrap: normal; }
+.skillList p { margin: 8px 0 0; color: var(--muted); font-size: 14px; line-height: 1.7; }
+
+@media (max-width: 899px) {
+  .section { padding: 64px 24px; }
+  .skills { padding-top: 0; }
+  .title { font-size: 28px; }
+  .statement { margin-top: 28px; }
+  .profile { grid-template-columns: 1fr; gap: 28px; margin-top: 40px; padding-top: 28px; }
+  .portrait { max-width: 260px; }
+  .skillList { grid-template-columns: repeat(2, minmax(0, 1fr)); margin-top: 28px; }
+  .skillList li { padding: 20px 16px 20px 0; }
+}
+@media (max-width: 389px) { .skillList h3 { font-size: 20px; } }

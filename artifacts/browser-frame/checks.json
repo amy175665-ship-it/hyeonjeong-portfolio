@@ -1,0 +1,40 @@
+[
+  {
+    "width": 1440,
+    "errors": [],
+    "overflow": false,
+    "clipped": false,
+    "returned": true
+  },
+  {
+    "width": 390,
+    "errors": [],
+    "overflow": false,
+    "clipped": false,
+    "returned": true
+  },
+  {
+    "width": 320,
+    "errors": [],
+    "overflow": false,
+    "clipped": false,
+    "returned": true
+  },
+  {
+    "width": 480,
+    "errors": [],
+    "overflow": false,
+    "clipped": false,
+    "returned": true
+  },
+  {
+    "width": 768,
+    "errors": [],
+    "overflow": false,
+    "clipped": false,
+    "returned": true
+  },
+  {
+    "reducedMotion": "relative"
+  }
+]

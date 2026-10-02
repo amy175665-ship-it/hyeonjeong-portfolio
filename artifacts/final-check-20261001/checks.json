@@ -1,0 +1,131 @@
+{
+  "320": {
+    "geo": {
+      "top": 0,
+      "height": 5376,
+      "about": 5435,
+      "project": 7174,
+      "doc": 8245
+    },
+    "overflow": [],
+    "drawsHero": {
+      "avatar": 98,
+      "other": 0,
+      "cactus": 5
+    },
+    "drawsBuild": {
+      "avatar": 0,
+      "other": 0,
+      "cactus": 4161
+    },
+    "heroPausedAtBuild": true,
+    "sandStreamFrozen": true,
+    "drawsAbout": {
+      "avatar": 0,
+      "other": 0,
+      "cactus": 680
+    },
+    "stageVisibleAtAbout": false,
+    "errors": []
+  },
+  "390": {
+    "geo": {
+      "top": 0,
+      "height": 7090,
+      "about": 7149,
+      "project": 8558,
+      "doc": 9562
+    },
+    "overflow": [],
+    "drawsHero": {
+      "avatar": 77,
+      "other": 0,
+      "cactus": 5
+    },
+    "drawsBuild": {
+      "avatar": 0,
+      "other": 0,
+      "cactus": 4161
+    },
+    "heroPausedAtBuild": true,
+    "sandStreamFrozen": true,
+    "drawsAbout": {
+      "avatar": 0,
+      "other": 0,
+      "cactus": 425
+    },
+    "stageVisibleAtAbout": false,
+    "errors": []
+  },
+  "1024": {
+    "geo": {
+      "top": 0,
+      "height": 6451,
+      "about": 5930,
+      "project": 7905,
+      "doc": 9024
+    },
+    "overflow": [],
+    "drawsHero": {
+      "avatar": 56,
+      "other": 0,
+      "cactus": 4
+    },
+    "drawsBuild": {
+      "avatar": 0,
+      "other": 0,
+      "cactus": 4161
+    },
+    "heroPausedAtBuild": true,
+    "sandStreamFrozen": true,
+    "drawsAbout": {
+      "avatar": 0,
+      "other": 0,
+      "cactus": 6035
+    },
+    "stageVisibleAtAbout": true,
+    "errors": []
+  },
+  "1440": {
+    "geo": {
+      "top": 0,
+      "height": 7560,
+      "about": 7103,
+      "project": 9082,
+      "doc": 10323
+    },
+    "overflow": [],
+    "drawsHero": {
+      "avatar": 42,
+      "other": 0,
+      "cactus": 4
+    },
+    "drawsBuild": {
+      "avatar": 0,
+      "other": 0,
+      "cactus": 4161
+    },
+    "heroPausedAtBuild": true,
+    "sandStreamFrozen": true,
+    "drawsAbout": {
+      "avatar": 0,
+      "other": 0,
+      "cactus": 6205
+    },
+    "stageVisibleAtAbout": true,
+    "errors": []
+  },
+  "reduced": {
+    "wordAnimations": 0,
+    "sandStreamStatic": true,
+    "gustBlank": true
+  },
+  "readingOrder": [
+    "배운 것을 흡수하고, 직접 구현하며 성장하는 웹퍼블리셔 백현정입니다.",
+    "GROW.",
+    "직접 만들고",
+    "환경이 바뀌어도",
+    "환경이 바뀌어도, 끝까지."
+  ],
+  "sectionLabel": "ABSORB. BUILD. GROW. 컨셉 소개"
+}
