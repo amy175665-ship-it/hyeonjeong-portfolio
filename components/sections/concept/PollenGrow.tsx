@@ -7,7 +7,9 @@ import styles from "./ConceptScenes.module.css";
 
 // SCENE 4: sand falls from above the stage and settles into the word "GROW." (Canvas 2D), letter by letter.
 // Every grain's position is a pure function of scroll progress, so scrolling back lifts it away again.
-const COLORS = { ink: "#202731", accent: "#e9a33a", sand: "#e2b878" };
+// Settled grains keep the colors of sand (deeper, toasted tones so the word reads against the bright sky);
+// the G and the period keep the GROW. accent.
+const COLORS = { accent: "#e9a33a", sand: "#e2b878", settled: ["#a8763f", "#b8864c", "#946233", "#c4955a"] };
 const FORM = { start: 0.22, length: 0.3, sweep: 0.55, scatter: 0.25 }; // local SCENE 4 progress
 const GAP = { desktop: 3, mobile: 2 }; // px between sampled glyph points
 
@@ -56,7 +58,7 @@ export default function PollenGrow({ progress, desktop }: Props) {
             drift: (Math.random() - 0.5) * 30,
             // Left-to-right sweep (G first, period last) with a little randomness per grain.
             delay: ((tx - left) / total) * FORM.sweep + Math.random() * FORM.scatter,
-            color: accent ? COLORS.accent : COLORS.ink, size: 1 + Math.random() * 1.2,
+            color: accent ? COLORS.accent : COLORS.settled[Math.floor(Math.random() * COLORS.settled.length)], size: 1 + Math.random() * 1.2,
           });
         }
       }

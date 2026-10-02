@@ -189,7 +189,7 @@ function Lights({ progress }: { progress: MotionValue<number> }) {
     <>
       <hemisphereLight ref={sky} args={["#fff4dc", "#a98a5f", 1.5]} />
       <directionalLight ref={sun} position={[4, 6, 3]} intensity={2.6} color="#fff0cc" castShadow
-        shadow-mapSize={[1024, 1024]} shadow-camera-left={-4} shadow-camera-right={4} shadow-camera-top={4} shadow-camera-bottom={-1} />
+        shadow-mapSize={[2048, 2048]} shadow-camera-left={-10} shadow-camera-right={10} shadow-camera-top={10} shadow-camera-bottom={-2} />
     </>
   );
 }
@@ -207,13 +207,13 @@ function FrameControl({ running, reduced, progress }: { running: boolean; reduce
 
 export default function CactusScene({ progress, wind, reduced, running }: Props) {
   return (
-    <Canvas shadows frameloop={running ? "always" : "demand"} dpr={[1, 1.5]} camera={{ position: [0, 1.7, 8.5], fov: 34 }} gl={{ alpha: true, antialias: true }} style={{ pointerEvents: "none" }}
+    <Canvas resize={{ offsetSize: true }} shadows frameloop={running ? "always" : "demand"} dpr={[1, 1.5]} camera={{ position: [0, 1.7, 8.5], fov: 34 }} gl={{ alpha: true, antialias: true }} style={{ pointerEvents: "none" }}
       onCreated={({ camera }) => camera.lookAt(0, 1.35, 0)}>
       <Lights progress={progress} />
       <Cactus progress={progress} wind={wind} reduced={reduced} />
       {/* Invisible ground that only shows the cactus shadow on top of the sand image. */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.04, 0]} receiveShadow>
-        <planeGeometry args={[14, 14]} />
+        <planeGeometry args={[40, 40]} />
         <shadowMaterial opacity={0.22} />
       </mesh>
       <FrameControl running={running} reduced={reduced} progress={progress} />

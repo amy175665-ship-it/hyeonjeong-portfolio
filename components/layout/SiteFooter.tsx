@@ -1,10 +1,11 @@
 ﻿type Contact = { name: string; phone?: string; email?: string; github?: string; resume?: string };
-const contact: Contact = {
+// Shared with ContactStory (the contact section inside the desert browser window).
+export const contact: Contact = {
   name: "백현정",
   email: "amy010402@naver.com",
   // Add phone, github, and resume only when real values are available.
 };
-const iconPaths = {
+export const iconPaths = {
   phone: "M6 3h4l2 5-3 2a15 15 0 0 0 5 5l2-3 5 2v4a3 3 0 0 1-3 3C9 20 4 15 3 6a3 3 0 0 1 3-3Z",
   email: "M3 5h18v14H3V5Zm0 1 9 7 9-7",
   github: "M9 19c-4 1-4-2-6-2m12 5v-4a3.5 3.5 0 0 0-1-3c3-.3 6-1.5 6-6a5 5 0 0 0-1.5-3.5A4.5 4.5 0 0 0 18.4 2S17.2 1.7 15 3a13 13 0 0 0-6 0C6.8 1.7 5.6 2 5.6 2a4.5 4.5 0 0 0-.1 3.5A5 5 0 0 0 4 9c0 4.5 3 5.7 6 6a3.5 3.5 0 0 0-1 3v4",

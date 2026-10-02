@@ -1,0 +1,23 @@
+/* Same cream page and type system as WorkStory (BUILD. green dot). */
+.section { --ink: #202731; --muted: #58636e; --line: #e7dccb; --green: #7f9657; padding: 56px 40px; background: #fbf6ee; color: var(--ink); }
+.inner { width: 100%; max-width: 1120px; margin: 0 auto; }
+.kicker { display: flex; align-items: center; gap: 10px; margin: 0 0 14px; color: var(--muted); font: 400 16px/1 var(--font-editorial), Georgia, serif; letter-spacing: .04em; }
+.dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); }
+.title { margin: 0; font: 600 36px/1.2 var(--font-editorial), var(--font-hangul-serif, serif), Georgia, serif; letter-spacing: -.02em; }
+/* Nothing to show yet: a quiet dashed slot rather than an empty grid. */
+.empty { display: flex; min-height: 200px; align-items: center; justify-content: center; margin: 40px 0 0; border: 1px dashed #d9c8ae; border-radius: 6px; background: #f6eee1; color: var(--muted); font-size: 14px; }
+.grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 32px 24px; margin: 40px 0 0; padding: 0; list-style: none; }
+.item { margin: 0; }
+.media { position: relative; aspect-ratio: 4 / 3; overflow: hidden; border-radius: 6px; background: #f1e7d7; box-shadow: 0 1px 0 var(--line), 0 18px 40px -28px #5a3d1a55; }
+.image { object-fit: contain; padding: 12px; }
+.caption { margin: 14px 0 0; font: 600 20px/1.35 var(--font-editorial), var(--font-hangul-serif, serif), Georgia, serif; letter-spacing: -.02em; word-break: keep-all; }
+
+@media (max-width: 899px) {
+  .section { padding: 40px 24px; }
+  .title { font-size: 28px; }
+  .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); margin-top: 28px; }
+  .empty { margin-top: 28px; min-height: 160px; }
+}
+@media (max-width: 599px) {
+  .grid { grid-template-columns: 1fr; }
+}

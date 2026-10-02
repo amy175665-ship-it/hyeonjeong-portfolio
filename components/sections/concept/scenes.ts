@@ -11,11 +11,11 @@ export const SCENES = {
 // Inside "cover": rise until this local point, hold (backdrop swaps at the middle), then sink from COVER.sink.
 export const COVER = { risen: 0.45, swap: 0.5, sink: 0.55 };
 
-// The track is 5 screens tall (ConceptScenes.module.css .track), so it scrolls 4 screens while pinned.
-// "cover" uses the first half (2 screens); from its end the other scenes play over PLAY_SECONDS while the stage
-// holds for the second half, and anyone in a hurry can keep scrolling past without waiting.
-export const COVER_SCROLL = 0.5;
-export const PLAY_SECONDS = 7;
+// The track is 3.8 screens tall (ConceptScenes.module.css .track), so it scrolls 2.8 screens while pinned.
+// "cover" uses the first 2 screens; at its end the page is held while the other scenes play over PLAY_SECONDS,
+// then the last 0.8 screen lets the dunes melt into the next section.
+export const COVER_SCROLL = 2 / 2.8;
+export const PLAY_SECONDS = 11;
 
 export type SceneName = keyof typeof SCENES;
 

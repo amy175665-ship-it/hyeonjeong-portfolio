@@ -7,7 +7,7 @@ README는 프로젝트 소개와 개발 안내, 이 문서는 에이전트의 �
 ## 1. 기본 원칙
 
 - 작업 경험, 교육 이력, 자격증, 연락처, 프로젝트 성과, 숙련도를 임의로 만들지 않습니다.
-- 현재 프로젝트 3개와 사진은 자리 표시입니다. 실제 자료 등록은 사용자가 요청할 때 진행하며, 그 전까지 `placeholder` 표시와 "작성 예시" 문구를 유지합니다.
+- 현재 프로젝트 3개와 소개의 생년월일·교육·자격증은 자리 표시입니다(소개 항목은 `[수정 예정]`을 붙인 가상의 예시, `About.tsx`의 profile). 실제 자료 등록은 사용자가 요청할 때 진행하며, 그 전까지 `placeholder` 표시와 "작성 예시" 문구를 유지합니다. 프로필 사진은 등록되어 있습니다(`public/images/profile/profile-front.webp`, 1075×1463 WebP, 사용자 제공. `assets/`에 원본은 없음).
 - 사용자가 디자인만 요청하면 기존 문구·데이터·링크 목적지를 보존합니다.
 - 외부 링크는 값이 있을 때만 표시하고, 확인용 가짜 주소를 넣지 않습니다.
 - 화면에 넣는 문구는 사용자가 정했거나 이미 있는 문구를 씁니다. 새 문구가 필요하면 후보를 제안하고 확인받습니다.
@@ -25,13 +25,13 @@ README는 프로젝트 소개와 개발 안내, 이 문서는 에이전트의 �
 
 | 플래그 | 값 | 내용 |
 | --- | --- | --- |
-| `showConceptIntro` | true(현재) | ConceptScenes(히어로 + 모래 전환 + 선인장 장면) → AboutStory → WorkStory |
+| `showConceptIntro` | true(현재) | ConceptScenes(히어로 + 모래 전환 + 선인장 장면 → 사막에서 올라오는 브라우저 창 DesertWindow 안에 AboutStory → WorkStory → DesignStory → ContactStory) |
 | | false | 이전 구성: ScrollHero(히어로 + 날아오는 데모 + 브라우저 창 소개·기술) → ProjectCarousel |
-| `showLowerSections` | false(현재) | SideProjects, DesignGallery, SiteFooter 숨김 |
+| `showLowerSections` | false(현재) | 이전 구성용 SideProjects, DesignGallery, SiteFooter 숨김(컨셉 구성에서는 창 안의 DesignStory·ContactStory가 같은 데이터를 씀) |
 
 - 이전 구성 컴포넌트(ScrollHero, PinnedBrowser, HeroBrowserDemo, ProjectCarousel, About, Skills, WorkGrid)는 삭제하지 않고 보존합니다.
-- 헤더 메뉴의 ABOUT(#about)·SKILLS(#skill)·PROJECTS(#project)는 동작합니다. DESIGN(#design)·CONTACT(#contact)는 해당 섹션이 숨겨져 있어 현재 이동할 곳이 없습니다.
-- 마무리(GROW.·연락처) 섹션은 아직 없습니다. 푸터를 다시 켜거나 새로 만들 때 기존 연락처 데이터를 사용합니다.
+- 헤더 메뉴의 ABOUT(#about)·SKILLS(#skill)·PROJECTS(#project)·DESIGN(#design)·CONTACT(#contact)는 모두 브라우저 창 안의 해당 위치로 이동합니다.
+- 마무리는 창 안 마지막 ContactStory(GROW.·연락처·이력서)입니다. 연락처 데이터는 `SiteFooter.tsx`의 `contact`를 공유합니다(상세 페이지는 계속 SiteFooter 사용).
 - 음성 소개(VoiceIntro)는 코드만 있고 `public/audio/`가 없습니다. 현재 화면에서도 쓰지 않습니다.
 
 ## 4. 폴더 구조
@@ -39,12 +39,12 @@ README는 프로젝트 소개와 개발 안내, 이 문서는 에이전트의 �
 ```text
 app/                       page, layout(폰트·CustomCursor), globals.css, work/[slug] 상세 페이지
 components/
-├─ layout/                 SiteNav, SiteFooter, SmoothScroll(Lenis)
+├─ layout/                 SiteNav, SiteFooter, SmoothScroll(Lenis), scrollLock(재생 중 스크롤 고정)
 ├─ sections/
-│  ├─ AboutStory, WorkStory           컨셉 흐름의 소개·기술, 대표 프로젝트
+│  ├─ AboutStory, WorkStory, DesignStory, ContactStory   브라우저 창 안의 소개·기술, 대표 프로젝트, 디자인, 연락처
 │  ├─ About, Skills, ProjectCarousel, WorkGrid, SideProjects, DesignGallery   이전 구성·숨김 섹션(데이터 공유)
 │  ├─ hero/                Hero, GrowthScene, HeroAvatar/AvatarCanvas, SandStream, ScrollHero, PinnedBrowser, HeroBrowserDemo, VoiceIntro
-│  └─ concept/             ConceptScenes, scenes.ts, CactusScene, WindGust, PollenGrow
+│  └─ concept/             ConceptScenes, scenes.ts, CactusScene, WindGust, PollenGrow, DesertWindow
 └─ ui/                     Reveal, ProjectLinks, ProjectTags, CustomCursor
 data/                      projects, navigation, design
 assets/                    원본 디자인 소스(커서·모래 PNG). 배포되지 않으며 화면에서 쓰지 않음
@@ -78,6 +78,7 @@ artifacts/                 화면 캡처와 확인 스크립트
 ### 글자
 
 - 제목·큰 문구: `var(--font-editorial), var(--font-hangul-serif)` 순서로 지정합니다. 영문·문장부호는 DM Serif Display, 한글은 Noto Serif KR 600(본명조)으로 나옵니다.
+- 한글 세리프 변수는 항상 `var(--font-hangul-serif, serif)`처럼 대체값을 붙입니다. 개발 서버가 Noto Serif KR을 못 받아 변수가 비면, 대체값 없는 `font: 600 clamp(...) ... var(--font-hangul-serif) ...` 한 줄이 통째로 무효가 되어 큰 문구가 16px로 떨어집니다. 그때는 개발 서버를 다시 켜면 본명조로 돌아옵니다.
 - 본문: Pretendard(`--font-pretendard`), 줄 간격 1.7 기준.
 - Noto Serif KR은 `next/font/google`(preload false)이라 빌드할 때 인터넷 연결이 필요합니다. 함렛(Hahmlet)은 한글이 고딕에 가까워 쓰지 않습니다.
 - 섹션 제목 36px(모바일 28px), 카드 제목 24px(모바일 20px), 보조 설명 14px, 태그 12px를 기준으로 합니다.
@@ -99,7 +100,7 @@ artifacts/                 화면 캡처와 확인 스크립트
 
 - 가운데 선인장 로고(`public/images/logo/logo.png`, 76px, 홈 링크)와 오른쪽 햄버거 버튼만 둡니다. 메뉴는 전체 화면 패널로 열립니다.
 - 로고 호버: 0.62초 동안 두 번 흔들리는 종 모션(Web Animations API, 재생 중 재호버 무시, 터치·모션 감소 제외).
-- 컨셉 트랙 아래 끝이 화면 아래에서 40px 이상 올라오면 html에 `data-header-solid`가 붙고 `.header::before`(PC 108px, 모바일 92px 반투명 흰색+blur)가 나타납니다. 히어로와 컨셉 장면이 고정된 동안에는 배경이 없습니다.
+- 컨셉 트랙 아래 끝이 화면 아래에서 40px 이상 올라오면 html에 `data-header-solid`가 붙고 `.header::before`(PC 108px, 모바일 92px 반투명 흰색+blur)가 나타납니다. 지금은 트랙이 페이지 끝까지 이어져(브라우저 창) 나타나지 않으며, 아래 섹션을 다시 켜면 동작합니다.
 - 모바일 메뉴의 열기·닫기, 바깥 클릭, Escape, 포커스 복귀를 보존합니다. 스크롤에 따른 활성 메뉴 표시는 구현되어 있지 않습니다.
 - 메뉴 이름과 목적지는 `data/navigation.ts`에서 관리합니다.
 
@@ -117,32 +118,45 @@ artifacts/                 화면 캡처와 확인 스크립트
 
 ### 컨셉 장면 (ConceptScenes)
 
-하나의 고정 트랙(5화면, sticky 무대 높이 max(600px, 100svh), 고정된 동안 4화면 스크롤)에서 진행합니다. 구간은 `scenes.ts`의 SCENES(cover 0~0.27 / build 0.27~0.54 / adapt 0.54~0.76 / grow 0.76~1)이며, 모든 장면은 진행률(story)을 따릅니다.
+하나의 고정 트랙(3.8화면, sticky 무대 높이 max(600px, 100svh), 고정된 동안 2.8화면 스크롤)에서 진행합니다. 구간은 `scenes.ts`의 SCENES(cover 0~0.27 / build 0.27~0.54 / adapt 0.54~0.76 / grow 0.76~1)이며, 모든 장면은 진행률(story)을 따릅니다.
 
-- cover만 스크롤로 움직입니다. 고정 스크롤의 앞 절반(`COVER_SCROLL` 0.5, 2화면)을 `useSpring(stiffness 55, damping 22)`로 부드럽게 따라갑니다.
-- 모래가 수평선에 자리 잡으면 build → adapt → grow가 `PLAY_SECONDS`(7초) 동안 시간 기반으로 재생됩니다(playhead). 뒤 절반(2화면)은 무대를 붙잡아 두는 구간이며 스크롤을 막지 않으므로, 계속 스크롤하면 재생 중에도 지나갈 수 있습니다. 화면 밖으로 나가도 재생은 계속되고, 모래가 다시 선인장을 덮을 만큼 위로 올라가면 처음 상태로 돌아가 다시 내려올 때 재생됩니다.
-- 모션 감소 설정에서는 시간 재생 대신 뒤 절반의 스크롤이 build~grow를 움직입니다.
-- 트랙 높이(`.track`의 5)와 `COVER_SCROLL`은 함께 고칩니다.
+- cover만 스크롤로 움직입니다. 고정 스크롤의 앞 2화면(`COVER_SCROLL` 2/2.8)을 `useSpring(stiffness 55, damping 22)`로 부드럽게 따라갑니다.
+- 모래가 수평선에 자리 잡으면 build → adapt → grow가 `PLAY_SECONDS`(11초) 동안 시간 기반으로 재생됩니다(playhead). 재생하는 동안에는 `components/layout/scrollLock.ts`로 스크롤을 cover 끝 위치에 고정합니다(휠·터치·스크롤 키 차단, 스크롤바 이동은 되돌림, Lenis stop). 재생이 끝나면 풀리고, 링크를 누르면 바로 풀려 메뉴 이동은 동작합니다. 재생 중이거나 끝난 뒤 cover 끝보다 조금(`REWIND_FROM`, 트랙 진행률 0.01) 위로 올라가면 선인장·꽃가루·문구가 0.35초 동안 사라진 뒤(outro) 처음 상태로 돌아가고, 다시 내려오면 처음부터 재생됩니다. 남은 0.8화면은 브라우저 창이 머무는 자리이며, 창이 올라올 때 장면 문구와 모래 GROW.는 창보다 먼저 사라집니다(textFade).
+- 모션 감소 설정에서는 시간 재생 없이 cover가 끝나면 바로 완성된 장면(grow 끝)을 보여 주고, 스크롤을 고정하지 않습니다.
+- 이야기 구간 높이(`.storyTrack`·`.track`의 3.8)와 `COVER_SCROLL`은 함께 고칩니다. 진행률은 `.storyTrack` 기준이고, `.track`은 브라우저 창 내용 이동 거리(`--travel`)만큼 더 깁니다.
+- 로고(홈 링크)를 이 페이지에서 누르면 바로 맨 위로 점프하지 않습니다. 이야기를 끝난 상태로 두고(재생 중이면 멈춤), 창이 내려가며 cover 끝으로 이동한 뒤 `RETURN_SECONDS`(3초) 동안 ease-in-out으로 맨 위까지 미끄러지듯 올라갑니다. 그래서 모래가 천천히 올라와 덮었다가 천천히 내려가며 첫 화면이 드러납니다(`glideTo`, 이동 중 입력 무시). `scrollToY`·`glideTo`는 이동 전에 Lenis 높이를 다시 재서, 창 내용만큼 길어진 페이지 끝이 잘리지 않게 합니다.
+
+#### 브라우저 창 (DesertWindow, 소개·기술·프로젝트·디자인·연락처가 들어 있음)
+
+- 크림색 창(PC 위 120px·최대 1240px, 모바일 위 96px·좌우 12px, 아래 끝은 화면 밖)이 모래 아래에서 올라와 사막 무대 안에 고정됩니다. 스크롤을 따라 조금씩 움직이지 않고 한 번에 움직입니다(raise): 이야기가 끝난 뒤 cover 끝에서 조금(트랙 진행률 0.005) 내려가면 0.9초 동안 올라오며 페이지도 창 내용 시작 위치(`travelStart`)로 함께 이동하고(`glideTo`, 이동 중 휠·터치·키 무시), 창 내용 맨 위에서 조금 올라가면 같은 방식으로 내려가며 cover 끝으로 돌아갑니다. 메뉴 이동처럼 그 지점을 건너뛰면 창만 바로 바뀝니다. 무대는 페이지 끝까지 고정되어 사막 분위기가 끊기지 않습니다.
+- 위쪽 막대: 코랄·노랑·초록 점과 주소. 주소는 섹션 순서대로 `/about` → `/projects` → `/design` → `/contact`이며, 각 섹션 윗부분이 창 40% 지점까지 올라오면 바뀝니다(맨 끝에서는 마지막 섹션).
+- 창 안 내용은 안쪽 스크롤바 없이 페이지 스크롤에 맞춰 transform으로 이동합니다.
+- 한 화면 = 한 섹션: 창 안의 각 `[data-page]`(소개, 기술, 프로젝트 1·2·3, 디자인, 연락처)는 창 높이(`--page-h`, DesertWindow가 설정하며 그 전에는 CSS 기본값 `100svh − 164px`, 모바일 `− 132px`) 이상입니다. 창 안 스크롤은 일반 스크롤처럼 자유롭게 움직이고(페이지 단위로 끊지 않음), 헤더 메뉴로 이동하면 섹션 윗선이 창 윗선에 정확히 맞아 그 섹션 하나만 잘림 없이 보입니다. 그래서 각 페이지가 창 높이를 넘지 않게 유지합니다(PC·1024×768·390×844 기준 확인, 320px 폭은 소개·프로젝트가 넘침).
+- 같은 페이지의 #about·#skill·#project·#design·#contact 링크(헤더 메뉴)는 기본 이동을 막고 창 안 해당 위치로 스크롤합니다. 이때 이야기는 바로 끝난 상태가 되고, 모래 전환도 다시 재생하지 않고 사막 상태로 바로 맞춘 뒤 창이 올라옵니다(enterWindow: jumpPastStory + `sandProgress.jump`). 주소에 해시가 있으면 처음 열 때도 이동하고, 창 밖 요소로 키보드 포커스가 가면 창 위쪽 1/3 지점으로 가져옵니다.
 
 - cover: 모래(`public/images/hero/hero-sand-bg.webp`)가 히어로의 원래 언덕 위치에서 올라와 화면을 덮고(COVER.risen), 덮인 동안 히어로를 숨겨 하늘 배경으로 바꾼 뒤(COVER.swap), 모래 윗선이 무대 62%에 올 때까지 내려갑니다.
 - cover 중 헤더(coverHeader): 올라오는 능선 뒤로 가려지고, 덮인 동안 숨겨지며, 내려가는 능선을 따라 다시 드러납니다. CREST_PROFILE(모래 이미지 가로 11지점의 능선 높이)로 clip-path를 만듭니다. cover 구간이 끝나면(local ≥ 1) 인라인 스타일을 모두 지웁니다. 능선이 헤더에 닿기 전에는 clip-path를 걸지 않아 모바일 메뉴 패널이 잘리지 않습니다.
 - build: CactusScene(R3F 로우폴리 선인장)이 새싹 → 마디 4개 → 윗머리 → 양팔 순서로 자랍니다. WindGust(가로 모래바람, PC는 마우스 가로 이동으로 강화)에 살짝 휘었다 돌아옵니다. 문구 "직접 만들고".
 - adapt: 하늘이 노을 → 밤(별 70개) → 새벽으로 바뀌고, 3D 조명이 돌며 그림자가 회전합니다. 문구 "표면을 설계하고, / 경험을 짓다."(첫 줄 차콜·밤에는 아이보리, 둘째 줄 아이보리).
-- grow: 꽃이 피고 PollenGrow가 위에서 떨어지는 모래알로 "GROW."를 왼쪽부터 쌓습니다. 아래에 "웬만해선 시들지 않습니다."와 "선인장처럼, 어떤 환경에서도 생각보다 잘 자라는 사람입니다."(선생님 추천 문구)가 이어집니다.
+- grow: 꽃이 피고 PollenGrow가 위에서 떨어지는 모래알로 "GROW."를 왼쪽부터 쌓습니다. 쌓인 모래알은 짙은 모래색 4가지(#A8763F·#B8864C·#946233·#C4955A), G와 마침표는 노랑(#E9A33A)입니다. 아래에 "웬만해선 시들지 않습니다."와 "선인장처럼, 어떤 환경에서도 생각보다 잘 자라는 사람입니다."(선생님 추천 문구)가 이어집니다.
+- 마무리 신호: 재생이 끝나 스크롤 고정이 풀리면 0.3초 뒤 화면 아래 가운데에 가는 세로선과 그 위를 떨어지는 모래알(.scrollCue, 글자 없음, aria-hidden)이 나타나고, 다시 스크롤하면 사라집니다. 모션 감소 설정에서는 시간 재생이 없으므로 나타나지 않습니다.
 - 배치: PC 선인장은 오른쪽 70%에 고정(1.18배, 4svh 아래), 모바일은 가운데. 장면 문구는 왼쪽 15vw·높이 26%(모바일 왼쪽 24px·높이 18~20%). GROW. 블록은 무대 33%(모바일 30%) 기준선이며 PollenGrow baseline과 `.closing` top을 함께 고칩니다.
-- 전환: 재생의 마지막 15% 동안, 또는 재생이 끝나기 전에 스크롤로 고정 구간 끝 15%에 닿으면 무대 하단이 모래색으로 흐려지고(.groundFade, 선인장 뒤), 트랙 뒤 `.handoff`가 #E3BF91 → `--next-bg`(#FBF6EE)로 이어집니다.
-- 층 순서: 하늘(+시간대 층) < 히어로 < 모래 < 색조 < 바닥 흐림 < 선인장 < 모래바람 < 꽃가루 < 문구.
+- 전환: 재생의 마지막 15% 동안 무대 하단이 모래색으로 흐려지고(.groundFade, 선인장 뒤), 이어서 브라우저 창이 올라옵니다. 이전의 모래색→크림색 띠(.handoff)는 없앴습니다.
+- 층 순서: 하늘(+시간대 층) < 히어로 < 모래 < 색조 < 바닥 흐림 < 선인장 < 모래바람 < 꽃가루 < 문구 < 브라우저 창.
 - 성능: 히어로가 덮이면 `[data-pause-scope]`에 `data-paused`를 붙여 AvatarCanvas(frameloop never)와 SandStream을 멈춥니다. 선인장 3D는 모래가 내려가기 시작한 뒤, 무대가 화면에 있을 때만 그립니다.
 - 스크린리더 순서: 직접 만들고 → 표면을 설계하고, 경험을 짓다. → GROW.(sr-only) → 웬만해선 시들지 않습니다. → 설명.
 
 ### 소개·기술 (AboutStory, #about·#skill)
 
-- 크림 배경, "ABSORB."(코랄 점) 표시, 큰 세리프 문장("화면을 만들고, 클릭했을 때 동작하게 만드는 과정이 재밌습니다."), 모래빛 사진 자리, 이름·직무·교육, 기술 6개를 3열(모바일 2열) 세리프 목록으로 보여 줍니다.
+- 브라우저 창 안에 들어갑니다(`app/page.tsx`에서 ConceptScenes의 `content`로 전달).
+- 소개 페이지: "ABSORB."(코랄 점)·"소개" 제목 아래 2단 구성. 내용은 페이지 위쪽부터 배치합니다. 왼쪽은 프로필 사진(300px, 높이 860px 이하 PC 240px, 모바일 120px, 4:5, `object-position: 50% 30%`, `unoptimized`)과 이름·직무(생년월일은 값이 있을 때만), 오른쪽은 큰 세리프 문장("화면을 만들고, 클릭했을 때 동작하게 만드는 과정이 재밌습니다.")과 자격증(값이 있을 때만)·교육 목록입니다. 목록은 굵은 연도(고정폭 2.9em, 항목이 세로로 정렬됨) / 항목 / 회색 보조정보(자격증: 취득월·기관, 교육: 상태·기간)를 한 줄로 두고(모바일은 보조정보를 아랫줄에) 왼쪽에 가는 세로선을 둡니다. 900px 미만은 작은 사진(112px) 옆에 이름, 그 아래 문장과 목록.
+- 기술 페이지: "학습·사용 기술" 제목과 기술 6개를 3열(모바일 2열) 세리프 목록으로 보여 줍니다.
 - 데이터는 `About.tsx`의 `profile`, `Skills.tsx`의 `skills`를 씁니다. 소개글·자격증·기술 설명은 값이 있을 때만 표시합니다.
 
 ### 대표 프로젝트 (WorkStory, #project)
 
-- 크림 배경, "BUILD."(초록 점) 표시, 자리 표시 안내 문구(예시가 있을 때만), mainProjects를 16:9 이미지와 설명이 좌우로 번갈아 놓이는 행으로 보여 줍니다(900px 미만은 세로).
+- AboutStory 다음으로 같은 브라우저 창 안에 들어갑니다. 큰 창과 겹치지 않도록 이미지에는 별도 창 틀 없이 카드 모양만 둡니다.
+- 크림 배경, "BUILD."(초록 점) 표시, 자리 표시 안내 문구(예시가 있을 때만). 프로젝트 하나가 한 페이지이며, 첫 페이지에는 제목과 첫 프로젝트가 함께 들어갑니다. 16:9 이미지와 설명이 페이지마다 좌우를 번갈아 놓이고(900px 미만은 세로), 설명 위에 "01 / 03" 순번을 둡니다. 이전 작업(sideProjects)이 있으면 별도 페이지입니다.
 - 이미지·제목·"상세 보기"는 /work/[slug]로 연결됩니다. sideProjects가 있을 때만 "이전 작업" 번호 목록이 나오며 현재 데이터에는 없습니다.
 
 ### 커스텀 커서 (CustomCursor)
@@ -170,7 +184,7 @@ artifacts/                 화면 캡처와 확인 스크립트
 ## 9. 접근성과 모션
 
 - 제목 계층, 대체 텍스트, 버튼의 접근 가능한 이름, 키보드 포커스 표시를 유지합니다.
-- `prefers-reduced-motion`: 단어 부유·모래 줄기·모래바람·커서 보간을 멈추고, 선인장은 다 자란 상태로 보이며, 하늘·꽃·꽃가루는 스크롤에 맞춰 바뀝니다.
+- `prefers-reduced-motion`: 단어 부유·모래 줄기·모래바람·커서 보간을 멈추고, 선인장 이야기는 재생 없이 완성된 장면(꽃·GROW.·마무리 문구)으로 바로 보이고 스크롤을 고정하지 않습니다.
 - 장식 캔버스와 3D 영역은 `aria-hidden`, 의미 있는 문구는 텍스트로 둡니다(꽃가루 "GROW."는 sr-only 텍스트를 함께 둠).
 - 화면 밖 애니메이션은 멈춥니다(IntersectionObserver, data-paused).
 
@@ -206,9 +220,9 @@ artifacts/                 화면 캡처와 확인 스크립트
 
 ## 11. 남은 작업
 
-1. 마무리(GROW.) 섹션과 연락처: 푸터를 컨셉 톤으로 다시 켜거나 새로 구성(연락처 데이터 재사용, 문구는 사용자 확인)
-2. 헤더 메뉴의 DESIGN·CONTACT 대상 정리(섹션 표시 또는 메뉴 조정)
-3. 실제 소개·사진·프로젝트·이미지 등록(사용자 요청 시)
+1. 마무리 문구: ContactStory에는 기존 제목·연락처만 있습니다. 마무리 한 줄이 필요하면 문구 후보를 제안하고 확인받습니다.
+2. 디자인 작업물(`data/design.ts`)이 비어 있어 "준비 중입니다"가 보입니다. 실제 작업을 넣거나 섹션을 숨길지 결정이 필요합니다.
+3. 실제 소개·교육·자격증·프로젝트·이미지 등록(사용자 요청 시). 프로필 사진은 등록 완료
 4. 상세 페이지(/work/[slug])를 크림 톤으로 맞출지 결정
 5. 전체 `npm.cmd run build`와 PC·태블릿·모바일 최종 점검
 

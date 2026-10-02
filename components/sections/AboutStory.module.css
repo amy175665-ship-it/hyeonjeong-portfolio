@@ -1,44 +1,84 @@
-/* Continues the desert hand-off: warm cream ground, serif headings (DM Serif + Noto Serif KR), Pretendard body. */
+/* Cream pages inside the desert browser window: serif headings (DM Serif + Noto Serif KR), Pretendard body.
+   Each section fills one window-high page ([data-page], see DesertWindow.module.css), content from the top. */
 .page { --cream: #fbf6ee; --ink: #202731; --muted: #58636e; --line: #e7dccb; --coral: #e96b5a; --sand: #e3bf91; background: var(--cream); color: var(--ink); }
-.section { padding: 96px 40px; }
-.inner { max-width: 1120px; margin: 0 auto; }
+.section { padding: 44px 40px; }
+/* About and skills start at the top of their window page instead of floating in the middle. */
+.page > .section[data-page] { justify-content: flex-start; }
+.inner { width: 100%; max-width: 1120px; margin: 0 auto; }
 .kicker { display: flex; align-items: center; gap: 10px; margin: 0 0 14px; color: var(--muted); font: 400 16px/1 var(--font-editorial), Georgia, serif; letter-spacing: .04em; }
 .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--coral); }
-.title { margin: 0; font: 600 36px/1.2 var(--font-editorial), var(--font-hangul-serif), Georgia, serif; letter-spacing: -.02em; }
-.statement { max-width: 24em; margin: 40px 0 0; font: 600 clamp(30px, 3.6vw, 52px)/1.35 var(--font-editorial), var(--font-hangul-serif), Georgia, serif; letter-spacing: -.035em; word-break: keep-all; }
+.title { margin: 0; font: 600 36px/1.2 var(--font-editorial), var(--font-hangul-serif, serif), Georgia, serif; letter-spacing: -.02em; }
 
-/* Portrait and facts side by side, separated by a hairline rather than boxes. */
-.profile { display: grid; grid-template-columns: minmax(0, 320px) minmax(0, 1fr); gap: 64px; align-items: end; margin-top: 64px; padding-top: 40px; border-top: 1px solid var(--line); }
-.portrait { position: relative; margin: 0; aspect-ratio: 4 / 5; overflow: hidden; border-radius: 4px; background: linear-gradient(160deg, #f3e6d1, var(--sand)); }
-.photo { object-fit: cover; }
-.placeholder { display: flex; height: 100%; flex-direction: column; align-items: center; justify-content: center; gap: 12px; color: #8a6a43; }
-.placeholder span { font: 400 72px/1 var(--font-editorial), Georgia, serif; letter-spacing: -.04em; }
-.placeholder small { font-size: 14px; }
-.bio { min-width: 0; }
-.name { margin: 0; font: 600 24px/1.3 var(--font-pretendard), sans-serif; }
-.role { margin: 6px 0 0; color: var(--muted); font-size: 14px; }
-.introduction { margin: 24px 0 0; font-size: 16px; line-height: 1.7; word-break: keep-all; }
-.facts { margin: 32px 0 0; }
-.facts > div { display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 4px 24px; padding: 18px 0; border-top: 1px solid var(--line); }
-.facts dt { grid-row: 1 / span 4; color: var(--muted); font-size: 14px; font-weight: 600; }
-.facts dd { margin: 0; font-size: 16px; line-height: 1.7; }
-.facts dd span { display: block; color: var(--muted); font-size: 14px; }
+/* About: portrait + name on the left, statement and record rows on the right. */
+.profile { display: grid; grid-template-columns: 300px minmax(0, 1fr); gap: 72px; align-items: start; margin-top: 36px; }
+.card { min-width: 0; }
+.portrait { position: relative; margin: 0; aspect-ratio: 4 / 5; overflow: hidden; border-radius: 8px; background: linear-gradient(160deg, #f3e6d1, var(--sand)); }
+/* Keeps the face in frame when the photo is a little taller than 4:5. */
+.photo { object-fit: cover; object-position: 50% 30%; }
+.placeholder { display: flex; height: 100%; flex-direction: column; align-items: center; justify-content: center; gap: 10px; color: #8a6a43; }
+.placeholder span { font: 400 56px/1 var(--font-editorial), Georgia, serif; letter-spacing: -.04em; }
+.placeholder small { font-size: 13px; }
+.identity { margin-top: 20px; }
+.name { margin: 0; font: 600 20px/1.3 var(--font-pretendard), sans-serif; }
+.role { margin: 4px 0 0; color: var(--muted); font-size: 14px; line-height: 1.6; }
+.info { min-width: 0; }
+.statement { max-width: 22em; margin: 0; font: 600 clamp(24px, 2.4vw, 34px)/1.4 var(--font-editorial), var(--font-hangul-serif, serif), Georgia, serif; letter-spacing: -.03em; word-break: keep-all; }
+.introduction { max-width: 40em; margin: 16px 0 0; font-size: 16px; line-height: 1.7; word-break: keep-all; }
+.group { margin-top: 40px; }
+.groupTitle { margin: 0 0 16px; font: 600 18px/1.3 var(--font-pretendard), sans-serif; }
+/* Record rows: bold year, item, muted note on one line; a thin bracket line on the left groups them. */
+.rows { margin: 0; padding: 2px 0 2px 20px; list-style: none; border-left: 1px solid var(--line); }
+.rows li { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 14px; padding: 7px 0; font-size: 16px; line-height: 1.6; word-break: keep-all; }
+/* Fixed-width year column so the items line up under each other. */
+.year { flex: none; width: 2.9em; font-weight: 700; font-variant-numeric: tabular-nums; }
+.item { min-width: 0; }
+.note { color: var(--muted); font-size: 14px; }
 
 /* Skills: names set large in the serif, three to a row, divided by hairlines. */
-.skills { padding-top: 0; }
 .skillList { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); margin: 40px 0 0; padding: 0; list-style: none; border-top: 1px solid var(--line); }
 .skillList li { padding: 28px 24px 28px 0; border-bottom: 1px solid var(--line); }
 .skillList h3 { margin: 0; font: 400 clamp(24px, 2.4vw, 34px)/1.2 var(--font-editorial), Georgia, serif; letter-spacing: -.02em; overflow-wrap: normal; }
 .skillList p { margin: 8px 0 0; color: var(--muted); font-size: 14px; line-height: 1.7; }
 
 @media (max-width: 899px) {
-  .section { padding: 64px 24px; }
-  .skills { padding-top: 0; }
+  .section { padding: 40px 24px; }
   .title { font-size: 28px; }
-  .statement { margin-top: 28px; }
-  .profile { grid-template-columns: 1fr; gap: 28px; margin-top: 40px; padding-top: 28px; }
-  .portrait { max-width: 260px; }
+  /* Small portrait beside the name, the record rows below. */
+  .profile { grid-template-columns: 1fr; gap: 28px; margin-top: 28px; }
+  .card { display: flex; align-items: flex-end; gap: 18px; }
+  .portrait { width: 112px; flex: none; }
+  .placeholder span { font-size: 30px; }
+  .placeholder small { font-size: 11px; }
+  .identity { margin: 0; }
+  .statement { font-size: 22px; }
+  .group { margin-top: 28px; }
+  .rows li { font-size: 15px; }
   .skillList { grid-template-columns: repeat(2, minmax(0, 1fr)); margin-top: 28px; }
   .skillList li { padding: 20px 16px 20px 0; }
 }
 @media (max-width: 389px) { .skillList h3 { font-size: 20px; } }
+/* Short desktop windows (e.g. 1024×768): tighter spacing so the about page still fits one window. */
+@media (min-width: 900px) and (max-height: 860px) {
+  .section { padding: 28px 40px; }
+  .profile { margin-top: 28px; gap: 56px; }
+  .portrait { width: 240px; }
+  .profile { grid-template-columns: 240px minmax(0, 1fr); }
+  .statement { font-size: 24px; }
+  .group { margin-top: 24px; }
+  .groupTitle { margin-bottom: 8px; }
+  .rows li { padding: 4px 0; font-size: 15px; }
+}
+/* Phones: smaller portrait and type, each record as year + item with the note under it. */
+@media (max-width: 899px) {
+  .section { padding: 20px 24px; }
+  .profile { margin-top: 16px; gap: 16px; }
+  .portrait { width: 100px; }
+  .placeholder span { font-size: 24px; }
+  .statement { font-size: 17px; line-height: 1.4; }
+  .group { margin-top: 14px; }
+  .groupTitle { margin-bottom: 4px; font-size: 15px; }
+  .rows { padding-left: 14px; }
+  .rows li { display: grid; grid-template-columns: 2.9em minmax(0, 1fr); gap: 0 10px; padding: 3px 0; font-size: 14px; line-height: 1.4; }
+  .year { width: auto; }
+  .note { grid-column: 2; font-size: 12px; }
+}

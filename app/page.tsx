@@ -3,6 +3,8 @@ import ScrollHero from "@/components/sections/hero/ScrollHero";
 import ConceptScenes from "@/components/sections/concept/ConceptScenes";
 import AboutStory from "@/components/sections/AboutStory";
 import WorkStory from "@/components/sections/WorkStory";
+import DesignStory from "@/components/sections/DesignStory";
+import ContactStory from "@/components/sections/ContactStory";
 
 
 import DesignGallery from "@/components/sections/DesignGallery";
@@ -22,9 +24,8 @@ export default function Home() {
     <>
       <main>
         {showConceptIntro ? <>
-        <ConceptScenes><Hero showExtras={false} showTitle={false} desert /></ConceptScenes>
-        <AboutStory />
-        <WorkStory />
+        {/* All the page sections (about, projects, design, contact) live in a browser window that rises out of the desert after the story. */}
+        <ConceptScenes content={<><AboutStory /><WorkStory /><DesignStory designItems={designItems} /><ContactStory /></>}><Hero showExtras={false} showTitle={false} desert /></ConceptScenes>
         </> : <>
         <ScrollHero><Hero showExtras={false} showTitle={false} /></ScrollHero>
         <ProjectCarousel />
