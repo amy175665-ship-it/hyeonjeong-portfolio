@@ -7,7 +7,7 @@ README는 프로젝트 소개와 개발 안내, 이 문서는 에이전트의 �
 ## 1. 기본 원칙
 
 - 작업 경험, 교육 이력, 자격증, 연락처, 프로젝트 성과, 숙련도를 임의로 만들지 않습니다.
-- 현재 프로젝트 3개와 소개의 생년월일·교육·자격증은 자리 표시입니다(소개 항목은 `[수정 예정]`을 붙인 가상의 예시, `About.tsx`의 profile). 실제 자료 등록은 사용자가 요청할 때 진행하며, 그 전까지 `placeholder` 표시와 "작성 예시" 문구를 유지합니다. 프로필 사진은 등록되어 있습니다(`public/images/profile/profile-front.webp`, 1075×1463 WebP, 사용자 제공. `assets/`에 원본은 없음).
+- 현재 프로젝트 3개와 소개의 생년월일·교육·자격증은 자리 표시입니다(소개 항목은 `[수정 예정]`을 붙인 가상의 예시, `data/profile.ts`의 profile). 실제 자료 등록은 사용자가 요청할 때 진행하며, 그 전까지 `placeholder` 표시와 "작성 예시" 문구를 유지합니다. 프로필 사진은 등록되어 있습니다(`public/images/profile/profile-front.webp`, 1075×1463 WebP, 사용자 제공. `assets/`에 원본은 없음).
 - 사용자가 디자인만 요청하면 기존 문구·데이터·링크 목적지를 보존합니다.
 - 외부 링크는 값이 있을 때만 표시하고, 확인용 가짜 주소를 넣지 않습니다.
 - 화면에 넣는 문구는 사용자가 정했거나 이미 있는 문구를 씁니다. 새 문구가 필요하면 후보를 제안하고 확인받습니다.
@@ -19,34 +19,37 @@ README는 프로젝트 소개와 개발 안내, 이 문서는 에이전트의 �
 - 선인장은 "환경에 유연하게 적응하면서도 쉽게 흔들리지 않고 꾸준히 자라는" 태도를 뜻합니다. "척박한 환경", "천천히", "자신의 속도로" 같은 표현은 쓰지 않습니다(선생님 피드백).
 - 한글 문구는 "~습니다" 완결형 교훈 문장을 크게 쓰면 공익광고처럼 보입니다. 큰 문구는 짧은 표어형으로 둡니다.
 
+### 리디자인 진행 (2026-10-08 승인, "A Living Digital Desert")
+
+- 방향 B: 모래 전환으로 드러난 브라우저 창이 스크롤에 맞춰 풀리며 전면 편집 레이아웃이 되고, 마지막(BLOOM)에 다시 닫혀 오프닝으로 돌아갑니다. 이야기 순서는 PROLOGUE → ABSORB(소개·취미) → BUILD(프로젝트, 중심) → GROW(How I Work, 나중에 디자인 작업으로 교체 가능) → BLOOM(밤, 꽃 핀 선인장, 돌아온 3D 얼굴, 연락처).
+- 승인된 동작 시안: `artifacts/mockup-living-desert-20261008/index.html`(브라우저로 열기). 구현은 이 시안의 분위기·배치·전환을 기준으로 합니다. 시안의 2D 선인장·그림 얼굴·하프톤 초상은 임시이며 실제 3D 선인장·3D 얼굴·프로필 사진으로 바꿉니다.
+- 단계별로 구현하고, 단계마다 캡처·녹화로 사용자 확인과 승인을 받은 뒤 다음 단계로 갑니다.
+  - 1단계(완료, 2026-10-08): 데이터 정리(`data/`), 단계 설정(`data/stages.ts`), 모션 도구(`components/motion/`), 창 내용을 일반 문서 스크롤로 전환(WindowFrame), 창틀 값(`--frame` 1→0)과 헤더 두 상태, 쓰지 않는 옛 컴포넌트 삭제.
+  - 다음 후보: 2단계 헤더·전체 메뉴, 3단계 BUILD 겹치는 프로젝트 패널·상세 페이지, 4단계 ABSORB(모래알 하프톤, 문장 채움, 취미 가로 띠, 뿌리 전환), 5단계 GROW 원 변형·BLOOM, 6단계 모션 감소판·접근성·성능 점검.
+- 오프닝(히어로, 3D 얼굴, 모래 덮기, 선인장 이야기, 모래 전환)은 그대로 유지합니다.
+
 ## 3. 페이지 구성
 
-`app/page.tsx`의 플래그로 구성을 바꿉니다.
+`app/page.tsx`: ConceptScenes(히어로 + 모래 덮기 + 선인장 이야기 + 모래 전환) 뒤에 브라우저 창(WindowFrame)이 이어지고, 창 안에 AboutStory → WorkStory → DesignStory → ContactStory가 차례로 들어갑니다. 창의 최상위 자식 하나가 이야기 한 단계입니다(about=ABSORB, project=BUILD, design=GROW, contact=BLOOM, `data/stages.ts`).
 
-| 플래그 | 값 | 내용 |
-| --- | --- | --- |
-| `showConceptIntro` | true(현재) | ConceptScenes(히어로 + 모래 전환 + 선인장 장면 → 사막에서 올라오는 브라우저 창 DesertWindow 안에 AboutStory → WorkStory → DesignStory → ContactStory) |
-| | false | 이전 구성: ScrollHero(히어로 + 날아오는 데모 + 브라우저 창 소개·기술) → ProjectCarousel |
-| `showLowerSections` | false(현재) | 이전 구성용 SideProjects, DesignGallery, SiteFooter 숨김(컨셉 구성에서는 창 안의 DesignStory·ContactStory가 같은 데이터를 씀) |
-
-- 이전 구성 컴포넌트(ScrollHero, PinnedBrowser, HeroBrowserDemo, ProjectCarousel, About, Skills, WorkGrid)는 삭제하지 않고 보존합니다.
-- 헤더 메뉴의 ABOUT(#about)·SKILLS(#skill)·PROJECTS(#project)·DESIGN(#design)·CONTACT(#contact)는 모두 브라우저 창 안의 해당 위치로 이동합니다.
-- 마무리는 창 안 마지막 ContactStory(GROW.·연락처·이력서)입니다. 연락처 데이터는 `SiteFooter.tsx`의 `contact`를 공유합니다(상세 페이지는 계속 SiteFooter 사용).
-- 음성 소개(VoiceIntro)는 코드만 있고 `public/audio/`가 없습니다. 현재 화면에서도 쓰지 않습니다.
+- 이전 구성 컴포넌트(ScrollHero, PinnedBrowser, HeroBrowserDemo, ProjectCarousel, About, Skills, WorkGrid, SideProjects, DesignGallery, VoiceIntro)와 페이지 플래그(showConceptIntro, showLowerSections)는 사용자 승인으로 1단계에서 지웠습니다(쓰는 곳이 없음을 확인하고, About·Skills 안의 데이터는 `data/`로 옮김). 옛 코드가 필요하면 git 기록에서 찾습니다.
+- 헤더 메뉴의 ABOUT(#about)·PROJECTS(#project)·DESIGN(#design)·CONTACT(#contact)는 모두 브라우저 창 안의 해당 위치로 이동합니다.
+- 마무리는 창 안 마지막 ContactStory(GROW.·연락처·이력서)입니다. 연락처 데이터는 `data/contact.ts`에 있고 ContactStory와 상세 페이지의 SiteFooter가 함께 씁니다.
 
 ## 4. 폴더 구조
 
 ```text
 app/                       page, layout(폰트·CustomCursor), globals.css, work/[slug] 상세 페이지
 components/
-├─ layout/                 SiteNav, SiteFooter, SmoothScroll(Lenis), scrollLock(재생 중 스크롤 고정)
+├─ layout/                 SiteNav(헤더·전체 메뉴), SiteFooter(상세 페이지 푸터), MenuSand, SmoothScroll(Lenis), scrollLock(스크롤 고정·glideTo)
+├─ motion/                 SplitText(글자·단어 쪼개기), RollingWord(글자가 굴러 바뀌는 단어), useScrollDirection
+├─ stage/                  windowState(지금 단계와 창이 풀렸는지를 헤더 등에 알림)
 ├─ sections/
-│  ├─ AboutStory, WorkStory, DesignStory, ContactStory   브라우저 창 안의 소개·기술, 대표 프로젝트, 디자인, 연락처
-│  ├─ About, Skills, ProjectCarousel, WorkGrid, SideProjects, DesignGallery   이전 구성·숨김 섹션(데이터 공유)
-│  ├─ hero/                Hero, GrowthScene, HeroAvatar/AvatarCanvas, SandStream, ScrollHero, PinnedBrowser, HeroBrowserDemo, VoiceIntro
-│  └─ concept/             ConceptScenes, scenes.ts, CactusScene, WindGust, PollenGrow, DesertWindow
+│  ├─ AboutStory, HobbyFlow, HobbyCactus, WorkStory, DesignStory, ContactStory   창 안의 소개·취미, 대표 프로젝트, 디자인, 연락처
+│  ├─ hero/                Hero, GrowthScene, HeroAvatar/AvatarCanvas, SandStream
+│  └─ concept/             ConceptScenes, scenes.ts, CactusScene, WindGust, PollenGrow, WindowFrame(브라우저 창)
 └─ ui/                     Reveal, ProjectLinks, ProjectTags, CustomCursor
-data/                      projects, navigation, design
+data/                      profile(소개·취미·브이로그), skills, contact, projects, design, navigation, stages(이야기 단계)
 assets/                    원본 디자인 소스(커서·모래 PNG). 배포되지 않으며 화면에서 쓰지 않음
 public/                    화면에 쓰는 정적 파일(이미지 WebP, 폰트, models/avatar6.glb, 로고)
 artifacts/                 화면 캡처와 확인 스크립트
@@ -54,7 +57,7 @@ artifacts/                 화면 캡처와 확인 스크립트
 
 - 여러 섹션에서 쓰는 요소는 `ui/`, 히어로 전용은 `sections/hero/`, 사막 이후 컨셉 장면은 `sections/concept/`에 둡니다.
 - 폴더를 넘는 참조는 `@/components/...`를 씁니다. 파일을 옮기면 import와 README 경로를 함께 고칩니다.
-- 섹션 ID(#about, #skill, #project)와 상세 경로(/work/[slug])를 임의로 바꾸지 않습니다.
+- 섹션 ID(#about, #project)와 상세 경로(/work/[slug])를 임의로 바꾸지 않습니다.
 - 원본 이미지는 `assets/`, 화면용 변환본은 `public/`에 둡니다. 원본을 교체하면 변환본(WebP)도 다시 만듭니다.
 
 ## 5. 디자인 기준
@@ -65,9 +68,9 @@ artifacts/                 화면 캡처와 확인 스크립트
 | --- | --- | --- |
 | 기본 글자 | `#202731` | 제목·본문 |
 | 보조 글자 | `#58636E` | 설명·라벨 |
-| 크림 배경 | `#FBF6EE` | AboutStory·WorkStory, 컨셉 전환 구간 끝 |
+| 창 배경(흰색 계열) | `#FCFCFB` | 브라우저 창과 그 안의 모든 섹션(사용자 요청으로 크림 #FBF6EE에서 변경). 위쪽 막대 `#F3F3F1`, 탭 호버 `#EBEBE8` |
 | 모래 | `#E3BF91` | 모래 이미지에서 추출, 전환 그라데이션 |
-| 따뜻한 구분선 | `#E7DCCB` | 크림 배경 위 구분선 |
+| 구분선 | `#E6E6E2` | 창 안 구분선·테두리(이전 따뜻한 구분선 #E7DCCB에서 변경) |
 | 코랄 | `#E96B5A` | ABSORB. 강조 |
 | 선인장 초록 | `#7F9657` | BUILD. 강조, 글자 호버 |
 | 노랑·주황 | `#E9A33A` | GROW. 강조 |
@@ -98,16 +101,17 @@ artifacts/                 화면 캡처와 확인 스크립트
 
 ### 헤더 (SiteNav)
 
-- 가운데 선인장 로고(`public/images/logo/logo.png`, 76px, 홈 링크)와 오른쪽 햄버거 버튼만 둡니다. 메뉴는 전체 화면 패널로 열립니다.
+- 가운데 선인장 로고(`public/images/logo/logo.png`, 76px, 홈 링크)와 오른쪽 햄버거 버튼만 둡니다. 메뉴는 전체 화면 패널로 열립니다. 햄버거 막대는 PC 44×4px·간격 18px, 1023px 이하는 세 줄 22×2px·간격 6px, 진한 갈색 #5B3F2A(사용자 제안), 버튼 44px, 로고 64px(짧은 두 줄은 "="처럼 보여 깨진 듯했고, 둥근 흰 버튼도 별로라 바꿈). 가운데 막대(`.barMiddle`)는 모바일에서만 보이고 열면 사라짐. 크기는 `.toggle`의 `--bar-*` 변수로 바꾸며 열림 ×는 이 값으로 계산됩니다.
 - 로고 호버: 0.62초 동안 두 번 흔들리는 종 모션(Web Animations API, 재생 중 재호버 무시, 터치·모션 감소 제외).
-- 컨셉 트랙 아래 끝이 화면 아래에서 40px 이상 올라오면 html에 `data-header-solid`가 붙고 `.header::before`(PC 108px, 모바일 92px 반투명 흰색+blur)가 나타납니다. 지금은 트랙이 페이지 끝까지 이어져(브라우저 창) 나타나지 않으며, 아래 섹션을 다시 켜면 동작합니다.
+- 헤더 두 상태(1단계): 창이 브라우저 창 모습일 때는 지금처럼 로고가 제목 표시줄 안에 들어가고 PC에서는 햄버거가 탭 뒤로 숨습니다(`data-window-up`). 창이 전면으로 풀리면(WindowFrame이 `components/stage/windowState`에 floating을 알림) 헤더가 페이지 위에 떠서 햄버거 왼쪽에 지금 단계 단어(ABSORB./BUILD./GROW./BLOOM., `RollingWord`로 글자가 굴러 바뀜, 장식이라 aria-hidden)를 보이고, 아래로 스크롤하면 위로 숨었다가(`.tucked`) 위로 스크롤하면 돌아옵니다(`useScrollDirection`). 메뉴가 열려 있으면 숨지 않습니다. 이전의 흰 반투명 헤더 배경(`data-header-solid`)은 없앴습니다. 전체 메뉴 재디자인은 2단계입니다.
+- 메뉴 패널: 링크에 마우스를 올리면 로고 아래 가운데에서 모래알 줄기(`MenuSand`, 캔버스, 글자 뒤, 폭 약 7px, 알갱이 2~3.6px, 모래색 4가지)가 일직선으로 떨어져 그 메뉴 글자 아랫선(글자 박스 아래 − 글꼴 크기×0.24)에서 사라집니다. 떼면 새로 떨어지지 않고 떨어지던 것만 마저 내려갑니다. 시간 기준이라 프레임이 느려도 같은 속도. 마우스에서만, 모션 감소 시 없음. 링크 호버 밑줄은 사용자 요청으로 없앴습니다. 호버·키보드 포커스한 메뉴 글자 발치에는 모래 더미 이미지(`public/images/effects/sand-mound.webp`, 900×163, 원본 `assets/effects/sand-mound.png` 2172×724를 투명 여백 잘라 변환)가 모든 메뉴에서 같은 크기(6.5em, 1440에서 312px)로 글자 뒤에서 아랫부분과 조금 겹치며 위로 자라듯(0.45초) 나타나, 떨어지는 모래가 그 위에 쌓이는 모양이 됩니다. 원본 가장자리의 노랑·빨강 번짐은 밝은 배경에서는 보이지 않아 손대지 않았습니다.
 - 모바일 메뉴의 열기·닫기, 바깥 클릭, Escape, 포커스 복귀를 보존합니다. 스크롤에 따른 활성 메뉴 표시는 구현되어 있지 않습니다.
 - 메뉴 이름과 목적지는 `data/navigation.ts`에서 관리합니다.
 
 ### 히어로 (Hero, GrowthScene, HeroAvatar, SandStream)
 
 - 배경: `public/images/hero/hero-sunlight-bg.webp`(center/cover). GrowthScene이 햇살·그림자 장식을 더합니다.
-- 3D 얼굴: AvatarCanvas가 React Three Fiber로 `public/models/avatar6.glb`를 표시합니다. GLB 원본 재질을 쓰고 중복 검은 머리 `Hair_Web.001`만 숨깁니다. 마우스를 따라 회전하고, 1.8초 동안 움직임이 없으면 대기 모션(IDLE_MOTION)으로 바뀝니다. 모델 로드 후 0.8초 쉬었다가 1.8초 동안 나타납니다.
+- 3D 얼굴: AvatarCanvas가 React Three Fiber로 `public/models/avatar6.glb`를 표시합니다. 이 파일은 원본 `assets/models/avatar6.glb`(23.5MB)를 `assets/models/optimize-glb.mjs`로 줄인 1.3MB 변환본입니다(중복 검은 머리 `Hair_Web.001`·안 쓰는 꼭짓점 색/UV 제거, 질감 WebP·모자 천 512px, meshopt 압축. 전후 화면 차이 평균 0.6/255). 원본으로 되돌려도 되도록 코드는 `Hair_Web.001`을 계속 숨깁니다. 모델을 교체하면 스크립트로 다시 변환합니다. 마우스를 따라 회전하고, 1.8초 동안 움직임이 없으면 대기 모션(IDLE_MOTION)으로 바뀝니다. 터치 기기(`(hover: none), (pointer: coarse)`)는 마우스 반응이 없으므로 처음부터 더 큰 모션(TOUCH_MOTION: 좌우 돌아보기 ±0.34rad, 끄덕임, 갸웃, 위아래 0.09)을 씁니다. 모델 로드 후 0.8초 쉬었다가 1.8초 동안 나타납니다.
 - PC 타이포(1024px 이상, GrowthScene): ABSORB.(왼쪽 위 -7deg) / BUILD.(중앙 -3deg) / GROW.(왼쪽 아래, bottom 26%, BUILD. top 31%) 비대칭 배치. 보이는 너비 비율은 약 GROW. 100 / ABSORB. 70 / BUILD. 40입니다. 1024px 미만에서는 숨기고 얼굴 중심 화면을 씁니다. 실제 h1은 시각적으로 숨긴 채 유지합니다.
 - 글자 색: 기본 #202731, ABSORB.의 A·마침표 코랄, BUILD.의 U·마침표 초록, GROW.의 G·마침표 노랑(`:where`로 우선순위를 낮춤).
 - 글자 호버: 글자마다 `.char`(호버·색)와 `.glyph`(기울기)로 나뉩니다. 호버한 글자만 #7F9657과 -8~8deg 기울기·2~4px 이동. inline-block으로 사라지는 커닝은 HoverLetters가 원래 위치를 측정해 em 여백으로 보정합니다. 커서는 기본 화살표, 텍스트 선택은 막습니다.
@@ -121,18 +125,24 @@ artifacts/                 화면 캡처와 확인 스크립트
 하나의 고정 트랙(3.8화면, sticky 무대 높이 max(600px, 100svh), 고정된 동안 2.8화면 스크롤)에서 진행합니다. 구간은 `scenes.ts`의 SCENES(cover 0~0.27 / build 0.27~0.54 / adapt 0.54~0.76 / grow 0.76~1)이며, 모든 장면은 진행률(story)을 따릅니다.
 
 - cover만 스크롤로 움직입니다. 고정 스크롤의 앞 2화면(`COVER_SCROLL` 2/2.8)을 `useSpring(stiffness 55, damping 22)`로 부드럽게 따라갑니다.
-- 모래가 수평선에 자리 잡으면 build → adapt → grow가 `PLAY_SECONDS`(11초) 동안 시간 기반으로 재생됩니다(playhead). 재생하는 동안에는 `components/layout/scrollLock.ts`로 스크롤을 cover 끝 위치에 고정합니다(휠·터치·스크롤 키 차단, 스크롤바 이동은 되돌림, Lenis stop). 재생이 끝나면 풀리고, 링크를 누르면 바로 풀려 메뉴 이동은 동작합니다. 재생 중이거나 끝난 뒤 cover 끝보다 조금(`REWIND_FROM`, 트랙 진행률 0.01) 위로 올라가면 선인장·꽃가루·문구가 0.35초 동안 사라진 뒤(outro) 처음 상태로 돌아가고, 다시 내려오면 처음부터 재생됩니다. 남은 0.8화면은 브라우저 창이 머무는 자리이며, 창이 올라올 때 장면 문구와 모래 GROW.는 창보다 먼저 사라집니다(textFade).
+- 모래가 수평선에 자리 잡으면 build → adapt → grow가 `PLAY_SECONDS`(11초) 동안 시간 기반으로 재생됩니다(playhead). 재생하는 동안에는 `components/layout/scrollLock.ts`로 스크롤을 cover 끝 위치에 고정합니다(휠·터치·스크롤 키 차단, 스크롤바 이동은 되돌림, Lenis stop). 재생이 끝나면 풀리고, 링크를 누르면 바로 풀려 메뉴 이동은 동작합니다. 재생 중이거나 끝난 뒤 cover 끝보다 조금(`REWIND_FROM`, 트랙 진행률 0.01) 위로 올라가면 선인장·꽃가루·문구가 0.35초 동안 사라진 뒤(outro) 처음 상태로 돌아가고, 다시 내려오면 처음부터 재생됩니다. 남은 0.8화면은 모래 전환이 끝나는 자리입니다. 창으로 넘어갈 때는 아래 "모래 전환"을 따릅니다.
 - 모션 감소 설정에서는 시간 재생 없이 cover가 끝나면 바로 완성된 장면(grow 끝)을 보여 주고, 스크롤을 고정하지 않습니다.
-- 이야기 구간 높이(`.storyTrack`·`.track`의 3.8)와 `COVER_SCROLL`은 함께 고칩니다. 진행률은 `.storyTrack` 기준이고, `.track`은 브라우저 창 내용 이동 거리(`--travel`)만큼 더 깁니다.
+- 이야기 구간 높이(`.storyTrack`·`.track`의 3.8)와 `COVER_SCROLL`은 함께 고칩니다. 진행률은 `.storyTrack` 기준이고, `.track`은 창틀이 풀리는 구간(`DISSOLVE_SCREENS` 0.9화면, `scenes.ts`, CSS `--dissolve`)만큼 더 깁니다. 무대(`.stage`)는 이 구간 끝까지 고정됩니다.
 - 로고(홈 링크)를 이 페이지에서 누르면 바로 맨 위로 점프하지 않습니다. 이야기를 끝난 상태로 두고(재생 중이면 멈춤), 창이 내려가며 cover 끝으로 이동한 뒤 `RETURN_SECONDS`(3초) 동안 ease-in-out으로 맨 위까지 미끄러지듯 올라갑니다. 그래서 모래가 천천히 올라와 덮었다가 천천히 내려가며 첫 화면이 드러납니다(`glideTo`, 이동 중 입력 무시). `scrollToY`·`glideTo`는 이동 전에 Lenis 높이를 다시 재서, 창 내용만큼 길어진 페이지 끝이 잘리지 않게 합니다.
 
-#### 브라우저 창 (DesertWindow, 소개·기술·프로젝트·디자인·연락처가 들어 있음)
+#### 브라우저 창 (WindowFrame, 소개·취미·프로젝트·디자인·연락처가 들어 있음)
 
-- 크림색 창(PC 위 120px·최대 1240px, 모바일 위 96px·좌우 12px, 아래 끝은 화면 밖)이 모래 아래에서 올라와 사막 무대 안에 고정됩니다. 스크롤을 따라 조금씩 움직이지 않고 한 번에 움직입니다(raise): 이야기가 끝난 뒤 cover 끝에서 조금(트랙 진행률 0.005) 내려가면 0.9초 동안 올라오며 페이지도 창 내용 시작 위치(`travelStart`)로 함께 이동하고(`glideTo`, 이동 중 휠·터치·키 무시), 창 내용 맨 위에서 조금 올라가면 같은 방식으로 내려가며 cover 끝으로 돌아갑니다. 메뉴 이동처럼 그 지점을 건너뛰면 창만 바로 바뀝니다. 무대는 페이지 끝까지 고정되어 사막 분위기가 끊기지 않습니다.
-- 위쪽 막대: 코랄·노랑·초록 점과 주소. 주소는 섹션 순서대로 `/about` → `/projects` → `/design` → `/contact`이며, 각 섹션 윗부분이 창 40% 지점까지 올라오면 바뀝니다(맨 끝에서는 마지막 섹션).
-- 창 안 내용은 안쪽 스크롤바 없이 페이지 스크롤에 맞춰 transform으로 이동합니다.
-- 한 화면 = 한 섹션: 창 안의 각 `[data-page]`(소개, 기술, 프로젝트 1·2·3, 디자인, 연락처)는 창 높이(`--page-h`, DesertWindow가 설정하며 그 전에는 CSS 기본값 `100svh − 164px`, 모바일 `− 132px`) 이상입니다. 창 안 스크롤은 일반 스크롤처럼 자유롭게 움직이고(페이지 단위로 끊지 않음), 헤더 메뉴로 이동하면 섹션 윗선이 창 윗선에 정확히 맞아 그 섹션 하나만 잘림 없이 보입니다. 그래서 각 페이지가 창 높이를 넘지 않게 유지합니다(PC·1024×768·390×844 기준 확인, 320px 폭은 소개·프로젝트가 넘침).
-- 같은 페이지의 #about·#skill·#project·#design·#contact 링크(헤더 메뉴)는 기본 이동을 막고 창 안 해당 위치로 스크롤합니다. 이때 이야기는 바로 끝난 상태가 되고, 모래 전환도 다시 재생하지 않고 사막 상태로 바로 맞춘 뒤 창이 올라옵니다(enterWindow: jumpPastStory + `sandProgress.jump`). 주소에 해시가 있으면 처음 열 때도 이동하고, 창 밖 요소로 키보드 포커스가 가면 창 위쪽 1/3 지점으로 가져옵니다.
+- 구조(1단계): 창은 이야기 트랙 바로 뒤에 오는 **일반 문서 내용**이고(트랙의 마지막 한 화면과 겹치게 `.anchor`가 음수 여백), 창 안은 페이지 스크롤로 그대로 내려갑니다(안쪽 스크롤바·transform 이동 없음, sticky 사용 가능). 창이 풀려나는 지점(`.anchor` 위치)에 닿기 전에는 WindowFrame이 창을 transform으로 화면 맨 위에 붙잡아 둡니다.
+- 층 순서: 모래 전환이 끝날 때까지 창은 무대 뒤에 숨어 있고(`.scenes`의 `.track` z-index 2, 창 1), 모래가 능선째 가라앉는 동안(raise 0.6~1) 무대에서 모래와 흰빛을 뺀 나머지를 숨겨(`.stage[data-handoff]`) 창이 능선 위로 드러납니다. raise가 1이 되면 `.scenes[data-up]`으로 창이 무대 앞으로 옵니다.
+- 창틀 값 `--frame`(1 브라우저 창 → 0 전면): 모래 전환이 끝난 자리(`travelStart`)부터 `DISSOLVE_SCREENS`(0.9화면) 동안 창을 그 자리에 붙잡은 채 스크롤에 맞춰 1→0으로 바뀝니다. PC는 제목 표시줄(고정, 96px)이 위로 빠지며 흐려지고, 모바일은 카드(위 84px·좌우 8px·둥근 위 모서리, clip-path)가 화면 전체로 열리며 막대(36px)가 빠집니다. 위로 스크롤하면 그대로 거꾸로 돌아옵니다. `--frame`이 0.5 아래면 헤더가 떠 있는 상태가 됩니다(헤더 항목 참고). 2단계 이후 각 단계 연출은 이 값과 단계별 스크롤 진행에 묶습니다.
+- 크림색 창(PC 1024px 이상은 최대화한 브라우저처럼 화면 전체(여백·둥근 모서리 없음, 선생님 요청). 위쪽 막대 96px(좌우 4.2%로 헤더와 같아 신호등 버튼이 햄버거와 대칭)라 고정 헤더의 로고·햄버거가 막대 안에 제목 표시줄처럼 들어감, 1024~1279px는 탭을 촘촘히 함. 모바일 위 84px·좌우 8px. 선생님 요청: 창이 작으면 답답해 보임). 모래 전환은 스크롤을 따라 조금씩 움직이지 않고 한 번에 재생됩니다(raise 0→1): 이야기가 끝난 뒤 cover 끝에서 조금(트랙 진행률 0.005) 내려가면 `RAISE_SECONDS`(2.6초) 동안 재생되며 페이지도 `travelStart`로 함께 이동하고(`glideTo`, 이동 중 휠·터치·키 무시), 창 맨 위(`travelStart`)보다 조금 올라가면 거꾸로 재생되며 cover 끝으로 돌아갑니다. 메뉴·해시·키보드 포커스로 창 안에 바로 들어가면 전환 없이 창이 바로 올라온 상태가 됩니다(`enterWindow`, `raise.jump(1)`).
+- 모래 전환(`ConceptScenes.tsx`, 선생님 피드백: 창이 스윽 올라오지 말고 선인장 마지막 장면에서 이어지게): raise 값을 구간(`HANDOFF`)으로 나눠 씁니다. 선인장이 살짝 가라앉으며 사라짐(0~0.16, .cactusWrap의 opacity·y) → 문구와 모래 GROW.가 흐려지며 오른쪽으로 날아감(0.06~0.24, blur·x) → 선인장이 사라진 뒤(0.16) 모래 이미지가 무대 맨 앞(z-index 10)으로 와서 처음 cover와 같은 모양으로 올라와 화면을 덮음(0.12~0.52) → 덮인 모래가 흰빛으로 밝아짐(.handoffLight, 0.42~0.86, 창의 흰색과 이어지게) → 모래가 능선째 아래로 가라앉으며 무대 뒤의 창이 위에서부터 드러남(0.6~1, 모래 이미지 위쪽 하늘이 투명해서 실제 능선 모양이 그대로 경계가 됨). 창은 0.6 전에는 clip-path로 숨겨 두고, 0.6부터 헤더 햄버거를 숨기고(`upAt`) 0.8에 소개 등장 모션을 재생합니다(`enterAt`). 이전의 창이 아래에서 올라오는 방식(SAND_HANDOFF=false)은 새 구조에서 지원하지 않아 지웠습니다. 모션 감소에서는 전환 없이 바로 바뀝니다.
+- 위쪽 막대: 맥 창 버튼처럼 코랄·노랑·초록 원(PC 13px, 1023px 이하 12px)과 탭. 원 묶음에 마우스를 올리거나 키보드 포커스가 가면 코랄에 ×, 노랑에 −, 초록에 ›가 나타나고, 코랄(aria-label "창 닫기")·노랑("창 내리기")을 누르면 창 맨 위로 옮긴 뒤 위로 스크롤했을 때와 같이 모래 전환이 거꾸로 재생되며 cover 끝(선인장 완성 장면)으로 돌아가고(ConceptScenes의 `closeWindow`), 다시 아래로 스크롤하면 창이 다시 나타납니다. 초록("다음 섹션")은 다음 파트 맨 위로 이동합니다(소개 → 프로젝트 → 디자인 → 연락처 → 다시 소개, 주소 해시도 바뀜). 버튼은 창틀이 보이는 동안(창 맨 위 근처)만 화면에 있습니다.
+- PC 제목 표시줄(1024px 이상): 왼쪽 신호등 버튼, 가운데 로고(고정 헤더), 오른쪽 탭. 막대 위 안쪽 여백 28px로 버튼·탭 글자 중심을 로고 중심(62px, 헤더 행 높이는 76px 햄버거가 정함)에 맞춤. 창이 브라우저 창 모습으로 보이는 동안(WindowFrame이 html에 `data-window-up`, 창틀이 풀리면 빠짐) PC에서는 햄버거를 숨기고 그 자리에 탭이 놓입니다(같은 메뉴가 두 번 나오지 않게). 탭은 막대 높이를 다 쓰고, 흰 면(`::before`)이 아래에서 위로 차오름(호버, 0.4초)·지금 파트는 늘 가득. 고정 헤더가 막대 위에 겹치므로 헤더(.header)는 `pointer-events: none`이고 로고·햄버거·전체 메뉴 패널만 클릭을 받습니다(안 그러면 탭·신호등 버튼이 눌리지 않음). 아래 설명의 탭 높이 변화(34→64px)는 1023px 이하에만 해당합니다.
+- 탭(주 메뉴): 위쪽 막대에 ABOUT·PROJECTS·DESIGN·CONTACT가 브라우저 탭으로 놓입니다(PC는 오른쪽, 모바일은 맥 버튼 오른쪽. `data/navigation.ts`의 navLinks + navCta, 일반 메뉴 링크라 같은 창 안 이동, nav aria-label "창 안 이동"). 지금 파트의 탭은 마우스 올린 탭과 같은 모양으로 늘 위로 올라와 있고(64px, 1023px 이하 48px, 흰 면으로 본문과 이어짐, aria-current), 나머지는 회색 막대(#F0F0ED) 위 글자만. 마우스를 올린 탭은 파일을 꺼내듯 창 윗선 밖까지 위로 길어지고 흰색이 됨(34→64px, 1023px 이하 28→48px, 0.32초 살짝 튀는 곡선, 그림자, 터치·모션 감소 제외). 지금 파트는 화면 가운데를 지나는 파트입니다(IntersectionObserver). 탭 점과 탭 테두리·막대 아래 구분선은 사용자 요청으로 없앰(선 없이 면 색으로만 구분). 주소창과 오른쪽 세로 메뉴는 사용자 요청으로 탭으로 대체해 없앴습니다. 480px 이하는 점 없이 촘촘하게, 그래도 넘치면(320px) 탭 줄이 가로로 밀립니다.
+- 연속 스크롤(1단계, 사용자 승인): 이전의 "한 번에 한 파트만 보이기"는 없앴습니다. 소개 → 취미 → 프로젝트 → 디자인 → 연락처가 한 줄로 이어지고, 헤더 메뉴·탭·초록 버튼은 해당 파트로 이동하는 링크입니다.
+- 한 화면 = 한 섹션: 창 안의 각 `[data-page]`(소개, 취미, 프로젝트 1·2·3, 디자인, 연락처)는 창 높이(`--page-h` = `max(600px, 100svh)` − `--chrome`) 이상입니다. `--chrome`은 위쪽 막대·떠 있는 헤더가 가리는 높이(PC 96px, 1023px 이하 120px)이고 창 내용 맨 위에 그만큼 여백이 있습니다. 헤더 메뉴로 이동하면 섹션 윗선이 `--chrome` 아래에 맞아 그 섹션 하나만 잘림 없이 보입니다(`scrollToY(위치 − chrome)`).
+- 같은 페이지의 #about·#project·#design·#contact 링크(헤더 메뉴·탭)는 기본 이동을 막고 창 안 해당 위치로 스크롤합니다. 이때 이야기는 바로 끝난 상태가 되고, 모래 전환도 다시 재생하지 않고 사막 상태로 맞춘 뒤 창이 바로 올라온 상태가 됩니다(enterWindow). 주소에 해시가 있으면 처음 열 때도 이동하고, 이야기 중에 창 안으로 키보드 포커스가 가면 창을 올리고 그 요소를 화면 위쪽 1/3 지점으로 가져옵니다.
 
 - cover: 모래(`public/images/hero/hero-sand-bg.webp`)가 히어로의 원래 언덕 위치에서 올라와 화면을 덮고(COVER.risen), 덮인 동안 히어로를 숨겨 하늘 배경으로 바꾼 뒤(COVER.swap), 모래 윗선이 무대 62%에 올 때까지 내려갑니다.
 - cover 중 헤더(coverHeader): 올라오는 능선 뒤로 가려지고, 덮인 동안 숨겨지며, 내려가는 능선을 따라 다시 드러납니다. CREST_PROFILE(모래 이미지 가로 11지점의 능선 높이)로 clip-path를 만듭니다. cover 구간이 끝나면(local ≥ 1) 인라인 스타일을 모두 지웁니다. 능선이 헤더에 닿기 전에는 clip-path를 걸지 않아 모바일 메뉴 패널이 잘리지 않습니다.
@@ -141,17 +151,20 @@ artifacts/                 화면 캡처와 확인 스크립트
 - grow: 꽃이 피고 PollenGrow가 위에서 떨어지는 모래알로 "GROW."를 왼쪽부터 쌓습니다. 쌓인 모래알은 짙은 모래색 4가지(#A8763F·#B8864C·#946233·#C4955A), G와 마침표는 노랑(#E9A33A)입니다. 아래에 "웬만해선 시들지 않습니다."와 "선인장처럼, 어떤 환경에서도 생각보다 잘 자라는 사람입니다."(선생님 추천 문구)가 이어집니다.
 - 마무리 신호: 재생이 끝나 스크롤 고정이 풀리면 0.3초 뒤 화면 아래 가운데에 가는 세로선과 그 위를 떨어지는 모래알(.scrollCue, 글자 없음, aria-hidden)이 나타나고, 다시 스크롤하면 사라집니다. 모션 감소 설정에서는 시간 재생이 없으므로 나타나지 않습니다.
 - 배치: PC 선인장은 오른쪽 70%에 고정(1.18배, 4svh 아래), 모바일은 가운데. 장면 문구는 왼쪽 15vw·높이 26%(모바일 왼쪽 24px·높이 18~20%). GROW. 블록은 무대 33%(모바일 30%) 기준선이며 PollenGrow baseline과 `.closing` top을 함께 고칩니다.
-- 전환: 재생의 마지막 15% 동안 무대 하단이 모래색으로 흐려지고(.groundFade, 선인장 뒤), 이어서 브라우저 창이 올라옵니다. 이전의 모래색→크림색 띠(.handoff)는 없앴습니다.
-- 층 순서: 하늘(+시간대 층) < 히어로 < 모래 < 색조 < 바닥 흐림 < 선인장 < 모래바람 < 꽃가루 < 문구 < 브라우저 창.
+- 전환: 재생의 마지막 15% 동안 무대 하단이 모래색으로 흐려지고(.groundFade, 선인장 뒤), 이어서 스크롤하면 모래 전환으로 브라우저 창이 나타납니다(위 "모래 전환" 참고). 이전의 모래색→크림색 띠(.handoff)는 없앴습니다.
+- 층 순서: 하늘(+시간대 층) < 히어로 < 모래 < 색조 < 바닥 흐림 < 선인장 < 모래바람 < 꽃가루 < 문구 < 브라우저 창. 모래 전환 중(raise 0.16~1 미만)에는 모래가 브라우저 창 위(z-index 10)로, 흰빛(.handoffLight)은 그 위(11)로 옵니다.
 - 성능: 히어로가 덮이면 `[data-pause-scope]`에 `data-paused`를 붙여 AvatarCanvas(frameloop never)와 SandStream을 멈춥니다. 선인장 3D는 모래가 내려가기 시작한 뒤, 무대가 화면에 있을 때만 그립니다.
 - 스크린리더 순서: 직접 만들고 → 표면을 설계하고, 경험을 짓다. → GROW.(sr-only) → 웬만해선 시들지 않습니다. → 설명.
 
-### 소개·기술 (AboutStory, #about·#skill)
+### 소개 (AboutStory, #about)
 
 - 브라우저 창 안에 들어갑니다(`app/page.tsx`에서 ConceptScenes의 `content`로 전달).
-- 소개 페이지: "ABSORB."(코랄 점)·"소개" 제목 아래 2단 구성. 내용은 페이지 위쪽부터 배치합니다. 왼쪽은 프로필 사진(300px, 높이 860px 이하 PC 240px, 모바일 120px, 4:5, `object-position: 50% 30%`, `unoptimized`)과 이름·직무(생년월일은 값이 있을 때만), 오른쪽은 큰 세리프 문장("화면을 만들고, 클릭했을 때 동작하게 만드는 과정이 재밌습니다.")과 자격증(값이 있을 때만)·교육 목록입니다. 목록은 굵은 연도(고정폭 2.9em, 항목이 세로로 정렬됨) / 항목 / 회색 보조정보(자격증: 취득월·기관, 교육: 상태·기간)를 한 줄로 두고(모바일은 보조정보를 아랫줄에) 왼쪽에 가는 세로선을 둡니다. 900px 미만은 작은 사진(112px) 옆에 이름, 그 아래 문장과 목록.
-- 기술 페이지: "학습·사용 기술" 제목과 기술 6개를 3열(모바일 2열) 세리프 목록으로 보여 줍니다.
-- 데이터는 `About.tsx`의 `profile`, `Skills.tsx`의 `skills`를 씁니다. 소개글·자격증·기술 설명은 값이 있을 때만 표시합니다.
+- 소개 페이지: 제목 없이 2단 구성이며, 남는 높이를 내용 묶음 위아래로 반씩 나눠(.inner의 margin auto) 기술 띠는 페이지 맨 아래에 둡니다(섹션은 aria-label "소개"). 창이 화면을 꽉 채우므로 소개 본문 폭은 최대 1440px(다른 창 페이지는 1120px), PC 좌우 여백은 헤더와 같은 4.2%(최소 40px)라 신호등 버튼·사진·햄버거가 한 선에 맞습니다. 사진·이름·문장·목록 글자는 화면 폭에 비례해 커지고(문장 최대 38px), 사진 폭은 `--photo`(20vw와 창 높이 기준 중 작은 값, 240~380px)라 창 높이를 넘지 않습니다. 높이 880px 이하는 세로 간격을 조금, 790px 이하는 더 줄입니다(1905×920·1920×860·1440×830·1280×720·1024×768·390×844에서 넘치지 않음 확인). 왼쪽은 프로필 사진(모바일 120px, 4:5, `object-position: 50% 30%`, `unoptimized`)과 이름(옆에 작은 회색 영문 "/ Beak hyeon jeong")·생년·T.·E.(모두 `[수정 예정]` 임시 값), 오른쪽은 소개 문장("안녕하세요, 새로운 환경에 금방 적응해 / 결과로 증명하는 백현정입니다.", 본문과 같은 Pretendard 700, clamp(22px, 2vw, 28px), "결과로 증명하는"에 옅은 코랄 형광펜 밑줄)과 자격증(값이 있을 때만)·교육 목록입니다. 목록 제목 "자격증·교육"은 사이트 제목 글꼴(DM Serif + 본명조 600, 22~28px, 모바일 18px)로 목록 글자(고딕)와 구분합니다(작은 회색 라벨로 바꾸지 않음). 목록은 굵은 연도(고정폭 2.9em, 항목이 세로로 정렬됨) / 항목 / 회색 보조정보(자격증: 취득월·기관, 교육: 상태·기간)를 한 줄로 두고(모바일은 보조정보를 아랫줄에) 왼쪽에 가는 세로선을 둡니다. 900px 미만은 작은 사진(112px) 옆에 이름, 그 아래 문장과 목록.
+- 소개 등장 모션: 창이 나타나거나(모래 전환 raise 0.8 통과) 메뉴·탭으로 소개에 들어올 때마다 다시 재생합니다. WindowFrame이 첫 파트(소개)에 `data-enter`("wait" 창이 내려가 있는 동안 숨김 / "play" 재생)를 붙이고, 연출은 `AboutStory.module.css` 끝에 있습니다: 사진이 아래에서 위로 열리며 확대(1.18배)에서 자리 잡음 → 문장 두 줄이 각자 가림막 안에서 올라옴 → 형광펜 밑줄이 왼쪽부터 그어짐 → 이름·T·E, 목록 제목·줄(70ms 간격)과 왼쪽 세로선이 위에서 그어짐 → 기술 띠(1초). 각 요소의 지연은 인라인 `--d`. 속성이 없거나 모션 감소면 그냥 보입니다. 소개 페이지는 Reveal을 쓰지 않습니다(브이로그는 계속 Reveal).
+- 기술: 별도 페이지 없이 소개 페이지 아래쪽에 기술 아이콘 띠가 왼쪽으로 끝없이 흐릅니다(26초 한 바퀴, 같은 목록 2벌을 -50% 이동, 양끝 흐림, 호버 시 멈춤, 모션 감소 시 정지, 두 번째 벌은 aria-hidden). 기술은 HTML·CSS·Figma·Photoshop·Illustrator·JavaScript(사용자 지정), 회색(#8B9198, 본문보다 한 단계 뒤) 굵은 고딕 22px(모바일 17px)과 투명도 50% 아이콘 34px(모바일 26px), 마우스를 올린 항목만 진한 글자색. 띠는 창 양끝까지 이어져(음수 여백) 창 가장자리에서 흐려짐. 아이콘은 `public/images/skills/*.svg`(출처는 `public/images/SOURCES.md`, Photoshop·Illustrator는 직접 그린 Ps·Ai 배지)이고 `skills`의 `icon`에 경로가 있습니다. SKILLS 메뉴와 #skill은 없앴습니다.
+- 취미(HobbyFlow, section aria-label "취미"): 소개 다음. 창 높이의 무대가 구간 동안 `--chrome` 아래에 고정되고(1단계부터 창 안이 일반 스크롤이라 CSS sticky 사용), 스크롤 타임라인(`SEGMENTS`)을 따라 움직입니다. 취미마다 한 칸(머무는 구간, 그 취미가 선택되고 사진이 오른쪽에서 열림: 전시·카페 → 음악 → 여행 → 봉사), 그룹이 바뀌는 칸에 들어서면 트랙이 `SLIDE_SECONDS`(0.9초) 동안 시간 기준으로 끝까지 밀려 다음 패널이 오른쪽에서 들어옴(ABSORB → BUILD → GROW, 스크롤을 어디서 멈춰도 두 패널 사이에 걸치지 않음). 한 칸은 `UNIT`(창 0.75개)이고 구간 높이는 (1 + 칸 수 × UNIT) × 창 높이를 인라인으로 넣습니다(취미를 추가하면 자동으로 늘어남). 마우스 올림·포커스·탭으로 취미를 고르면 페이지 스크롤을 그 취미 칸 가운데로 옮겨(무대가 고정된 동안만, 화면은 그대로) 이어서 스크롤하면 그 다음 칸으로 감(예: MUSIC 고른 뒤 스크롤 → BUILD). 패널마다 왼쪽 단어(히어로와 같은 강조 글자·마침표 색)·바로 아래 뜻(단어 아래 밑줄은 사용자 요청으로 없앰, 간격 10px)("보고 듣고 흡수하는 것" / "규칙을 파악하고 전략을 짜는 것" / "꾸준히 끝까지 가는 것", 사용자 확정)·취미 버튼(선택된 것은 강조색과 앞 선), 글자·사진 묶음은 PC에서 아래 패딩 48px로 약 24px 위로 올림(위에 튀어나온 탭 때문에 위가 비어 보여서). 무대에는 위쪽 40px 흰 그림자를 둬 소개 화면 기술 띠의 선이 비치지 않게 함. 오른쪽 사진 박스(PC는 5:6, 가로·세로 사진이 고르게 덜 잘리도록. 높이가 패널 안쪽 높이의 80%, 세로 가운데. 1440에서 약 432×518. 글자 칸은 나머지 폭). 사진이 여러 장이면 슬라이드(`SLIDE_EVERY` 3.5초, 0.9초 동안 새 사진만 위로 떠오르고 이전 사진은 아래에 그대로 있다가 사라짐(두 장이 반투명하게 겹쳐 탁해지지 않게), 화면에 60% 이상 보일 때만, 사진에 마우스를 올리면 멈춤, 취미가 바뀌면 첫 장부터, 나머지 사진은 미리 불러옴, 사진에 마우스를 올리면 다음 사진이 커서 오른쪽 아래(18px)에 170px 5:6 카드로 따라다님(테두리 없음, body에 포털, 마우스만), 모션 감소 시 자동 넘김 없음). 취미가 바뀔 때도 사진은 흐려졌다 떠오르는 크로스페이드. 왼쪽 글자는 한 묶음(단어·뜻·선인장·취미)으로 세로 가운데. PC에서는 패널을 창 끝까지 쓰고 그리드를 [여백 | 단어 묶음 | 여백 | 사진 | 여백]으로 나눠 세 여백을 같게 함: 창 왼쪽 끝→단어 = 단어 끝→사진 = 사진→창 오른쪽 끝(사용자 확정, 1440에서 ABSORB 160px). 묶음 폭은 단어만 정함(나머지는 contain: inline-size, 뜻은 nowrap). 선인장 칸은 BUILD·GROW 290px, ABSORB 새싹 170px이고 창이 낮으면 먼저 줄어듦. 뜻과 취미 목록 사이 빈 곳에 선 그림 선인장(`HobbyCactus`, 시험 적용 중): ABSORB 새싹 위 물방울(취미 수만큼), BUILD 양팔 몸통 위 열매, GROW 같은 몸통 위 꽃. 해당 취미까지 온 열매·꽃이 강조색으로 차고, 패널이 들어올 때 선이 그려지듯 나타남. 선 약 2.2px, 단계마다 그림에 맞춰 잘라(viewBox) 땅선 왼쪽 끝이 글자 왼쪽 선과 맞고, 취미 목록 바로 위에 서 있음(bottom 0). 높이는 BUILD·GROW 최대 280px, ABSORB 새싹 최대 140px이며 남는 공간에 맞춰 줄어들고 자리를 차지하지 않음(absolute), 900px 미만은 숨김. 선 그리기 효과(pathLength)와 충돌하므로 vector-effect: non-scaling-stroke는 쓰지 않음. 되돌리려면 `HobbyCactus.tsx`를 지우고 HobbyFlow의 import와 `.cactusSlot` 블록, CSS의 cactus 규칙을 지웁니다. 패널이 25% 이상 보이면 글자가 올라오고 사진이 열림(모션 감소 시 즉시). 900px 미만은 사진 위·글자 아래. 분류: ABSORB 전시·카페·음악·여행·봉사(아기 돌봄 한 달, VOLUNTEER) / BUILD 보드게임 / GROW 러닝, 데이터 `data/profile.ts`의 `hobbies`(`group`, `photos` 배열, 피사체가 한쪽에 있는 사진은 `focus`에 object-position, 예: 01은 "26% 50%"), EXHIBITION & CAFE 사진 7장 등록(사용자 제공 원본 `assets/hobby/`, 화면용 `public/images/hobby/exhibition-cafe-01~07.webp`, 긴 변 1600px, 메타데이터 제거). 사진 없으면 "사진 준비 중"만 작게(이름은 왼쪽 목록과 겹쳐 뺌), 바탕은 취미마다 다른 강조색 농도(`tints`)라 바뀌는 게 보임. 사용자 요청: 작은 라벨·숫자 없음, 세로 큰 HOBBY 없음. 취미 설명 한 줄은 문장이 정해질 때까지 데이터에서 비워 숨김(`description`을 넣으면 이름 아래에 나옴).
+- 브이로그 페이지: 취미 다음 페이지(aria-label "브이로그"). "VLOG" 제목과 16:9 박스 하나이며, 박스 너비는 창 높이(`--page-h`)에 맞춰 한 화면 안에 들어가게 줄어듭니다. 데이터는 `data/profile.ts`의 `vlog`(`video`, `poster`)이고, 영상이 없으면 페이지 자체를 숨깁니다(사용자 결정).
+- 데이터는 `data/profile.ts`의 `profile`, `data/skills.ts`의 `skills`를 씁니다. 소개글·자격증·기술 설명은 값이 있을 때만 표시합니다.
 
 ### 대표 프로젝트 (WorkStory, #project)
 
@@ -175,7 +188,8 @@ artifacts/                 화면 캡처와 확인 스크립트
 
 ## 8. 이미지와 데이터
 
-- 프로젝트·디자인·내비게이션 데이터는 `data/`에서 관리합니다. 상세 페이지는 대표 프로젝트만 대상으로 하며, 보조 프로젝트에 상세 링크를 넣기 전에 라우트 지원을 확인합니다.
+- 화면에 쓰는 데이터는 모두 `data/`에서 관리합니다(profile·skills·contact·projects·design·navigation·stages). 컴포넌트 안에 데이터를 두지 않습니다. 상세 페이지는 대표 프로젝트만 대상으로 하며, 보조 프로젝트에 상세 링크를 넣기 전에 라우트 지원을 확인합니다.
+- 프로젝트 교체: `public/images/projects/<slug>/`에 데스크톱·모바일 화면(WebP)을 넣고 `data/projects.ts`의 `image`·`desktopImage`·`mobileImage`를 바꾼 뒤, 글을 실제 경험으로 고치고 `placeholder: false`로 둡니다. `accent`는 3단계 전면 프로젝트 패널의 색입니다(없으면 단계 색).
 - 이 환경에는 sharp가 없어 Next 이미지 최적화가 큰 PNG에서 멈춥니다. 큰 이미지는 미리 WebP로 변환하고 `unoptimized`로 불러옵니다(모래, 커서).
 - 모래 이미지를 교체하면 WebP 재생성, 능선 높이(35%, CREST_PROFILE), 전환 모래색(#E3BF91)을 다시 확인합니다.
 - 이미지가 바뀌지 않으면 실제 파일, 참조 경로, 브라우저 요청 주소와 로딩 상태를 확인합니다. 캐시 문제로 단정하거나 생성물을 먼저 지우지 않습니다.
@@ -224,6 +238,8 @@ artifacts/                 화면 캡처와 확인 스크립트
 2. 디자인 작업물(`data/design.ts`)이 비어 있어 "준비 중입니다"가 보입니다. 실제 작업을 넣거나 섹션을 숨길지 결정이 필요합니다.
 3. 실제 소개·교육·자격증·프로젝트·이미지 등록(사용자 요청 시). 프로필 사진은 등록 완료
 4. 상세 페이지(/work/[slug])를 크림 톤으로 맞출지 결정
-5. 전체 `npm.cmd run build`와 PC·태블릿·모바일 최종 점검
+5. 리디자인 2단계 이후 진행(위 "리디자인 진행" 참고, 사용자 승인 후)
+6. `Hero.module.css`에 이전 구성에서 남은 쓰지 않는 규칙(photo, workLink, browserScene 등) 정리
+7. 전체 `npm.cmd run build`와 PC·태블릿·모바일 최종 점검
 
 이 순서는 작업 방향이며, 사용자가 요청하지 않은 단계를 자동으로 진행하라는 뜻은 아닙니다.

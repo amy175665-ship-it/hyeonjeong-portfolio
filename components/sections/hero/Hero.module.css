@@ -12,9 +12,7 @@
 .hero::after { content: ""; position: absolute; inset: 0; z-index: 5; pointer-events: none; background: url('/images/paper-grain.svg') repeat; opacity: .055; mix-blend-mode: multiply; }
 .composition { position: relative; display: grid; grid-template-columns: .52fr 1.3fr .85fr; align-items: center; gap: 3%; max-width: 1600px; margin: auto; padding: 30px 5% 90px 0; }
 .intro { position: relative; z-index: 2; }
-.eyebrow, .disciplines, .workLink, .scrollLink, .miniEyebrow { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
-.eyebrow { display: flex; align-items: center; gap: 14px; font-size: clamp(11px, 0.75vw, 13px); letter-spacing: .16em; margin-bottom: 22px; }
-.eyebrow > span { width: 8px; height: 8px; flex-shrink: 0; border-radius: 50%; background: var(--blue); box-shadow: 0 0 0 4px #b9dbf650; }
+.workLink, .miniEyebrow { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
 .title { font-family: var(--font-editorial), Georgia, serif; font-size: clamp(72px, 7.6vw, 128px); font-weight: 400; line-height: .91; letter-spacing: -.045em; cursor: default; }
 .titleHidden { opacity: 0; pointer-events: none; }
 .coverNavigation, .coverSubtitle { display: none; }
@@ -22,7 +20,6 @@
 .title > span:last-child { margin-top: 8px; font-size: .93em; }
 .title em { position: relative; font-weight: 400; }
 .title em::after { content: ""; position: absolute; bottom: -8px; left: -6%; width: 109%; height: 8px; border-radius: 50%; border-top: 6px solid var(--sky); transform: rotate(-5deg); }
-.disciplines { max-width: 460px; font-size: clamp(10px, 0.7vw, 12px); line-height: 2; letter-spacing: .12em; margin-top: 38px; }
 .workLink { display: inline-flex; align-items: center; justify-content: center; gap: 28px; min-height: 48px; padding: 0 28px; margin-top: 24px; border: 1px solid currentColor; border-radius: 99px; font-size: 12px; letter-spacing: .14em; transition: background .2s, transform .2s; }
 .workLink:hover { background: #f7fbfea0; transform: translateY(-2px); }
 .workLink > span { font: 22px var(--font-pretendard), sans-serif; }
@@ -71,9 +68,6 @@
 .checkItem > span:first-child { display: grid; place-items: center; width: 22px; height: 22px; border: 1px solid #8ba6bf; border-radius: 50%; }
 .progressLabel { display: block; margin-top: 12px; font-size: 10px; color: #52687a; }
 .heroBottom { display: flex; justify-content: center; align-items: end; position: relative; z-index: 2; max-width: 1440px; margin: 0 auto; padding: 15px 5%; }
-.scrollLink { display: flex; flex-direction: column; align-items: center; gap: 9px; font-size: 9px; letter-spacing: .16em; padding: 8px; }
-.scrollLink span { font: 25px var(--font-pretendard), sans-serif; }
-.voice { position: relative; z-index: 2; max-width: 380px; margin: 30px auto 0; padding: 0 20px; }
 @keyframes playful { 0%, 100% { transform: translateY(0) rotate(0); } 50% { transform: translateY(-18px) rotate(14deg); } }
 @media (min-width: 1600px) { .hero { padding-top: 190px; } }
 @media (max-width: 1099px) {
@@ -93,11 +87,9 @@
   .composition { display: flex; flex-direction: column; padding: 16px 24px 0; gap: 28px; }
   .intro { width: 100%; max-width: 420px; padding-top: 10px; }
   .title { font-size: clamp(64px, 15.6vw, 102px); }
-  .eyebrow { margin-bottom: 18px; }
   .photo { top: 70px; left: auto; right: -65px; width: 140px; transform: rotate(12deg); opacity: .45; z-index: 0; }
   .photo figcaption { font-size: 12px; padding: 12px 0 0 8px; }
   .photo figcaption span { display: none; }
-  .disciplines { max-width: 330px; margin-top: 22px; font-size: 11px; line-height: 1.7; letter-spacing: .08em; }
   .workLink { margin-top: 18px; }
   .browserScene { width: 100%; max-width: 390px; margin-top: 0; }
   .browser { transform: rotate(3deg); padding: 14px; }
@@ -109,9 +101,6 @@
   .stickyNote { display: none; }
   .demoStatus { text-align: center; margin-top: 18px; min-height: 20px; max-width: none; }
   .heroBottom { justify-content: center; padding: 8px 24px 0; }
-  .scrollLink { gap: 2px; }
-  .voice { margin-top: 12px; }
-  .voice > div { margin-top: 0; }
   .cloudTwo { bottom: 260px; }
 }
 @media (max-width: 479px) { .photo { display: none; } }
@@ -134,18 +123,11 @@
 .photo { position: absolute; z-index: -1; left: -12%; top: 27%; width: 45%; height: 110%; padding: 0; background: #b9dbf6; transform: rotate(-30deg); box-shadow: none; opacity: 1; }
 .photo img { width: 100%; height: 100%; aspect-ratio: auto; object-fit: cover; object-position: 50% 50%; }
 .orbit { position: absolute; inset: 0; width: 100%; height: 100%; z-index: -2; stroke: #95b4d0; stroke-width: 1; opacity: .7; pointer-events: none; }
-.extras { position: relative; display: grid; grid-template-columns: 1fr 1fr; align-items: center; gap: 100px; max-width: 1000px; margin: auto; padding: 100px 40px 110px; }
-.extras .browserScene { width: 100%; max-width: 420px; margin: 0; }
-.extras .browser { transform: rotate(3deg); }
-.extras .disciplines { margin-top: 24px; }
-.extras .voice { margin: 30px 0; padding: 0; }
-.extras .scrollLink { align-items: flex-start; }
 @media (min-width: 1600px) { .hero { padding-top: 0; } }
 @media (max-width: 1099px) {
   .composition { min-height: max(720px, 100svh); padding: 135px 24px 100px; }
   .title { font-size: clamp(100px, 12.5vw, 138px); }
   .photo { left: -23%; top: 37%; width: 57%; height: 95%; }
-  .extras { gap: 50px; }
 }
 @media (max-width: 699px) {
   .composition { display: grid; min-height: max(640px, 92svh); padding: 120px 20px 120px; }
@@ -153,10 +135,6 @@
   .title { font-size: clamp(70px, 16.4vw, 112px); }
   .workLink { min-height: 52px; min-width: 226px; margin-top: 36px; padding: 0 24px; font-size: 10px; gap: 25px; }
   .photo { left: -32%; right: auto; top: 69%; width: 72%; height: 74%; opacity: .7; }
-  .extras { grid-template-columns: 1fr; gap: 38px; padding: 54px 24px 64px; }
-  .extrasIntro { max-width: 390px; width: 100%; margin: auto; }
-  .extras .browserScene { margin: auto; }
-  .extras .voice { max-width: none; }
 }
 @media (prefers-reduced-motion: no-preference) {
   .intro { animation: coverEnter 1.1s cubic-bezier(.2,.65,.3,1) both; }

@@ -1,0 +1,884 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+</head>
+<body>
+<title>선인장 창 프레임 시안</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Noto+Sans+KR:wght@400;500;700;800;900&family=Noto+Serif+KR:wght@600&display=swap">
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.1.9/dist/lenis.min.js"></script>
+<style>
+/* Layout: one continuous full-screen story. Pinned scenes (sticky stages) hand over to each other:
+   prologue → sand → window → full screen (ABSORB) → statement → hobbies → roots → stacked projects → morphing circle → night. */
+:root {
+  --ink: #202731; --muted: #58636E; --paper: #FCFCFB; --bar: #F0F0ED; --line: #E6E6E2;
+  --sand: #E3BF91; --sand-2: #D9B07E; --sand-3: #B8864C; --sand-4: #8A6238; --sand-pale: #EADBC2;
+  --coral: #E96B5A; --green: #7F9657; --yellow: #E9A33A; --night: #121B33; --night-2: #24314F;
+  --f-display: "DM Serif Display", "Noto Serif KR", Georgia, serif;
+  --f-serif: "Noto Serif KR", Georgia, serif;
+  --f-sans: "Noto Sans KR", "Pretendard", system-ui, -apple-system, sans-serif;
+  --ease-out: cubic-bezier(.16, 1, .3, 1);
+  --skew: 0deg;
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+html { scrollbar-width: thin; }
+body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--f-sans); overflow-x: clip; -webkit-font-smoothing: antialiased; }
+button { font: inherit; }
+.pin { position: relative; height: var(--h); }
+.sticky { position: sticky; top: 0; height: 100vh; height: 100svh; overflow: hidden; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* ---------- Floating header (after the window dissolves) ---------- */
+.hdr { position: fixed; z-index: 60; top: 0; left: 0; right: 0; height: 72px; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; padding: 0 4.2%; color: #fff; mix-blend-mode: difference; pointer-events: none; opacity: 0; transition: transform .45s var(--ease-out); }
+.hdr.hide { transform: translateY(-100%); }
+.hdr .logo { grid-column: 2; width: 26px; height: 32px; }
+.hdr .logo path { fill: currentColor; }
+.hdr .right { justify-self: end; display: flex; align-items: center; gap: 18px; }
+.roll { position: relative; display: inline-block; overflow: hidden; height: 1.25em; font: 700 13px/1.25 var(--f-sans); letter-spacing: .16em; }
+.roll span { display: block; transition: transform .5s var(--ease-out); }
+.roll span + span { position: absolute; left: 0; top: 0; transform: translateY(110%); }
+.roll.go span:first-child { transform: translateY(-110%); }
+.roll.go span + span { transform: none; }
+.burger { display: grid; gap: 6px; width: 30px; }
+.burger i { height: 2px; background: currentColor; }
+
+/* ---------- Review HUD (mockup only) ---------- */
+.hud { position: fixed; z-index: 80; left: 16px; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); display: flex; align-items: center; gap: 10px; padding: 6px 6px 6px 14px; border-radius: 999px; background: rgb(18 22 30 / .82); color: #F3EFE7; font: 500 12px/1 var(--f-sans); backdrop-filter: blur(8px); box-shadow: 0 8px 24px -12px rgb(0 0 0 / .5); }
+.hud b { font-weight: 700; color: #fff; min-width: 9.5em; }
+.hud button { border: 0; border-radius: 999px; padding: 9px 13px; background: #F3EFE7; color: #121B33; font-weight: 700; font-size: 12px; cursor: pointer; }
+.hud button:focus-visible { outline: 2px solid var(--yellow); outline-offset: 2px; }
+
+/* ---------- INTRO: prologue end → sand → window → full screen ---------- */
+#intro .sticky { background: linear-gradient(180deg, #F5F2EE 0%, #EFE8DF 45%, #F3E3CB 62%); }
+.rays { position: absolute; inset: -10% -10% auto auto; width: 70%; height: 90%; background: linear-gradient(115deg, transparent 40%, rgb(255 236 205 / .55) 48%, transparent 56%, rgb(255 236 205 / .4) 62%, transparent 70%); filter: blur(8px); }
+.farDunes { position: absolute; left: -5%; right: -5%; top: 54%; height: 30%; }
+.farDunes svg, .sand svg { width: 100%; height: 100%; display: block; }
+.pCactus { position: absolute; z-index: 3; left: 72%; bottom: 4%; width: min(15vw, 180px); transform: translateX(-50%); }
+.pCactus svg, .bCactus svg, .sprout svg { width: 100%; display: block; overflow: visible; }
+.closing { position: absolute; z-index: 4; left: 50%; top: 17%; width: min(92vw, 760px); transform: translateX(-50%); text-align: center; }
+.closing .grow { font: 400 clamp(64px, 11vw, 168px)/.9 var(--f-display); letter-spacing: -.02em; color: transparent; background: radial-gradient(circle, var(--sand-4) 38%, transparent 42%) 0 0 / 6px 6px, radial-gradient(circle, var(--sand-3) 38%, transparent 42%) 3px 3px / 6px 6px; -webkit-background-clip: text; background-clip: text; }
+.closing .grow b { font-weight: 400; background: radial-gradient(circle, var(--yellow) 42%, transparent 46%) 0 0 / 6px 6px; -webkit-background-clip: text; background-clip: text; }
+.closing .lead { margin: 18px 0 0; font: 600 clamp(26px, 3vw, 46px)/1.2 var(--f-serif); letter-spacing: -.03em; }
+.closing .note { margin: 10px 0 0; color: var(--muted); font-size: clamp(14px, 1.15vw, 18px); }
+.sand { position: absolute; z-index: 2; left: -4%; right: -4%; top: 0; height: 230vh; height: 230svh; will-change: transform; }
+.sand.front { z-index: 20; }
+.light { position: absolute; z-index: 21; inset: 0; pointer-events: none; opacity: 0; background: radial-gradient(ellipse 90% 75% at 50% 35%, #FFFDF9 0%, #FFF8EEF2 45%, #FCF3E4B3 75%, #F6E6CC80 100%); }
+
+.win { position: absolute; z-index: 10; inset: 0; visibility: hidden; }
+.win .frame { position: absolute; background: var(--paper); overflow: hidden; }
+.win .tbar { position: absolute; z-index: 3; left: 0; right: 0; top: 0; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; padding: 0 4.2%; background: var(--bar); }
+.win .dots { display: flex; gap: 8px; }
+.win .dots i { width: 13px; height: 13px; border-radius: 50%; background: var(--coral); }
+.win .dots i:nth-child(2) { background: var(--yellow); } .win .dots i:nth-child(3) { background: var(--green); }
+.win .tbar .logo { width: 30px; height: 36px; } .win .tbar .logo path { fill: var(--green); }
+.win .tabs { justify-self: end; display: flex; gap: 2px; align-self: stretch; }
+.win .tabs span { display: grid; place-items: center; padding: 0 20px; font: 600 12.5px/1 var(--f-sans); letter-spacing: .12em; color: var(--muted); }
+.win .tabs .on { background: var(--paper); color: var(--ink); border-radius: 10px 10px 0 0; margin-top: 14px; }
+.win .page { position: absolute; left: 0; right: 0; bottom: 0; }
+.photo { position: absolute; z-index: 1; overflow: hidden; background: #F2EEE8; }
+.photo canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.aboutText { position: absolute; z-index: 2; left: 38%; top: 15%; width: 50%; display: grid; gap: 22px; }
+.aboutText .s { font: 700 clamp(20px, 2vw, 30px)/1.45 var(--f-sans); letter-spacing: -.03em; margin: 0; }
+.aboutText .s em { font-style: normal; background: linear-gradient(#F7C9C0, #F7C9C0) 0 88% / 100% 34% no-repeat; }
+.aboutText .h { font: 600 clamp(18px, 1.6vw, 24px)/1 var(--f-serif); margin: 6px 0 0; }
+.aboutText ul { list-style: none; margin: 0; padding: 0 0 0 18px; border-left: 1px solid var(--line); display: grid; gap: 12px; font-size: 15px; }
+.aboutText ul b { display: inline-block; width: 3em; }
+.aboutText .who { font-size: 15px; color: var(--muted); }
+.absorbWord { position: absolute; z-index: 3; left: 3.4%; bottom: -1.6vw; margin: 0; font: 900 clamp(84px, 21vw, 330px)/.8 var(--f-sans); letter-spacing: -.065em; color: var(--ink); mix-blend-mode: multiply; display: flex; pointer-events: none; }
+.absorbWord span { display: inline-block; }
+.absorbWord .dot { color: var(--coral); mix-blend-mode: normal; }
+.cue { position: absolute; z-index: 4; left: 50%; bottom: 26px; width: 2px; height: 52px; transform: translateX(-50%); background: linear-gradient(transparent, rgb(32 39 49 / .5)); overflow: hidden; opacity: 0; }
+.cue::after { content: ""; position: absolute; left: -1px; top: 0; width: 4px; height: 12px; border-radius: 2px; background: var(--sand-4); animation: cue 1.8s ease-in-out infinite; }
+@keyframes cue { from { transform: translateY(-12px); } to { transform: translateY(52px); } }
+
+/* ---------- ABSORB statement: words soak from sand to ink ---------- */
+#statement .sticky { display: grid; place-items: center; background: var(--paper); }
+.stmt { width: min(88vw, 1180px); margin: 0; font: 800 clamp(34px, 5.3vw, 88px)/1.18 var(--f-sans); letter-spacing: -.045em; word-break: keep-all; text-wrap: balance; }
+.stmt .w { display: inline-block; color: var(--sand-pale); }
+.stmt .w.mark { background: linear-gradient(#F7C9C0, #F7C9C0) 0 86% / calc(var(--m, 0) * 100%) 30% no-repeat; }
+.ledger { position: absolute; left: 6%; right: 6%; bottom: 7%; display: grid; grid-template-columns: repeat(3, 1fr); gap: 0 4vw; }
+.ledger div { display: grid; gap: 6px; padding-top: 14px; border-top: 1px solid var(--line); opacity: 0; filter: blur(8px); transform: translateY(12px); }
+.ledger b { font: 800 clamp(20px, 2.2vw, 34px)/1 var(--f-sans); letter-spacing: -.03em; }
+.ledger span { color: var(--muted); font-size: 14px; line-height: 1.5; }
+.sprout { position: absolute; left: 6%; bottom: 0; width: clamp(56px, 7vw, 110px); transform-origin: 50% 100%; }
+
+/* ---------- Hobbies: one compact strip moving with the scroll ---------- */
+#hobby .sticky { background: var(--paper); }
+.strip { position: absolute; top: 50%; left: 0; display: flex; gap: 2.4vw; padding-left: 6vw; transform: translate(var(--hx, 0px), -50%) skewX(var(--skew)); will-change: transform; }
+.hcard { position: relative; flex: none; width: clamp(240px, 24vw, 380px); aspect-ratio: 4 / 5; border-radius: 4px; overflow: hidden; display: grid; align-content: end; padding: 22px; color: #fff; cursor: default; transition: transform .5s var(--ease-out); }
+.hcard::before { content: ""; position: absolute; inset: 0; background: var(--bgc); transition: transform .8s var(--ease-out); }
+.hcard:hover { transform: translateY(-10px); }
+.hcard:hover::before { transform: scale(1.06); }
+.hcard .g { position: absolute; top: 16px; left: 18px; font: 400 clamp(46px, 5vw, 80px)/.9 var(--f-display); opacity: .28; letter-spacing: -.02em; }
+.hcard h3 { position: relative; margin: 0; font: 800 clamp(20px, 1.9vw, 28px)/1.1 var(--f-sans); letter-spacing: -.02em; }
+.hobbyTitle { position: absolute; left: 6vw; top: 12vh; margin: 0; font: 400 clamp(40px, 6vw, 96px)/1 var(--f-display); letter-spacing: -.02em; color: var(--ink); }
+.hobbyTitle em { font-style: normal; color: var(--coral); }
+
+/* ---------- Roots → BUILD ---------- */
+#roots .sticky { background: var(--paper); }
+.rootsSvg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.rootsSvg path { fill: none; stroke: var(--green); stroke-width: 1.2; stroke-linecap: round; }
+.buildWord { position: absolute; left: 3.4%; top: 50%; transform: translateY(-50%); margin: 0; display: flex; font: 900 clamp(90px, 23vw, 360px)/.8 var(--f-sans); letter-spacing: -.07em; color: transparent; -webkit-text-stroke: 2px var(--green); }
+.buildWord span { display: inline-block; }
+.buildWord .dot { color: var(--green); -webkit-text-stroke: 0; }
+.dim { position: absolute; inset: 0; z-index: 5; background: #000; opacity: 0; pointer-events: none; }
+
+/* ---------- BUILD: stacked full-screen project panels ---------- */
+#build { position: relative; z-index: 2; margin-top: -100vh; margin-top: -100svh; }
+.panel { position: sticky; top: 0; height: 100vh; height: 100svh; overflow: hidden; background: var(--night); }
+.spacer { height: var(--dwell, 110vh); }
+.pin-in { position: absolute; inset: 0; transform-origin: 50% 40%; will-change: transform, filter; }
+.shot { position: absolute; inset: 0; background: var(--accent); transform: scale(var(--zoom, 1.18)); transform-origin: 60% 40%; }
+.shot .nav { position: absolute; left: 0; right: 0; top: 0; height: 9%; background: rgb(255 255 255 / .92); display: flex; align-items: center; gap: 3%; padding: 0 6%; }
+.shot .nav i { height: 16%; width: 7%; border-radius: 99px; background: #D9D9D4; }
+.shot .nav i:first-child { width: 5%; background: var(--ink); }
+.shot .hero { position: absolute; inset: 0; background: linear-gradient(115deg, color-mix(in srgb, var(--accent) 62%, #000) 0%, var(--accent) 55%, color-mix(in srgb, var(--accent) 55%, #fff) 100%); }
+.shot .hero::after { content: ""; position: absolute; right: 8%; top: 18%; width: 34%; aspect-ratio: 1; border-radius: 50%; background: radial-gradient(circle at 35% 30%, rgb(255 255 255 / .55), rgb(255 255 255 / .05) 60%); }
+.shot .copy { position: absolute; left: 50%; top: 18%; width: 30%; display: grid; gap: 1.2vh; }
+.shot .copy i { height: 1.4vh; border-radius: 99px; background: rgb(255 255 255 / .55); }
+.shot .copy i:first-child { height: 3.2vh; width: 80%; background: rgb(255 255 255 / .8); }
+.shot .copy i:last-child { width: 55%; }
+.shot .tiles { position: absolute; left: 50%; right: 8%; top: 40%; height: 20%; display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.4vw; }
+.shot .tiles i { border-radius: 8px; background: rgb(255 255 255 / .16); box-shadow: inset 0 0 0 1px rgb(255 255 255 / .25); }
+.shade { position: absolute; inset: 0; background: linear-gradient(180deg, rgb(10 12 20 / .15) 0%, rgb(10 12 20 / 0) 30%, rgb(10 12 20 / .55) 100%); }
+.ptitle { position: absolute; z-index: 3; left: 4.2%; bottom: 7%; margin: 0; color: #fff; font: 900 clamp(64px, 10.5vw, 176px)/.86 var(--f-sans); letter-spacing: -.06em; text-shadow: 0 6px 40px rgb(0 0 0 / .25); }
+.ptitle .line { display: block; white-space: nowrap; }
+.ptitle .ch { display: inline-block; }
+.pmeta { position: absolute; z-index: 3; right: 4.2%; top: 104px; display: grid; justify-items: end; gap: 8px; color: #fff; font-size: 14px; text-align: right; opacity: var(--meta, 0); }
+.pmeta strong { font: 700 15px/1.4 var(--f-sans); }
+.ticker { position: absolute; z-index: 2; left: 0; right: 0; top: 30%; overflow: hidden; opacity: var(--tk, 0); }
+.ticker .row { display: flex; gap: 4vw; width: max-content; font: 400 clamp(44px, 6.2vw, 104px)/1 var(--f-display); color: rgb(255 255 255 / .92); transform: translateX(var(--tx, 0px)) skewX(var(--skew)); }
+.devices { position: absolute; z-index: 3; right: 6%; bottom: 10%; width: 40%; aspect-ratio: 16 / 10; pointer-events: none; }
+.devices .desk, .devices .phone { position: absolute; overflow: hidden; background: #fff; box-shadow: 0 30px 60px -24px rgb(0 0 0 / .55); }
+.devices .desk { inset: 0; border-radius: 10px; transform: translateY(var(--dy, 120%)); }
+.devices .phone { right: -6%; bottom: -12%; width: 26%; aspect-ratio: 9 / 19; border-radius: 18px; border: 5px solid #161A22; transform: translateY(var(--py, 160%)); }
+.devices .mini { position: absolute; inset: 0; background: var(--accent); }
+.devices .mini::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 12%; background: #fff; }
+.devices .mini::after { content: ""; position: absolute; left: 8%; right: 8%; bottom: 8%; height: 28%; border-radius: 6px; background: repeating-linear-gradient(90deg, #fff 0 30%, transparent 30% 35%); }
+.edgeCactus { position: fixed; z-index: 55; right: 22px; bottom: 18px; width: 30px; opacity: 0; transition: opacity .5s; pointer-events: none; }
+.edgeCactus rect, .edgeCactus path { transform-box: fill-box; transform-origin: 50% 100%; transition: transform .6s var(--ease-out); }
+
+/* ---------- GROW: one pinned circle that keeps changing ---------- */
+#grow { position: relative; z-index: 1; margin-top: -100vh; margin-top: -100svh; }
+#grow .sticky { background: var(--paper); }
+#grow canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.nightFill { position: absolute; inset: 0; background: radial-gradient(circle at 50% 50%, var(--night-2) 0%, var(--night) 70%); clip-path: circle(0px at 50% 50%); }
+.labels span { position: absolute; transform: translate(-50%, -50%); font: 800 clamp(18px, 2vw, 30px)/1 var(--f-sans); letter-spacing: -.02em; color: var(--ink); white-space: nowrap; }
+.labels span small { display: block; margin-top: 8px; font: 500 12px/1 var(--f-sans); letter-spacing: .14em; color: var(--muted); text-align: center; }
+.growWord { position: absolute; left: 50%; bottom: 9%; transform: translateX(-50%); margin: 0; font: 400 clamp(56px, 8vw, 132px)/.9 var(--f-display); letter-spacing: -.02em; opacity: 0; }
+.growWord b { font-weight: 400; color: var(--yellow); }
+
+/* ---------- BLOOM ---------- */
+#bloom .sticky { background: radial-gradient(circle at 66% 55%, #2A3A66 0%, var(--night) 60%); color: #F6F1E4; }
+.stars { position: absolute; inset: 0; }
+.stars i { position: absolute; width: 2px; height: 2px; border-radius: 50%; background: #FFF7E2; animation: tw 3.4s ease-in-out infinite; }
+@keyframes tw { 50% { opacity: .25; } }
+.bglow { position: absolute; left: 68%; top: 34%; width: 52vmin; aspect-ratio: 1; border-radius: 50%; transform: translate(-50%, -50%); background: radial-gradient(circle, rgb(233 163 58 / .42), transparent 62%); opacity: 0; }
+.bCactus { position: absolute; left: 68%; bottom: -2%; width: clamp(150px, 16vw, 260px); transform: translateX(-50%); }
+.face { position: absolute; left: 8%; top: 18%; width: clamp(130px, 13vw, 210px); opacity: 0; }
+.face svg { width: 100%; display: block; transition: transform .5s var(--ease-out); }
+.bloomText { position: absolute; left: 8%; bottom: 12%; display: grid; gap: 18px; }
+.bloomWord { margin: 0; font: 400 clamp(56px, 9vw, 150px)/.85 var(--f-display); letter-spacing: -.02em; }
+.bloomWord b { font-weight: 400; color: var(--yellow); }
+.mail { justify-self: start; border: 0; background: none; color: inherit; padding: 6px 0; cursor: pointer; font: 400 clamp(26px, 3.4vw, 54px)/1.1 var(--f-display); transform: translate(var(--mx, 0px), var(--my, 0px)); transition: transform .35s var(--ease-out); }
+.mail span { background: linear-gradient(var(--yellow), var(--yellow)) 0 96% / var(--ul, 0%) 2px no-repeat; transition: background-size .5s var(--ease-out); }
+.mail:hover span, .mail:focus-visible span { --ul: 100%; }
+.mail:focus-visible { outline: 2px solid var(--yellow); outline-offset: 6px; }
+.copied { margin-left: 14px; font: 600 14px/1 var(--f-sans); color: var(--yellow); opacity: 0; transition: opacity .3s; }
+.copied.on { opacity: 1; }
+.petal { position: absolute; z-index: 5; width: 10px; height: 16px; border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%; pointer-events: none; }
+.closeBar { position: absolute; z-index: 8; left: 0; right: 0; top: 0; height: 88px; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; padding: 0 4.2%; background: var(--bar); transform: translateY(-100%); }
+.closeBar .dots { display: flex; gap: 8px; }
+.closeBar .dots i { width: 13px; height: 13px; border-radius: 50%; background: var(--coral); }
+.closeBar .dots i:nth-child(2) { background: var(--yellow); } .closeBar .dots i:nth-child(3) { background: var(--green); }
+.closeBar .logo { width: 30px; height: 36px; } .closeBar .logo path { fill: var(--green); }
+.endSand { position: absolute; z-index: 9; left: -4%; right: -4%; top: 100%; height: 160%; }
+.endSand svg { width: 100%; height: 100%; display: block; }
+
+/* ---------- Mobile compositions (390px) ---------- */
+@media (max-width: 700px) {
+  .hdr { height: 60px; padding: 0 20px; }
+  .hdr .logo { width: 22px; height: 28px; }
+  .pCactus { left: 50%; width: 30vw; bottom: 6%; }
+  .closing { top: 15%; }
+  .win .tabs span { padding: 0 9px; font-size: 10px; letter-spacing: .06em; }
+  .win .tabs .on { margin-top: 10px; }
+  .win .dots i { width: 10px; height: 10px; } .win .dots { gap: 6px; }
+  .win .tbar { grid-template-columns: auto 1fr; gap: 10px; padding: 0 14px; }
+  .win .tbar .logo { display: none; }
+  .aboutText { left: 7%; top: 34%; width: 86%; gap: 14px; }
+  .aboutText .s { font-size: 19px; }
+  .aboutText ul { font-size: 13px; }
+  .absorbWord { font-size: 20.5vw; left: 4%; bottom: 8svh; }
+  .stmt { font-size: 9vw; line-height: 1.24; width: 88vw; }
+  .ledger { grid-template-columns: 1fr; gap: 10px; bottom: 6%; }
+  .ledger div { padding-top: 10px; }
+  .hcard { width: 66vw; padding: 18px; }
+  .hobbyTitle { top: 10svh; font-size: 12vw; }
+  .ptitle { font-size: 16vw; bottom: 8%; left: 6%; }
+  .pmeta { top: 76px; right: 6%; font-size: 12px; }
+  .ticker { top: 24%; }
+  .ticker .row { font-size: 13vw; }
+  .devices { right: 6%; bottom: auto; top: 40%; width: 64%; }
+  .labels span { font-size: 5vw; }
+  .growWord { bottom: 12%; font-size: 17vw; }
+  .bCactus { left: 72%; width: 40vw; }
+  .bglow { left: 72%; top: 46%; width: 90vw; }
+  .face { left: 8%; top: 12%; width: 34vw; }
+  .bloomText { left: 7%; right: 7%; bottom: 9%; }
+  .bloomWord { font-size: 20vw; }
+  .mail { font-size: 8.2vw; }
+  .closeBar { height: 64px; padding: 0 16px; }
+  .edgeCactus { right: 12px; bottom: 12px; width: 22px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .roll span, .hdr, .hcard, .hcard::before, .mail, .edgeCactus rect, .edgeCactus path { transition: none !important; }
+  .stars i, .cue::after { animation: none; }
+}
+</style>
+
+<header class="hdr" id="hdr" aria-hidden="true">
+  <svg class="logo" viewBox="0 0 22 26"><path d="M6 2c1.7 0 3 1.3 3 3v6h2V8c0-1.1.9-2 2-2s2 .9 2 2v5c0 1.7-1.3 3-3 3h-1v8H6v-6H5c-1.7 0-3-1.3-3-3v-3c0-1.1.9-2 2-2s2 .9 2 2v1V5c0-1.7 1.3-3 3-3Z"/></svg>
+  <span class="right"><span class="roll" id="word"><span>ABSORB.</span><span></span></span><span class="burger"><i></i><i></i><i></i></span></span>
+</header>
+
+<div class="hud" role="group" aria-label="시안 도구">
+  <span>지금</span><b id="scene">프롤로그 끝</b>
+  <button type="button" id="play">▶ 자동 재생</button>
+</div>
+
+<svg class="edgeCactus" id="edge" viewBox="-14 -96 28 100" aria-hidden="true">
+  <g fill="#7F9657" stroke="#56693B" stroke-width="1.2">
+    <rect x="-6" y="-22" width="12" height="24" rx="5.5"/>
+    <rect class="e2" x="-6.5" y="-46" width="13" height="25" rx="6"/>
+    <rect class="e3" x="-6.5" y="-70" width="13" height="25" rx="6"/>
+    <rect class="e4" x="-6" y="-93" width="12" height="24" rx="5.5"/>
+  </g>
+</svg>
+
+<main>
+  <!-- INTRO -->
+  <section class="pin" id="intro" style="--h: 520vh" aria-label="오프닝에서 소개로">
+    <div class="sticky">
+      <div class="rays"></div>
+      <div class="farDunes" id="farDunes" aria-hidden="true">
+        <svg viewBox="0 0 1000 200" preserveAspectRatio="none"><path d="M0 120 C120 60 220 70 330 100 S520 40 640 80 S860 50 1000 90 V200 H0Z" fill="#E9CFA6"/><path d="M0 150 C160 110 260 120 380 140 S600 90 760 120 S920 110 1000 130 V200 H0Z" fill="#E2BD8C"/></svg>
+      </div>
+      <div class="pCactus" id="pCactus" aria-hidden="true">
+        <svg viewBox="-44 -190 88 195">
+          <ellipse cx="-30" cy="2" rx="40" ry="5" fill="rgb(90 60 30 / .18)"/>
+          <g fill="#6E8550" stroke="#4E6136" stroke-width="1.5">
+            <rect x="-12" y="-40" width="24" height="44" rx="10"/><rect x="-13" y="-82" width="26" height="44" rx="11"/><rect x="-13" y="-124" width="26" height="44" rx="11"/><rect x="-12" y="-162" width="24" height="40" rx="10"/>
+            <path d="M-13 -72 h-15 a7 7 0 0 1 -7 -7 v-24 a6 6 0 0 1 12 0 v19 h10 z"/><path d="M13 -100 h15 a7 7 0 0 0 7 -7 v-18 a6 6 0 0 0 -12 0 v13 h-10 z"/>
+          </g>
+          <g transform="translate(0 -162)"><path d="M0 0 C-10 -6 -16 -18 -10 -24 C-6 -14 -2 -8 0 0Z" fill="#E96B5A"/><path d="M0 0 C-4 -10 -2 -22 4 -26 C4 -16 2 -8 0 0Z" fill="#E9A33A"/><path d="M0 0 C8 -6 16 -16 12 -24 C6 -14 2 -8 0 0Z" fill="#E96B5A"/></g>
+        </svg>
+      </div>
+      <div class="closing" id="closing">
+        <p class="grow" aria-label="GROW.">GROW<b>.</b></p>
+        <p class="lead">웬만해선 시들지 않습니다.</p>
+        <p class="note">선인장처럼, 어떤 환경에서도 생각보다 잘 자라는 사람입니다.</p>
+      </div>
+
+      <div class="win" id="win">
+        <div class="frame" id="frame">
+          <div class="tbar" id="tbar">
+            <span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>
+            <svg class="logo" viewBox="0 0 22 26" aria-hidden="true"><path d="M6 2c1.7 0 3 1.3 3 3v6h2V8c0-1.1.9-2 2-2s2 .9 2 2v5c0 1.7-1.3 3-3 3h-1v8H6v-6H5c-1.7 0-3-1.3-3-3v-3c0-1.1.9-2 2-2s2 .9 2 2v1V5c0-1.7 1.3-3 3-3Z"/></svg>
+            <span class="tabs" aria-hidden="true"><span class="on">ABOUT</span><span>PROJECTS</span><span>DESIGN</span><span>CONTACT</span></span>
+          </div>
+          <div class="page" id="page">
+            <div class="photo" id="photo"><canvas id="halftone" aria-label="프로필 사진(모래알 하프톤)" role="img"></canvas></div>
+            <div class="aboutText" id="aboutText">
+              <p class="s">안녕하세요, 새로운 환경에 금방 적응해<br><em>결과로 증명하는</em> 백현정입니다.</p>
+              <p class="h">자격증·교육</p>
+              <ul><li><b>2025</b>웹디자인개발기능사 [수정 예정]</li><li><b>2024</b>GTQ 그래픽기술자격 1급 [수정 예정]</li><li><b>2024</b>컴퓨터활용능력 2급 [수정 예정]</li></ul>
+            </div>
+            <h2 class="absorbWord" id="absorbWord" aria-label="ABSORB."></h2>
+            <div class="cue" id="cue" aria-hidden="true"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sand" id="sand" aria-hidden="true">
+        <svg viewBox="0 0 1000 2000" preserveAspectRatio="none">
+          <defs><linearGradient id="sg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#E7C597"/><stop offset=".08" stop-color="#E3BF91"/><stop offset=".3" stop-color="#D7AE7B"/><stop offset="1" stop-color="#CFA36E"/></linearGradient></defs>
+          <path d="M0 80 C90 40 170 30 260 62 S420 120 520 70 S700 10 800 48 S930 90 1000 60 V2000 H0Z" fill="url(#sg)"/>
+          <path d="M0 150 C140 110 260 130 380 160 S600 110 760 150 S900 140 1000 158" stroke="#C99A63" stroke-opacity=".35" stroke-width="3" fill="none"/>
+          <path d="M0 260 C160 220 300 250 420 270 S640 220 800 255 S940 250 1000 262" stroke="#C99A63" stroke-opacity=".25" stroke-width="3" fill="none"/>
+        </svg>
+      </div>
+      <div class="light" id="light"></div>
+    </div>
+  </section>
+
+  <!-- ABSORB statement -->
+  <section class="pin" id="statement" style="--h: 240vh" aria-label="소개 문장">
+    <div class="sticky">
+      <p class="stmt" id="stmt">안녕하세요, 새로운 환경에 금방 적응해 결과로 증명하는 백현정입니다.</p>
+      <div class="sprout" id="sprout" aria-hidden="true">
+        <svg viewBox="-30 -70 60 72"><ellipse cx="0" cy="1" rx="20" ry="3" fill="rgb(32 39 49 / .12)"/><rect x="-7" y="-26" width="14" height="27" rx="6.5" fill="#7F9657" stroke="#56693B" stroke-width="1.2"/><path d="M0 -26 c-6 -12 -16 -15 -22 -12 c5 8 12 11 22 12 c6 -12 16 -15 22 -12 c-5 8 -12 11 -22 12z" fill="#93AC67"/></svg>
+      </div>
+      <div class="ledger" id="ledger">
+        <div><b>2025</b><span>웹디자인개발기능사 [수정 예정]</span></div>
+        <div><b>2025</b><span>UI/UX 반응형 웹디자인 &amp; 웹퍼블리셔 양성과정 [수정 예정]</span></div>
+        <div><b>2024</b><span>GTQ 그래픽기술자격 1급 [수정 예정]</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Hobbies -->
+  <section class="pin" id="hobby" style="--h: 230vh" aria-label="취미">
+    <div class="sticky">
+      <div class="strip" id="strip">
+        <article class="hcard" style="--bgc: linear-gradient(160deg, #F0A193, #E96B5A)"><span class="g" aria-hidden="true">ABSORB</span><h3>EXHIBITION &amp; CAFE</h3></article>
+        <article class="hcard" style="--bgc: linear-gradient(160deg, #EFA89C, #D9604F)"><span class="g" aria-hidden="true">ABSORB</span><h3>MUSIC</h3></article>
+        <article class="hcard" style="--bgc: linear-gradient(160deg, #F2B3A7, #E07A69)"><span class="g" aria-hidden="true">ABSORB</span><h3>TRAVEL</h3></article>
+        <article class="hcard" style="--bgc: linear-gradient(160deg, #F5C2B8, #E58A7B)"><span class="g" aria-hidden="true">ABSORB</span><h3>VOLUNTEER</h3></article>
+        <article class="hcard" style="--bgc: linear-gradient(160deg, #A9BC86, #7F9657)"><span class="g" aria-hidden="true">BUILD</span><h3>BOARD GAME</h3></article>
+        <article class="hcard" style="--bgc: linear-gradient(160deg, #F2C77F, #E9A33A)"><span class="g" aria-hidden="true">GROW</span><h3>RUNNING</h3></article>
+      </div>
+    </div>
+  </section>
+
+  <!-- Roots → BUILD -->
+  <section class="pin" id="roots" style="--h: 320vh" aria-label="프로젝트로">
+    <div class="sticky">
+      <svg class="rootsSvg" id="rootsSvg" aria-hidden="true"></svg>
+      <h2 class="buildWord" id="buildWord" aria-label="BUILD."></h2>
+      <div class="dim" id="rootsDim"></div>
+    </div>
+  </section>
+
+  <!-- BUILD stacked panels -->
+  <section id="build" aria-label="프로젝트">
+    <article class="panel" style="--accent: #7F9657">
+      <div class="pin-in">
+        <div class="shot"><div class="hero"></div><div class="copy"><i></i><i></i><i></i></div><div class="tiles"><i></i><i></i><i></i></div></div>
+        <div class="shade"></div>
+        <div class="ticker" aria-hidden="true"><div class="row">반응형 · 모바일메뉴 · 카테고리필터 · 앵커이동 · 반응형 · 모바일메뉴 · 카테고리필터 · 앵커이동</div></div>
+        <div class="pmeta"><strong>HTML · CSS · JavaScript</strong><span>반응형 · 개인 프로젝트</span></div>
+        <h3 class="ptitle" data-title="카페 소개|웹사이트"></h3>
+        <div class="devices" aria-hidden="true"><div class="desk"><div class="mini"></div></div><div class="phone"><div class="mini"></div></div></div>
+      </div>
+    </article>
+    <div class="spacer"></div>
+    <article class="panel" style="--accent: #E96B5A">
+      <div class="pin-in">
+        <div class="shot"><div class="hero"></div><div class="copy"><i></i><i></i><i></i></div><div class="tiles"><i></i><i></i><i></i></div></div>
+        <div class="shade"></div>
+        <div class="ticker" aria-hidden="true"><div class="row">상품검색 · 카테고리필터 · 가격정렬 · 상품검색 · 카테고리필터 · 가격정렬</div></div>
+        <div class="pmeta"><strong>React · CSS</strong><span>반응형 · 클론코딩</span></div>
+        <h3 class="ptitle" data-title="상품 목록|페이지"></h3>
+        <div class="devices" aria-hidden="true"><div class="desk"><div class="mini"></div></div><div class="phone"><div class="mini"></div></div></div>
+      </div>
+    </article>
+    <div class="spacer"></div>
+    <article class="panel" style="--accent: #E9A33A">
+      <div class="pin-in">
+        <div class="shot"><div class="hero"></div><div class="copy"><i></i><i></i><i></i></div><div class="tiles"><i></i><i></i><i></i></div></div>
+        <div class="shade"></div>
+        <div class="ticker" aria-hidden="true"><div class="row">일정선택 · 아코디언메뉴 · 폼검증 · 일정선택 · 아코디언메뉴 · 폼검증</div></div>
+        <div class="pmeta"><strong>Next.js · React · Tailwind CSS</strong><span>반응형 · 리뉴얼</span></div>
+        <h3 class="ptitle" data-title="행사 안내|페이지"></h3>
+        <div class="devices" aria-hidden="true"><div class="desk"><div class="mini"></div></div><div class="phone"><div class="mini"></div></div></div>
+      </div>
+    </article>
+    <div class="spacer" style="--dwell: 190vh"></div>
+  </section>
+
+  <!-- GROW -->
+  <section class="pin" id="grow" style="--h: 560vh" aria-label="How I Work">
+    <div class="sticky">
+      <div class="nightFill" id="nightFill"></div>
+      <canvas id="particles" aria-hidden="true"></canvas>
+      <div class="labels" id="labels">
+        <span>반응형<small>RESPONSIVE</small></span>
+        <span>접근성<small>ACCESSIBILITY</small></span>
+        <span>퍼블리싱<small>PUBLISHING</small></span>
+      </div>
+      <p class="growWord" id="growWord" aria-hidden="true">GROW<b>.</b></p>
+    </div>
+  </section>
+
+  <!-- BLOOM -->
+  <section class="pin" id="bloom" style="--h: 380vh" aria-label="연락처">
+    <div class="sticky" id="bloomStage">
+      <div class="stars" id="stars" aria-hidden="true"></div>
+      <div class="bglow" id="bglow"></div>
+      <div class="bCactus" id="bCactus" aria-hidden="true">
+        <svg viewBox="-44 -190 88 195">
+          <g fill="#5F7646" stroke="#3F5130" stroke-width="1.5">
+            <rect x="-12" y="-40" width="24" height="44" rx="10"/><rect x="-13" y="-82" width="26" height="44" rx="11"/><rect x="-13" y="-124" width="26" height="44" rx="11"/><rect x="-12" y="-162" width="24" height="40" rx="10"/>
+            <path d="M-13 -72 h-15 a7 7 0 0 1 -7 -7 v-24 a6 6 0 0 1 12 0 v19 h10 z"/><path d="M13 -100 h15 a7 7 0 0 0 7 -7 v-18 a6 6 0 0 0 -12 0 v13 h-10 z"/>
+          </g>
+          <g id="petals" transform="translate(0 -162)"></g>
+        </svg>
+      </div>
+      <div class="face" id="face" aria-hidden="true">
+        <svg viewBox="0 0 100 112" id="faceSvg">
+          <path d="M16 58c0-26 15-42 34-42s34 16 34 42c0 5-1 11-3 15l-6-19c-11 4-31 4-48-6l-8 25c-2-5-3-11-3-15Z" fill="#2B2420"/>
+          <ellipse cx="50" cy="62" rx="26" ry="31" fill="#F2D7C4"/>
+          <path d="M23 52c4-19 15-27 27-27s25 8 28 25c-15-2-27-8-35-17-4 9-11 15-20 19Z" fill="#2B2420"/>
+          <g id="eyes"><ellipse cx="40" cy="64" rx="2.7" ry="3.5" fill="#2B2420"/><ellipse cx="60" cy="64" rx="2.7" ry="3.5" fill="#2B2420"/></g>
+          <path d="M43 78c4 3 10 3 14 0" stroke="#B5675A" stroke-width="2" fill="none" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="bloomText" id="bloomText">
+        <h2 class="bloomWord">BLOOM<b>.</b></h2>
+        <div><button type="button" class="mail" id="mail" aria-describedby="copied"><span>example@email.com</span></button><span class="copied" id="copied" role="status"></span></div>
+      </div>
+      <div class="closeBar" id="closeBar" aria-hidden="true">
+        <span class="dots"><i></i><i></i><i></i></span>
+        <svg class="logo" viewBox="0 0 22 26"><path d="M6 2c1.7 0 3 1.3 3 3v6h2V8c0-1.1.9-2 2-2s2 .9 2 2v5c0 1.7-1.3 3-3 3h-1v8H6v-6H5c-1.7 0-3-1.3-3-3v-3c0-1.1.9-2 2-2s2 .9 2 2v1V5c0-1.7 1.3-3 3-3Z"/></svg>
+        <span></span>
+      </div>
+      <div class="endSand" id="endSand" aria-hidden="true">
+        <svg viewBox="0 0 1000 1600" preserveAspectRatio="none"><path d="M0 80 C90 40 170 30 260 62 S420 120 520 70 S700 10 800 48 S930 90 1000 60 V1600 H0Z" fill="#E3BF91"/></svg>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script>
+(() => {
+  const $ = s => document.querySelector(s);
+  const $$ = s => [...document.querySelectorAll(s)];
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const clamp = (v, a = 0, b = 1) => Math.min(Math.max(v, a), b);
+  const ramp = (v, a, b) => clamp((v - a) / (b - a));
+  const lerp = (a, b, t) => a + (b - a) * t;
+  const easeOut = t => 1 - Math.pow(1 - t, 3);
+  const easeInOut = t => (t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+  const mobile = () => innerWidth <= 700;
+
+  // ---------- Smooth scroll (same library as the site) ----------
+  let lenis = null;
+  if (window.Lenis && !reduce) lenis = new Lenis({ lerp: 0.1, wheelMultiplier: 1 });
+
+  // ---------- Text splitting (screen readers get the aria-label) ----------
+  const splitInto = (el, text, cls = 'ch') => {
+    el.textContent = '';
+    [...text].forEach(c => { const s = document.createElement('span'); s.className = c === '.' ? 'dot' : cls; s.textContent = c === ' ' ? ' ' : c; s.setAttribute('aria-hidden', 'true'); el.append(s); });
+    return [...el.children];
+  };
+  const absorbChars = splitInto($('#absorbWord'), 'ABSORB.');
+  const buildChars = splitInto($('#buildWord'), 'BUILD.');
+  const titles = $$('.ptitle').map(h => {
+    const [a, b] = h.dataset.title.split('|');
+    h.setAttribute('aria-label', a + ' ' + b);
+    const chars = [];
+    [a, b].forEach(line => { const l = document.createElement('span'); l.className = 'line'; chars.push(...splitInto(l, line)); h.append(l); });
+    return chars;
+  });
+  const stmt = $('#stmt');
+  const stmtText = stmt.textContent.trim();
+  stmt.setAttribute('aria-label', stmtText);
+  stmt.textContent = '';
+  const stmtWords = stmtText.split(/\s+/).map((w, i, all) => {
+    const s = document.createElement('span'); s.className = 'w' + (w === '결과로' || w === '증명하는' ? ' mark' : ''); s.textContent = w; s.setAttribute('aria-hidden', 'true');
+    stmt.append(s); if (i < all.length - 1) stmt.append(' ');
+    return s;
+  });
+
+  // Stars
+  const stars = $('#stars');
+  let seed = 7; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  for (let i = 0; i < 80; i++) { const s = document.createElement('i'); s.style.left = rnd() * 100 + '%'; s.style.top = rnd() * 70 + '%'; s.style.opacity = .35 + rnd() * .65; s.style.animationDelay = (rnd() * 3).toFixed(2) + 's'; stars.append(s); }
+  // Petals of the blooming cactus
+  const petalG = $('#petals');
+  const petalColors = ['#E96B5A', '#E9A33A', '#E96B5A', '#F08A4B', '#E9A33A', '#E96B5A'];
+  const petals = petalColors.map(c => { const p = document.createElementNS('http://www.w3.org/2000/svg', 'path'); p.setAttribute('d', 'M0 0 C-7 -8 -7 -20 0 -27 C7 -20 7 -8 0 0Z'); p.setAttribute('fill', c); petalG.append(p); return p; });
+
+  // ---------- Measurements ----------
+  let vh = innerHeight, vw = innerWidth;
+  const sec = {};
+  const measure = () => {
+    vh = $('#intro .sticky').clientHeight; vw = innerWidth;
+    ['intro', 'statement', 'hobby', 'roots', 'grow', 'bloom'].forEach(id => {
+      const el = document.getElementById(id); const r = el.getBoundingClientRect();
+      sec[id] = { top: r.top + scrollY, h: el.offsetHeight };
+    });
+    const b = $('#build'); const r = b.getBoundingClientRect();
+    sec.build = { top: r.top + scrollY, h: b.offsetHeight };
+    buildRoots();
+    sizeParticles();
+  };
+  const prog = (id, startOffset = 0, endOffset = 0) => {
+    const s = sec[id]; const y = scrollY;
+    return clamp((y - s.top - startOffset) / Math.max(s.h - vh - startOffset - endOffset, 1));
+  };
+
+  // ---------- Header word + HUD scene ----------
+  let curWord = 'ABSORB.';
+  const wordEl = $('#word');
+  const setWord = w => {
+    if (w === curWord) return; curWord = w;
+    const [a, b] = wordEl.children; b.textContent = w;
+    wordEl.classList.remove('go'); void wordEl.offsetWidth; wordEl.classList.add('go');
+    clearTimeout(wordEl._t);
+    wordEl._t = setTimeout(() => { a.textContent = w; [a, b].forEach(x => x.style.transition = 'none'); wordEl.classList.remove('go'); void wordEl.offsetWidth; [a, b].forEach(x => x.style.transition = ''); }, reduce ? 0 : 520);
+  };
+  const sceneEl = $('#scene');
+  const setScene = t => { if (sceneEl.textContent !== t) sceneEl.textContent = t; };
+
+  // ---------- Sand-grain halftone (profile photo stand-in) ----------
+  const src = document.createElement('canvas'); src.width = 200; src.height = 250;
+  (() => {
+    const g = src.getContext('2d');
+    const bg = g.createLinearGradient(0, 0, 200, 250); bg.addColorStop(0, '#F3F0EC'); bg.addColorStop(1, '#DCD6CE'); g.fillStyle = bg; g.fillRect(0, 0, 200, 250);
+    g.fillStyle = '#2A2421'; g.beginPath(); g.ellipse(100, 100, 56, 66, 0, 0, Math.PI * 2); g.fill(); g.fillRect(44, 100, 112, 70);
+    g.fillStyle = '#3B3634'; g.beginPath(); g.moveTo(10, 250); g.bezierCurveTo(22, 196, 60, 178, 100, 178); g.bezierCurveTo(140, 178, 178, 196, 190, 250); g.fill();
+    g.fillStyle = '#E2C2AD'; g.fillRect(84, 150, 32, 34);
+    const sk = g.createRadialGradient(92, 104, 6, 100, 112, 52); sk.addColorStop(0, '#F6E2D4'); sk.addColorStop(1, '#E1BFA9');
+    g.fillStyle = sk; g.beginPath(); g.ellipse(100, 112, 38, 48, 0, 0, Math.PI * 2); g.fill();
+    g.fillStyle = '#2A2421'; g.beginPath(); g.moveTo(58, 102); g.bezierCurveTo(66, 58, 136, 52, 144, 100); g.bezierCurveTo(124, 86, 92, 82, 58, 102); g.fill();
+    g.fillStyle = '#3A2E28'; g.beginPath(); g.ellipse(86, 114, 3.4, 2.4, 0, 0, 7); g.ellipse(114, 114, 3.4, 2.4, 0, 0, 7); g.fill();
+    g.strokeStyle = '#B9786C'; g.lineWidth = 2.4; g.beginPath(); g.moveTo(91, 138); g.quadraticCurveTo(100, 143, 109, 138); g.stroke();
+  })();
+  const srcData = src.getContext('2d').getImageData(0, 0, 200, 250).data;
+  const lumAt = (u, v) => { const x = Math.min(199, Math.max(0, u * 200 | 0)), y = Math.min(249, Math.max(0, v * 250 | 0)); const i = (y * 200 + x) * 4; return (srcData[i] * .3 + srcData[i + 1] * .59 + srcData[i + 2] * .11) / 255; };
+  const ht = $('#halftone'); const htx = ht.getContext('2d');
+  const photoEl = $('#photo');
+  let grid = null; const pointer = { x: -9999, y: -9999, active: false };
+  addEventListener('pointermove', e => { pointer.x = e.clientX; pointer.y = e.clientY; pointer.active = true; }, { passive: true });
+  addEventListener('pointerleave', () => { pointer.active = false; });
+  const HT_COLORS = ['#EADBC2', '#D9B07E', '#B8864C', '#8A6238'];
+  let wind = 0;
+  const drawHalftone = () => {
+    const r = photoEl.getBoundingClientRect();
+    if (r.bottom < 0 || r.top > vh || r.width < 4) return;
+    const dpr = Math.min(devicePixelRatio || 1, 1.5);
+    const W = Math.round(r.width), H = Math.round(r.height);
+    if (ht.width !== Math.round(W * dpr) || ht.height !== Math.round(H * dpr)) { ht.width = Math.round(W * dpr); ht.height = Math.round(H * dpr); }
+    const sp = mobile() ? 7 : (W > 900 ? 10 : 8);
+    const cols = Math.ceil(W / sp) + 1, rows = Math.ceil(H / sp) + 1;
+    if (!grid || grid.cols !== cols || grid.rows !== rows) grid = { cols, rows, ox: new Float32Array(cols * rows), oy: new Float32Array(cols * rows) };
+    // cover-fit the 4:5 source into the box, face kept near the top third
+    // fit the portrait to the box height: a narrow box crops it at the sides, a wide box keeps it on the right (room for the big type)
+    const sw = H * (200 / 250), x0 = sw >= W ? (W - sw) / 2 : (W - sw) * .9;
+    htx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    htx.fillStyle = '#FBF6EE'; htx.fillRect(0, 0, W, H);
+    const paths = HT_COLORS.map(() => new Path2D());
+    const px = pointer.x - r.left, py = pointer.y - r.top, R = mobile() ? 70 : 110;
+    for (let j = 0; j < rows; j++) {
+      for (let i = 0; i < cols; i++) {
+        const k = j * cols + i;
+        const x = i * sp + (j % 2 ? sp / 2 : 0), y = j * sp;
+        const u = (x - x0) / sw;
+        const lum = u < 0 || u > 1 ? .93 : lumAt(u, y / H);
+        const dark = Math.pow(1 - lum, 1.15);
+        const rad = .45 + dark * sp * .52;
+        let tx = 0, ty = 0;
+        if (pointer.active && !reduce) {
+          const dx = x - px, dy = y - py, d = Math.hypot(dx, dy);
+          if (d < R && d > .01) { const f = Math.pow(1 - d / R, 2) * (mobile() ? 22 : 34); tx = dx / d * f; ty = dy / d * f; }
+        }
+        tx += wind * (1.5 + (k % 7) * .45);
+        grid.ox[k] += (tx - grid.ox[k]) * .16; grid.oy[k] += (ty - grid.oy[k]) * .16;
+        const b = dark > .62 ? 3 : dark > .36 ? 2 : dark > .14 ? 1 : 0;
+        const cx = x + grid.ox[k], cy = y + grid.oy[k];
+        paths[b].moveTo(cx + rad, cy); paths[b].arc(cx, cy, rad, 0, Math.PI * 2);
+      }
+    }
+    paths.forEach((p, i) => { htx.fillStyle = HT_COLORS[i]; htx.fill(p); });
+  };
+
+  // ---------- Roots: lines from the sprout to the 12-column grid ----------
+  const rootsSvg = $('#rootsSvg');
+  let rootPaths = [];
+  const buildRoots = () => {
+    const W = vw, H = vh, sx = W * .06 + 30, sy = H;
+    rootsSvg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+    rootsSvg.innerHTML = '';
+    const cols = mobile() ? 4 : 12, gut = W * .042, colW = (W - gut * 2) / cols;
+    rootPaths = [];
+    for (let c = 0; c <= cols; c++) {
+      const x = gut + c * colW;
+      const d = `M${sx} ${sy} C ${sx + (x - sx) * .2} ${H * .78}, ${x} ${H * .86}, ${x} ${H * .62} L ${x} 0`;
+      const p = document.createElementNS('http://www.w3.org/2000/svg', 'path'); p.setAttribute('d', d); p.setAttribute('pathLength', '1'); p.style.strokeDasharray = '1 1'; p.style.strokeDashoffset = '1'; p.style.opacity = '.55'; rootsSvg.append(p); rootPaths.push(p);
+    }
+    const base = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    base.setAttribute('d', `M${gut} ${H * .62} H ${W - gut}`); base.setAttribute('pathLength', '1'); base.style.strokeDasharray = '1 1'; base.style.strokeDashoffset = '1'; base.style.opacity = '.55';
+    rootsSvg.append(base); rootPaths.push(base);
+  };
+
+  // ---------- GROW particles: one material changing shape ----------
+  const pc = $('#particles'); const pcx = pc.getContext('2d');
+  let P = null, shapes = null;
+  const sizeParticles = () => {
+    const dpr = Math.min(devicePixelRatio || 1, 2);
+    pc.width = Math.round(vw * dpr); pc.height = Math.round(vh * dpr); pcx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const N = mobile() ? 560 : 1000;
+    const cx = vw / 2, cy = vh / 2, R = Math.min(vw, vh) * (mobile() ? .4 : .3);
+    let s2 = 11; const r2 = () => (s2 = (s2 * 16807) % 2147483647) / 2147483647;
+    const A = [], B = [], C = [], ringIx = [], ringAng = [];
+    // A: circle + three dividers (the three ways I work)
+    for (let i = 0; i < N; i++) {
+      if (i < N * .74) { const a = (i / (N * .74)) * Math.PI * 2; const j = (r2() - .5) * 3; A.push([cx + Math.cos(a) * (R + j), cy + Math.sin(a) * (R + j)]); }
+      else { const k = i % 3; const a = [90, 210, 330][k] * Math.PI / 180; const t = r2(); A.push([cx + Math.cos(a) * R * t, cy + Math.sin(a) * R * t]); }
+      // B: grains scattered by the wind
+      B.push([r2() * vw, r2() * vh]);
+      ringIx.push(i % 5); ringAng.push(r2() * Math.PI * 2);
+    }
+    // C: cactus logo silhouette, sampled from an offscreen drawing
+    const oc = document.createElement('canvas'); oc.width = 120; oc.height = 160; const o = oc.getContext('2d');
+    o.fillStyle = '#000';
+    const rr = (x, y, w, h, r) => { o.beginPath(); o.roundRect(x, y, w, h, r); o.fill(); };
+    rr(46, 20, 28, 136, 14); rr(16, 56, 16, 50, 8); rr(16, 92, 40, 14, 7); rr(88, 38, 16, 44, 8); rr(66, 70, 38, 14, 7);
+    o.beginPath(); o.arc(60, 16, 10, 0, Math.PI * 2); o.fill();
+    const od = o.getImageData(0, 0, 120, 160).data; const pts = [];
+    for (let y = 0; y < 160; y += 2) for (let x = 0; x < 120; x += 2) if (od[(y * 120 + x) * 4 + 3] > 128) pts.push([x, y]);
+    const scale = (R * 2.1) / 160;
+    for (let i = 0; i < N; i++) { const p = pts[Math.floor(r2() * pts.length)]; C.push([cx + (p[0] - 60) * scale + (r2() - .5) * 2, cy + (p[1] - 82) * scale + (r2() - .5) * 2]); }
+    shapes = { A, B, C, ringIx, ringAng, R, cx, cy, N, diag: Math.hypot(vw, vh) / 2 };
+    const delay = Array.from({ length: N }, () => r2());
+    P = { x: new Float32Array(N), y: new Float32Array(N), d: delay };
+    for (let i = 0; i < N; i++) { P.x[i] = A[i][0]; P.y[i] = A[i][1]; }
+    // label positions inside the three segments
+    $$('#labels span').forEach((el, i) => { const a = [270, 30, 150][i] * Math.PI / 180; el.style.left = (cx + Math.cos(a) * R * .55) + 'px'; el.style.top = (cy + Math.sin(a) * R * .55) + 'px'; });
+  };
+  const drawParticles = g => {
+    if (!P) return;
+    const { A, B, C, ringIx, ringAng, R, cx, cy, N, diag } = shapes;
+    pcx.clearRect(0, 0, vw, vh);
+    // phases: A hold · A→B · B drift · B→C · C hold · C→rings · rings expand
+    const ringGrow = easeInOut(ramp(g, .74, 1));
+    const ringBase = lerp(R * .5, diag * 1.35, ringGrow);
+    const night = ramp(g, .8, 1);
+    const t = performance.now() / 1000;
+    for (let i = 0; i < N; i++) {
+      const dl = P.d[i] * .5;
+      const ab = easeInOut(clamp((ramp(g, .18, .36) - dl * .4) / .6));
+      const bc = easeInOut(clamp((ramp(g, .44, .62) - dl * .4) / .6));
+      const cd = easeInOut(clamp((ramp(g, .68, .78) - dl * .3) / .7));
+      // drift while scattered
+      const bx = B[i][0] + Math.sin(t * .6 + i) * 10 + wind * 18, by = B[i][1] + Math.cos(t * .5 + i * 1.3) * 8;
+      let tx = lerp(A[i][0], bx, ab), ty = lerp(A[i][1], by, ab);
+      tx = lerp(tx, C[i][0], bc); ty = lerp(ty, C[i][1], bc);
+      const rr = ringBase * (.5 + ringIx[i] * .16) + Math.sin(t + i) * 2;
+      const a = ringAng[i] + t * .05 * (ringIx[i] % 2 ? 1 : -1);
+      tx = lerp(tx, cx + Math.cos(a) * rr, cd); ty = lerp(ty, cy + Math.sin(a) * rr, cd);
+      if (pointer.active && !reduce) { const dx = tx - pointer.x, dy = ty - pointer.y, d = Math.hypot(dx, dy); if (d < 90 && d > .01) { const f = (1 - d / 90) * 26; tx += dx / d * f; ty += dy / d * f; } }
+      if (reduce) { P.x[i] = tx; P.y[i] = ty; } else { P.x[i] += (tx - P.x[i]) * .14; P.y[i] += (ty - P.y[i]) * .14; }
+    }
+    const size = mobile() ? 1.8 : 2.2;
+    const cols = night > 0 ? ['#F2C77F', '#E9A33A', '#FFE3B0'] : ['#B8864C', '#8A6238', '#D9B07E'];
+    cols.forEach((c, ci) => {
+      pcx.fillStyle = c; pcx.beginPath();
+      for (let i = ci; i < N; i += 3) { pcx.moveTo(P.x[i] + size, P.y[i]); pcx.arc(P.x[i], P.y[i], size * (ci === 2 ? .8 : 1), 0, Math.PI * 2); }
+      pcx.fill();
+    });
+    $('#nightFill').style.clipPath = `circle(${(ringBase * .82 * ramp(g, .76, .9) + (g >= 1 ? diag * 2 : 0)).toFixed(1)}px at 50% 50%)`;
+  };
+
+  // ---------- Bloom: magnet email, face, petals ----------
+  const mail = $('#mail'), copied = $('#copied');
+  addEventListener('pointermove', e => {
+    if (reduce) return;
+    const m = mail.getBoundingClientRect(); const dx = e.clientX - (m.left + m.width / 2), dy = e.clientY - (m.top + m.height / 2);
+    const near = Math.hypot(dx, dy) < Math.max(m.width * .65, 140);
+    mail.style.setProperty('--mx', (near ? dx * .14 : 0).toFixed(1) + 'px'); mail.style.setProperty('--my', (near ? dy * .24 : 0).toFixed(1) + 'px');
+    const f = $('#face').getBoundingClientRect(); const fx = clamp((e.clientX - (f.left + f.width / 2)) / 400, -1, 1), fy = clamp((e.clientY - (f.top + f.height / 2)) / 400, -1, 1);
+    $('#eyes').setAttribute('transform', `translate(${(fx * 4).toFixed(2)} ${(fy * 3).toFixed(2)})`);
+    $('#faceSvg').style.transform = `rotate(${(fx * 5).toFixed(1)}deg)`;
+  }, { passive: true });
+  mail.addEventListener('click', async () => {
+    const text = 'example@email.com';
+    try { await navigator.clipboard.writeText(text); copied.textContent = '복사됨'; } catch { copied.textContent = text; }
+    copied.classList.add('on'); setTimeout(() => copied.classList.remove('on'), 1600);
+    $('#faceSvg').animate([{ transform: 'rotate(0)' }, { transform: 'translateY(6px) rotate(0)' }, { transform: 'rotate(0)' }], { duration: 520, easing: 'ease-in-out' });
+    if (reduce) return;
+    const stage = $('#bloomStage'), sr = stage.getBoundingClientRect(), fr = $('#bCactus').getBoundingClientRect();
+    for (let i = 0; i < 18; i++) {
+      const p = document.createElement('i'); p.className = 'petal'; p.style.background = petalColors[i % petalColors.length];
+      p.style.left = (fr.left + fr.width / 2 - sr.left) + 'px'; p.style.top = (fr.top + fr.height * .08 - sr.top) + 'px'; stage.append(p);
+      const a = Math.random() * Math.PI * 2, d = 80 + Math.random() * 220;
+      p.animate([{ transform: 'translate(0,0) rotate(0)', opacity: 1 }, { transform: `translate(${Math.cos(a) * d}px, ${Math.sin(a) * d + 160}px) rotate(${Math.random() * 540}deg)`, opacity: 0 }], { duration: 1400 + Math.random() * 700, easing: 'cubic-bezier(.2,.7,.3,1)' }).onfinish = () => p.remove();
+    }
+  });
+
+  // ---------- Main loop ----------
+  let lastY = scrollY, lastT = performance.now(), skew = 0, dir = 1, lastDirY = scrollY;
+  const panels = $$('.panel'), spacers = $$('#build .spacer');
+  const frame = $('#frame'), tbar = $('#tbar'), page = $('#page'), win = $('#win');
+  const hdr = $('#hdr'), edge = $('#edge');
+  const tick = now => {
+    if (lenis) lenis.raf(now);
+    const y = scrollY;
+    const dt = Math.max(now - lastT, 1); const v = (y - lastY) / dt; lastY = y; lastT = now;
+    skew += (clamp(-v * 2.4, -9, 9) - skew) * .12; wind += (clamp(v * .9, -3, 3) - wind) * .08;
+    document.documentElement.style.setProperty('--skew', (reduce ? 0 : skew).toFixed(2) + 'deg');
+    if (Math.abs(y - lastDirY) > 6) { dir = y > lastDirY ? 1 : -1; lastDirY = y; }
+    const m = mobile();
+
+    // INTRO
+    const p = prog('intro');
+    const cf = ramp(p, .04, .13);
+    $('#pCactus').style.cssText = `opacity:${1 - cf};transform:translate(-50%, ${(cf * 8).toFixed(2)}%)`;
+    const tf = ramp(p, .06, .16);
+    $('#closing').style.cssText = `opacity:${1 - tf};filter:${tf > 0 ? `blur(${(tf * 9).toFixed(1)}px)` : 'none'};transform:translate(calc(-50% + ${(tf * 60).toFixed(1)}px), 0)`;
+    const sandEl = $('#sand'); const ridge = vh * 2.3 * .03;
+    const horizon = vh * (m ? .64 : .6) - ridge, cover = -ridge - vh * .06, gone = vh + 30;
+    let sy = lerp(horizon, cover, easeInOut(ramp(p, .11, .3)));
+    sy = lerp(sy, gone, easeInOut(ramp(p, .38, .56)));
+    sandEl.style.transform = `translateY(${sy.toFixed(1)}px)`;
+    sandEl.classList.toggle('front', p > .13);
+    $('#light').style.opacity = (.92 * Math.min(easeInOut(ramp(p, .26, .36)), 1 - easeInOut(ramp(p, .4, .58)))).toFixed(3);
+    win.style.visibility = p > .36 ? 'visible' : 'hidden';
+    // frame: 1 = browser window (current site), 0 = full screen
+    const d = easeInOut(ramp(p, .62, .86)); const f = 1 - d;
+    const side = m ? 8 : 0, barH = m ? 58 : 88;
+    frame.style.inset = `${(f * side).toFixed(1)}px ${(f * side).toFixed(1)}px ${(f * side).toFixed(1)}px ${(f * side).toFixed(1)}px`;
+    frame.style.borderRadius = (m ? f * 16 : 0).toFixed(1) + 'px';
+    tbar.style.height = barH + 'px';
+    tbar.style.transform = `translateY(${(-d * 110).toFixed(1)}%)`;
+    page.style.top = (f * barH).toFixed(1) + 'px';
+    page.style.height = `calc(100% - ${(f * barH).toFixed(1)}px)`;
+    // photo grows from its place in the window to the whole screen
+    const pw = page.clientWidth, ph = page.clientHeight;
+    const fr = m ? { x: pw * .07, y: ph * .06, w: pw * .38, h: pw * .38 * 1.25 } : { x: pw * .042, y: ph * .14, w: Math.min(pw * .22, ph * .62 / 1.25), h: Math.min(pw * .22, ph * .62 / 1.25) * 1.25 };
+    const ed = easeInOut(ramp(p, .62, .9));
+    photoEl.style.left = lerp(fr.x, 0, ed) + 'px'; photoEl.style.top = lerp(fr.y, 0, ed) + 'px';
+    photoEl.style.width = lerp(fr.w, pw, ed) + 'px'; photoEl.style.height = lerp(fr.h, ph, ed) + 'px';
+    photoEl.style.borderRadius = lerp(8, 0, ed) + 'px';
+    const at = ramp(p, .6, .72);
+    $('#aboutText').style.cssText = `opacity:${1 - at};transform:translateY(${(-at * 30).toFixed(1)}px);filter:${at > 0 ? `blur(${(at * 6).toFixed(1)}px)` : 'none'}`;
+    absorbChars.forEach((c, i) => { const k = easeOut(ramp(p, .74 + i * .018, .86 + i * .018)); c.style.transform = `translateY(${((1 - k) * 105).toFixed(1)}%)`; c.style.opacity = k > 0 ? 1 : 0; });
+    $('#cue').style.opacity = ramp(p, .9, .96) * (1 - ramp(p, .985, 1));
+    const hdrOn = ramp(p, .78, .9);
+
+    // STATEMENT
+    const ps = prog('statement');
+    stmtWords.forEach((w, i) => {
+      const k = clamp((ps * 1.35 - (i / stmtWords.length) * .95) / .16);
+      w.style.color = `color-mix(in srgb, #202731 ${(k * 100).toFixed(0)}%, #EADBC2)`;
+      w.style.transform = `translateY(${((1 - k) * 8).toFixed(1)}px)`;
+      if (w.classList.contains('mark')) w.style.setProperty('--m', ramp(ps, .62, .78).toFixed(3));
+    });
+    $('#sprout').style.transform = `scale(${(.7 + ps * .7).toFixed(3)})`;
+    $$('#ledger div').forEach((el, i) => { const k = ramp(ps, .66 + i * .07, .8 + i * .07); el.style.opacity = k; el.style.filter = k < 1 ? `blur(${((1 - k) * 8).toFixed(1)}px)` : 'none'; el.style.transform = `translateY(${((1 - k) * 12).toFixed(1)}px)`; });
+
+    // HOBBIES
+    const ph2 = prog('hobby');
+    const strip = $('#strip'); const span = strip.scrollWidth - vw + vw * .12;
+    strip.style.setProperty('--hx', (-span * easeInOut(ph2)).toFixed(1) + 'px');
+
+    // ROOTS → BUILD (build overlaps the last screen of roots)
+    const pr = clamp((y - sec.roots.top) / Math.max(sec.roots.h - 2 * vh, 1));
+    rootPaths.forEach((pa, i) => { const k = easeOut(ramp(pr, i * .03, .55 + i * .03)); pa.style.strokeDashoffset = (1 - k).toFixed(3); });
+    buildChars.forEach((c, i) => { const k = easeOut(ramp(pr, .35 + i * .07, .6 + i * .07)); c.style.transform = `translateY(${((1 - k) * -60).toFixed(1)}%)`; c.style.opacity = k; });
+
+    // BUILD: panel i arrives, dwells, then gets covered by panel i+1
+    const T = sec.build.top; const dwell = spacers[0].offsetHeight;
+    const arrive = i => clamp((y - (T + i * (vh + dwell) - vh)) / vh);
+    const dwellP = i => clamp((y - (T + i * (vh + dwell))) / (i === panels.length - 1 ? spacers[i].offsetHeight : dwell));
+    $('#rootsDim').style.opacity = (arrive(0) * .55).toFixed(3);
+    $('#roots .sticky').style.filter = arrive(0) > 0 ? `blur(${(arrive(0) * 8).toFixed(1)}px)` : 'none';
+    panels.forEach((pn, i) => {
+      const a = arrive(i), dw = dwellP(i), c = i < panels.length - 1 ? arrive(i + 1) : 0;
+      const inner = pn.firstElementChild;
+      pn.style.visibility = c >= 1 ? 'hidden' : '';
+      inner.style.transform = `scale(${(1 - c * .08).toFixed(4)})`;
+      inner.style.filter = c > 0 ? `blur(${(c * 10).toFixed(1)}px) brightness(${(1 - c * .6).toFixed(3)})` : 'none';
+      pn.style.setProperty('--zoom', (1.22 - easeOut(a) * .22 + dw * .05).toFixed(4));
+      titles[i].forEach((ch, j) => { const k = easeOut(ramp(a, .35 + j * .025, .75 + j * .025)); ch.style.opacity = k; ch.style.filter = k < 1 ? `blur(${((1 - k) * 14).toFixed(1)}px)` : 'none'; ch.style.transform = `translateY(${((1 - k) * 30).toFixed(1)}px)`; });
+      pn.style.setProperty('--meta', ramp(a, .7, 1).toFixed(3));
+      pn.style.setProperty('--tk', (ramp(dw, .05, .25) * (1 - ramp(dw, .85, 1))).toFixed(3));
+      pn.querySelector('.ticker .row').style.setProperty('--tx', (-(dw) * (m ? 900 : 1500)).toFixed(1) + 'px');
+      pn.style.setProperty('--dy', ((1 - easeOut(ramp(dw, .2, .55))) * 130).toFixed(1) + '%');
+      pn.style.setProperty('--py', ((1 - easeOut(ramp(dw, .32, .65))) * 170).toFixed(1) + '%');
+      // the last project closes into the GROW circle
+      if (i === panels.length - 1) {
+        const close = easeInOut(ramp(dw, .55, .9));
+        const R = Math.min(vw, vh) * (m ? .4 : .3);
+        const full = Math.hypot(vw, vh) / 2 + 20;
+        pn.style.clipPath = close > 0 ? `circle(${lerp(full, R, close).toFixed(1)}px at 50% 50%)` : 'none';
+        pn.style.opacity = (1 - ramp(dw, .9, 1)).toFixed(3);
+      }
+    });
+
+    // GROW (starts once the last panel has closed into the circle)
+    const g = clamp((y - (sec.grow.top + vh)) / Math.max(sec.grow.h - 2 * vh, 1));
+    if (y > sec.grow.top - vh && y < sec.grow.top + sec.grow.h) drawParticles(g);
+    const lab = ramp(g, .12, .24);
+    $('#labels').style.cssText = `opacity:${(ramp(y, sec.grow.top + vh * .7, sec.grow.top + vh) * (1 - lab)).toFixed(3)};filter:${lab > 0 ? `blur(${(lab * 10).toFixed(1)}px)` : 'none'}`;
+    $('#growWord').style.opacity = (ramp(g, .56, .64) * (1 - ramp(g, .7, .76))).toFixed(3);
+
+    // BLOOM
+    const b = prog('bloom');
+    const open = easeOut(ramp(b, .02, .3));
+    petals.forEach((pe, i) => { const a = (i - 2.5) * 30 * open; pe.setAttribute('transform', `rotate(${a.toFixed(1)}) scale(${(.3 + .7 * open).toFixed(3)})`); });
+    $('#bglow').style.opacity = open.toFixed(3);
+    $('#face').style.cssText = `opacity:${ramp(b, .08, .24)};transform:translateY(${((1 - ramp(b, .08, .24)) * 20).toFixed(1)}px)`;
+    $('#bloomText').style.opacity = ramp(b, .14, .3);
+    const close = easeInOut(ramp(b, .7, .82));
+    $('#closeBar').style.transform = `translateY(${((close - 1) * 100).toFixed(1)}%)`;
+    $('#bloomStage').style.borderRadius = '0';
+    const es = easeInOut(ramp(b, .8, 1));
+    $('#endSand').style.transform = `translateY(${(-es * (vh * 1.08)).toFixed(1)}px)`;
+
+    // Header: appears after the window dissolves, hides on the way down, back on the way up, gives way to the closing window bar
+    const inStory = y > sec.intro.top + (sec.intro.h - vh) * .86;
+    hdr.style.opacity = (hdrOn * (1 - close)).toFixed(3);
+    hdr.classList.toggle('hide', inStory && dir > 0 && Math.abs(v) > .05 && y < sec.bloom.top);
+    const mid = y + vh * .5;
+    const word = mid < sec.hobby.top + sec.hobby.h ? 'ABSORB.' : mid < sec.grow.top + vh ? 'BUILD.' : mid < sec.bloom.top ? 'GROW.' : 'BLOOM.';
+    setWord(word);
+
+    // Edge cactus: a thin silhouette that gains a segment per project
+    const inBuild = y > sec.build.top - vh * .5 && y < sec.grow.top + vh * .3;
+    edge.style.opacity = inBuild ? .85 : 0;
+    ['.e2', '.e3', '.e4'].forEach((s, i) => { edge.querySelector(s).style.transform = `scaleY(${arrive(i) > .9 ? 1 : 0})`; });
+
+    // HUD
+    let scene = '프롤로그 끝';
+    if (p > .06) scene = '모래가 덮음';
+    if (p > .38) scene = '창이 드러남';
+    if (p > .6) scene = '창 → 전면';
+    if (p > .88) scene = 'ABSORB · 사진';
+    if (y > sec.statement.top - vh * .3) scene = 'ABSORB · 문장';
+    if (y > sec.hobby.top - vh * .3) scene = 'ABSORB · 취미';
+    if (y > sec.roots.top - vh * .3) scene = '뿌리 → BUILD';
+    panels.forEach((_, i) => { if (arrive(i) > .5) scene = `BUILD · 프로젝트 ${i + 1}`; });
+    if (dwellP(panels.length - 1) > .55) scene = '프로젝트 → 원';
+    if (g > 0) scene = g < .18 ? 'GROW · 세 가지 방식' : g < .44 ? 'GROW · 모래알로' : g < .7 ? 'GROW · 선인장' : 'GROW · 나이테 → 밤';
+    if (y > sec.bloom.top - vh * .2) scene = b < .7 ? 'BLOOM' : '창이 닫힘 → 처음으로';
+    setScene(scene);
+
+    drawHalftone();
+    requestAnimationFrame(tick);
+  };
+
+  // ---------- Autoplay ----------
+  const play = $('#play');
+  let auto = 0;
+  const stopAuto = () => { if (!auto) return; cancelAnimationFrame(auto); auto = 0; play.textContent = '▶ 자동 재생'; };
+  play.addEventListener('click', () => {
+    if (auto) return stopAuto();
+    scrollTo(0, 0); if (lenis) lenis.scrollTo(0, { immediate: true });
+    const total = document.documentElement.scrollHeight - innerHeight, dur = 75000, t0 = performance.now() + 400;
+    play.textContent = '■ 멈춤';
+    const step = now => {
+      const k = clamp((now - t0) / dur);
+      const yy = total * k;
+      if (lenis) lenis.scrollTo(yy, { immediate: true }); else scrollTo(0, yy);
+      if (k < 1) auto = requestAnimationFrame(step); else stopAuto();
+    };
+    auto = requestAnimationFrame(step);
+  });
+  ['wheel', 'touchstart'].forEach(t => addEventListener(t, stopAuto, { passive: true }));
+  addEventListener('keydown', e => { if (['ArrowDown', 'ArrowUp', 'PageDown', 'PageUp', ' ', 'Home', 'End'].includes(e.key)) stopAuto(); });
+
+  addEventListener('resize', () => { measure(); });
+  const start = () => { measure(); requestAnimationFrame(tick); };
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(start); else start();
+})();
+</script>
+
+</body>
+</html>

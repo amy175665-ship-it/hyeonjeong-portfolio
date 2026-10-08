@@ -1,5 +1,6 @@
 import Reveal from "@/components/ui/Reveal";
-import { contact, iconPaths } from "@/components/layout/SiteFooter";
+import { iconPaths } from "@/components/layout/SiteFooter";
+import { contact } from "@/data/contact";
 import styles from "./ContactStory.module.css";
 
 // Last section inside the desert browser window: GROW. (yellow dot) and the contact channels, with the same data and

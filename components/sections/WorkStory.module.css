@@ -1,6 +1,6 @@
-/* Same cream page and type system as AboutStory; the cactus green marks this BUILD. section. */
-.section { --cream: #fbf6ee; --ink: #202731; --muted: #58636e; --line: #e7dccb; --green: #7f9657; --sand: #e3bf91; background: var(--cream); color: var(--ink); }
-/* One window-high page per project (see [data-page] in DesertWindow.module.css). */
+/* Same near-white page and type system as AboutStory; the cactus green marks this BUILD. section. */
+.section { --bg: #fcfcfb; --ink: #202731; --muted: #58636e; --line: #e6e6e2; --green: #7f9657; --sand: #e3bf91; background: var(--bg); color: var(--ink); }
+/* One window-high page per project (see [data-page] in WindowFrame.module.css). */
 .page { padding: 48px 40px; }
 .inner { width: 100%; max-width: 1120px; margin: 0 auto; }
 .kicker { display: flex; align-items: center; gap: 10px; margin: 0 0 14px; color: var(--muted); font: 400 16px/1 var(--font-editorial), Georgia, serif; letter-spacing: .04em; }
@@ -13,10 +13,10 @@
 .inner > .list { margin-top: 32px; }
 .item { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 56px; align-items: center; }
 .flip > :first-child { order: 2; }
-.media { position: relative; display: block; aspect-ratio: 16 / 9; overflow: hidden; border-radius: 6px; background: #f1e7d7; box-shadow: 0 1px 0 var(--line), 0 18px 40px -28px #5a3d1a55; }
+.media { position: relative; display: block; aspect-ratio: 16 / 9; overflow: hidden; border-radius: 6px; background: #f0f0ec; box-shadow: 0 1px 0 var(--line), 0 18px 40px -28px #5a3d1a55; }
 .image { object-fit: cover; transition: transform .6s cubic-bezier(.2, .7, .3, 1); }
 .media:hover .image, .media:focus-visible .image { transform: scale(1.03); }
-.badge { position: absolute; left: 14px; top: 14px; padding: 4px 10px; border-radius: 999px; background: #fffaf2e6; color: var(--muted); font-size: 12px; font-weight: 500; }
+.badge { position: absolute; left: 14px; top: 14px; padding: 4px 10px; border-radius: 999px; background: #ffffffe6; color: var(--muted); font-size: 12px; font-weight: 500; }
 .text { min-width: 0; }
 .meta { margin: 0; color: var(--muted); font-size: 12px; font-weight: 500; letter-spacing: .04em; }
 .count { margin-right: 10px; color: var(--ink); font: 400 14px/1 var(--font-editorial), Georgia, serif; letter-spacing: .02em; }

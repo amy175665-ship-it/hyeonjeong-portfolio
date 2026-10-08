@@ -1,8 +1,6 @@
 import Image from "next/image";
 import sandImage from "@/public/images/hero/hero-sand-bg.webp";
-import HeroBrowserDemo from "./HeroBrowserDemo";
 import SandStream from "./SandStream";
-import VoiceIntro from "./VoiceIntro";
 import HeroAvatar from "./HeroAvatar";
 import GrowthScene from "./GrowthScene";
 import styles from "./Hero.module.css";
@@ -17,7 +15,7 @@ function Letters({ text }: { text: string }) {
   );
 }
 
-export default function Hero({ showExtras = true, showTitle = true, desert = false }: { showExtras?: boolean; showTitle?: boolean; desert?: boolean }) {
+export default function Hero({ showTitle = true, desert = false }: { showTitle?: boolean; desert?: boolean }) {
   return (
     <>
     <section className={`${styles.hero} ${!showTitle ? styles.editorial : ""} ${desert ? styles.desert : ""}`} aria-labelledby="hero-title">
@@ -36,15 +34,6 @@ export default function Hero({ showExtras = true, showTitle = true, desert = fal
         <SandStream />
         <Image src={sandImage} alt="" aria-hidden="true" className={styles.sand} priority unoptimized />
       </div>
-      {showExtras && <div className={styles.extras}>
-        <div className={styles.extrasIntro}>
-          <p className={styles.eyebrow}><span aria-hidden="true" /> HELLO, I’M HYUNJUNG.</p>
-          <p className={styles.disciplines} lang="en">WEB PUBLISHING / FRONTEND / INTERACTION</p>
-          <div className={styles.voice}><VoiceIntro /></div>
-          <a href="/#about" className={styles.scrollLink}><span aria-hidden="true">⌄</span> SCROLL TO EXPLORE</a>
-        </div>
-        <HeroBrowserDemo />
-      </div>}
     </section>
     </>
   );

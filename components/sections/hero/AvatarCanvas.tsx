@@ -10,6 +10,9 @@ const MODEL_URL = "/models/avatar6.glb";
 const ROTATION_LIMIT = { x: 0.15, y: 0.48 };
 const ROTATION_SMOOTHING = 6;
 const IDLE_MOTION = { delay: 1.8, floatHeight: 0.025, turnAngle: 0.10, blendSpeed: 2 };
+// Touch screens never get the pointer-follow, so the idle motion there is the whole show: it starts at once and is
+// livelier than on desktop: wider looks left and right, a nod, a head tilt and a higher, quicker float.
+const TOUCH_MOTION = { floatHeight: 0.09, floatSpeed: 1.5, turnAngle: 0.34, turnSpeed: 0.85, nod: 0.09, roll: 0.07 };
 // Normalize the head height, then center it inside the rotating parent.
 const MODEL_HEIGHT = 2.8;
 const MODEL_OFFSET: [number, number, number] = [0, 0, 0];
@@ -21,12 +24,13 @@ function Avatar3D({ onReady }: { onReady: () => void }) {
   const pivot = useRef<THREE.Group>(null);
   const target = useRef({ x: 0, y: 0 });
   const reducedMotion = useRef(false);
+  const touch = useRef(false);
   const idle = useRef({ sincePointer: IDLE_MOTION.delay, time: 0, blend: 0 });
   const model = useMemo(() => {
     // Clone objects only; leave the cached GLTF geometry and face/hat materials intact.
     const clone = scene.clone(true);
-    // The export contains overlapping brown and dark hair. Hide only the dark
-    // duplicate in this scene; preserve the GLB and both original materials.
+    // The original export contains overlapping brown and dark hair. The optimized GLB in public/ no longer has the
+    // dark duplicate (assets/models/optimize-glb.mjs drops it); hiding it here still covers the original file.
     clone.traverse((object) => {
       if (object instanceof THREE.Mesh) {
         const materials = Array.isArray(object.material) ? object.material : [object.material];
@@ -45,6 +49,10 @@ function Avatar3D({ onReady }: { onReady: () => void }) {
 
   useEffect(() => {
     const preference = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const coarse = window.matchMedia("(hover: none), (pointer: coarse)");
+    const updateTouch = () => { touch.current = coarse.matches; };
+    updateTouch();
+    coarse.addEventListener("change", updateTouch);
     const reset = () => {
       target.current = { x: 0, y: 0 };
       idle.current.sincePointer = 0;
@@ -71,6 +79,7 @@ function Avatar3D({ onReady }: { onReady: () => void }) {
       window.removeEventListener("blur", reset);
       document.removeEventListener("visibilitychange", reset);
       preference.removeEventListener("change", updatePreference);
+      coarse.removeEventListener("change", updateTouch);
     };
   }, []);
 
@@ -86,6 +95,21 @@ function Avatar3D({ onReady }: { onReady: () => void }) {
     const step = Math.min(delta, 0.05);
     const motion = idle.current;
     motion.time += step;
+    if (touch.current) {
+      // Touch: a glance to each side with a slower drift on top, a nod out of step with it, a gentle tilt, a float.
+      const t = motion.time, m = TOUCH_MOTION;
+      motion.blend = THREE.MathUtils.lerp(motion.blend, 1, 1 - Math.exp(-IDLE_MOTION.blendSpeed * step));
+      const ease = 1 - Math.exp(-3 * step);
+      const turn = m.turnAngle * (0.7 * Math.sin(t * m.turnSpeed) + 0.3 * Math.sin(t * 0.47 + 1.3));
+      const nod = m.nod * (0.6 * Math.sin(t * 1.25 + 0.6) + 0.4 * Math.sin(t * 0.61));
+      const roll = m.roll * Math.sin(t * 0.73 + 2.1);
+      pivot.current.rotation.x = THREE.MathUtils.lerp(pivot.current.rotation.x, nod * motion.blend, ease);
+      pivot.current.rotation.y = THREE.MathUtils.lerp(pivot.current.rotation.y, turn * motion.blend, ease);
+      pivot.current.rotation.z = THREE.MathUtils.lerp(pivot.current.rotation.z, roll * motion.blend, ease);
+      pivot.current.position.y = m.floatHeight * Math.sin(t * m.floatSpeed) * motion.blend;
+      return;
+    }
+    pivot.current.rotation.z = THREE.MathUtils.lerp(pivot.current.rotation.z, 0, 1 - Math.exp(-ROTATION_SMOOTHING * step));
     motion.sincePointer += step;
     const resting = motion.sincePointer >= IDLE_MOTION.delay;
     motion.blend = THREE.MathUtils.lerp(motion.blend, resting ? 1 : 0,

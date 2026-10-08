@@ -36,3 +36,10 @@ Thumbs.db
 # Stray temp folder and debug log
 /Users*Temp/
 debug.log
+
+# Original hobby photos keep their camera metadata (one has a location); only the stripped WebP copies in
+# public/images/hobby/ are committed
+/assets/hobby/
+
+# Screen recordings from the check scripts (re-create them with record.cjs)
+/artifacts/**/*.webm

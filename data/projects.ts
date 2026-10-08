@@ -20,13 +20,17 @@ export type Project = {
   scope: string;
   responsive: string;
   features: string[];
+  // Colour of the project's full-screen panel (background tint, accents). Optional: the stage colour is used without it.
+  accent?: string;
 };
 
 // All projects below are writing examples, not completed work.
-// Replace descriptions with verified experience and images with actual screenshots.
+// To replace one: put screenshots in public/images/projects/<slug>/ (desktop and mobile, WebP), point image /
+// desktopImage / mobileImage at them, rewrite the text fields from real experience and set placeholder: false.
 export const projects: Project[] = [
   {
     slug: "responsive-cafe",
+    accent: "#7f9657",
     featured: true,
     placeholder: true,
     categoryTags: ["반응형","개인 프로젝트"],
@@ -48,6 +52,7 @@ export const projects: Project[] = [
   },
   {
     slug: "product-catalog",
+    accent: "#e96b5a",
     featured: true,
     placeholder: true,
     categoryTags: ["반응형","클론코딩"],
@@ -69,6 +74,7 @@ export const projects: Project[] = [
   },
   {
     slug: "event-landing",
+    accent: "#e9a33a",
     featured: true,
     placeholder: true,
     categoryTags: ["반응형","리뉴얼"],

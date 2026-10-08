@@ -1,0 +1,8 @@
+/* The leaving word sits on top of the arriving one; both are clipped to one line so letters roll in and out of view. */
+.roll { position: relative; display: inline-grid; overflow: hidden; vertical-align: top; }
+.word { grid-area: 1 / 1; display: inline-flex; white-space: nowrap; }
+.char { display: inline-block; }
+.out .char { animation: rollOut .5s cubic-bezier(.65, 0, .35, 1) calc(var(--i) * 28ms) both; }
+.in .char { animation: rollIn .6s cubic-bezier(.16, 1, .3, 1) calc(var(--i) * 28ms + 60ms) both; }
+@keyframes rollOut { to { transform: translateY(-110%); } }
+@keyframes rollIn { from { transform: translateY(110%); } }

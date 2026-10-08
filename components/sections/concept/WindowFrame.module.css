@@ -1,0 +1,93 @@
+/* The near-white browser window after the cactus story: ordinary page content right after the story's pinned track,
+   overlapping its last screen (WindowFrame holds it at the top of the screen until it is released). --frame (set by
+   WindowFrame) is 1 while it is a browser window and 0 once it has dissolved into the full-screen layout.
+   --chrome: what the title bar covers at the top of the screen (desktop: as tall as the header row, so the fixed logo
+   sits in it like a title bar; phones: the card starts 84px down under the header, plus its 36px bar). */
+.anchor { position: relative; height: 0; margin-top: calc(-1 * max(600px, 100svh)); }
+.ruler { position: absolute; top: 0; width: 1px; height: max(600px, 100svh); visibility: hidden; pointer-events: none; }
+.window { --frame: 1; --chrome: 96px; --page-h: calc(max(600px, 100svh) - var(--chrome)); position: relative; z-index: 1; background: #fcfcfb; }
+.content { padding-top: var(--chrome); }
+/* Toolbar: Mac-style window buttons in the ABSORB. / GROW. / BUILD. accents, then the main menu as browser tabs.
+   No hairlines: the grey toolbar and the white page are told apart by their fill alone. */
+/* The window does not clip (so a hovered tab can rise out over its top edge); the toolbar rounds its own top corners
+   and the viewport clips the content. */
+/* The title bar is fixed to the top of the screen (to the held window while it has a transform) and slides up out of
+   view as the frame dissolves. */
+.bar { position: fixed; z-index: 3; top: 0; left: 0; right: 0; display: flex; align-items: center; gap: 24px; height: 96px; padding: 28px 4.2% 0; border-radius: 0; background: #f0f0ed; transform: translateY(calc((var(--frame) - 1) * 100%)); opacity: min(1, calc(var(--frame) * 1.6)); }
+.window[data-hidden] .bar { visibility: hidden; }
+/* The 28px top padding centres the window buttons and tab words on the header's logo line (62px down: the header
+   row is as tall as its 76px menu button, from 24px); the side padding matches the
+   header's, so the buttons mirror the menu button. */
+.dots { display: flex; align-items: center; gap: 8px; }
+.dots > * { position: relative; display: block; flex: none; width: 13px; height: 13px; padding: 0; border: 0; border-radius: 50%; background: #e96b5a; box-shadow: inset 0 0 0 .5px #0000001f; }
+.dots > :nth-child(2) { background: #e9a33a; }
+.dots > :nth-child(3) { background: #7f9657; }
+.dots button { cursor: pointer; }
+/* Glyphs (× on coral, − on yellow, › on green) appear while the pointer is over the group or a button has keyboard focus. */
+.dotClose::before, .dotClose::after, .dotMin::before { content: ""; position: absolute; top: 50%; left: 50%; width: 7px; height: 1.2px; border-radius: 1px; background: #4d0000b3; opacity: 0; transform: translate(-50%, -50%) rotate(45deg); transition: opacity .15s; }
+.dotClose::after { transform: translate(-50%, -50%) rotate(-45deg); }
+.dotMin::before { background: #5c3a00b3; transform: translate(-50%, -50%); }
+.dotNext::before { content: ""; position: absolute; top: 50%; left: 50%; width: 4px; height: 4px; border: solid #1f3300b3; border-width: 1.2px 1.2px 0 0; opacity: 0; transform: translate(-70%, -50%) rotate(45deg); transition: opacity .15s; }
+.dots:hover button::before, .dots:hover button::after, .dots:focus-within button::before, .dots:focus-within button::after { opacity: 1; }
+.dots button:active { filter: brightness(.85); }
+/* Tabs sit on the toolbar's bottom edge; the current one is a white tab that runs straight into the page below (no
+   outline), the others are plain words on the grey toolbar. */
+.tabs { align-self: stretch; min-width: 0; }
+.tabs ol { display: flex; height: 100%; align-items: flex-end; gap: 2px; margin: 0; padding: 0; list-style: none; }
+.tab { position: relative; display: flex; height: 34px; align-items: center; padding: 0 22px; border-radius: 10px 10px 0 0; color: #58636e; font: 600 13px/1 var(--font-pretendard), sans-serif; letter-spacing: .08em; text-decoration: none; white-space: nowrap; transition: height .32s cubic-bezier(.34, 1.56, .64, 1), background-color .2s, color .2s, box-shadow .25s; }
+.tab:hover { background: #ebebe8; color: #202731; }
+/* The current section's tab stays pulled up (the same raised, white state a hovered tab takes). */
+.tabCurrent, .tabCurrent:hover { height: 64px; background: #fcfcfb; color: #202731; box-shadow: 0 -10px 22px -12px #20273140; }
+/* Mouse only: the hovered tab stretches far up out of the toolbar, past the window's top edge, like a file tab
+   pulled from a drawer: it turns page-white, bounces slightly and casts a soft lift shadow. */
+@media (hover: hover) and (pointer: fine) {
+  .tab:hover { height: 64px; background: #fcfcfb; color: #202731; box-shadow: 0 -10px 22px -12px #20273140; }
+}
+@media (hover: hover) and (pointer: fine) and (max-width: 1023px) {
+  .tab:hover { height: 48px; }
+}
+@media (prefers-reduced-motion: reduce) { .tab { transition: background-color .2s, color .2s; } }
+
+/* Desktop title bar: window buttons on the left, the logo in the middle (the fixed header), the tabs on the right
+   where the menu button was (the header hides it while the window is up: the tabs are the same menu). Each tab is as
+   tall as the bar, so its word sits on the same line as the buttons and the logo; its white face fills up from the
+   bottom on hover (mouse) and stays full on the current tab, joining the page below. */
+@media (min-width: 1024px) {
+  .tabs { margin-left: auto; }
+  .tabs ol { align-items: stretch; }
+  .tabs li { display: flex; }
+  .tab, .tab:hover, .tabCurrent, .tabCurrent:hover { height: auto; background: none; box-shadow: none; }
+  .tab { isolation: isolate; transition: color .2s; }
+  .tab::before { content: ""; position: absolute; inset: 0; z-index: -1; border-radius: 12px 12px 0 0; background: #fcfcfb; clip-path: inset(100% 0 0 0); transition: clip-path .4s cubic-bezier(.22, 1, .36, 1); }
+  .tabCurrent::before { clip-path: inset(0); }
+}
+@media (min-width: 1024px) and (hover: hover) and (pointer: fine) {
+  .tab:hover { color: #202731; }
+  .tab:hover::before { clip-path: inset(0); }
+}
+@media (min-width: 1024px) and (prefers-reduced-motion: reduce) { .tab::before { transition: none; } }
+/* Narrower desktops: tighter tabs so they stay clear of the centred logo. */
+@media (min-width: 1024px) and (max-width: 1279px) {
+  .bar { gap: 16px; }
+  .tab { padding: 0 13px; font-size: 12px; letter-spacing: .05em; }
+}
+@media (max-width: 1023px) {
+  .window { --chrome: 120px; }
+  .bar { top: calc(var(--frame) * 84px); left: calc(var(--frame) * 8px); right: calc(var(--frame) * 8px); height: 36px; padding: 0 12px; border-radius: calc(var(--frame) * 11px) calc(var(--frame) * 11px) 0 0; transform: translateY(calc((var(--frame) - 1) * 300%)); }
+  .dots { gap: 7px; }
+  .dots > * { width: 12px; height: 12px; }
+  .dotClose::before, .dotClose::after, .dotMin::before { width: 6px; }
+  .bar { gap: 14px; }
+  .tab { height: 28px; padding: 0 12px; font-size: 11px; letter-spacing: .05em; border-radius: 8px 8px 0 0; }
+  .tabCurrent, .tabCurrent:hover { height: 48px; }
+}
+/* Every [data-page] in the content is one window page high (the screen minus what the title bar covers) and centres
+   what it holds, so a menu link lands on one whole section. */
+.content :global([data-page]) { display: flex; min-height: var(--page-h); flex-direction: column; justify-content: center; }
+/* Phones: tabs tighten; if they still do not fit, the tab row scrolls sideways (no scrollbar). */
+@media (max-width: 480px) {
+  /* A sideways-scrolling row also clips vertically, so it reaches up past the toolbar to leave the raised tab room. */
+  .tabs { margin-top: -14px; padding-top: 14px; overflow-x: auto; scrollbar-width: none; }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tab { padding: 0 8px; font-size: 10px; letter-spacing: .04em; }
+}

@@ -1,14 +1,26 @@
-/* Pinned stage holding the hero, the concept scenes and the browser window (the hero's cover uses the same height in desert
-   mode). The story takes 3.8 screens; the track grows by how far the window content moves (--travel). */
-.track { --cover-h: max(600px, 100svh); position: relative; height: calc(var(--cover-h) * 3.8 + var(--travel, 0px)); }
+/* The story's pinned stage (hero, concept scenes) followed by the browser window (WindowFrame, ordinary page content that
+   overlaps the track's last screen). The hero's cover uses the same height in desert mode. The story takes 3.8 screens;
+   the track is --dissolve screens longer, where the window is held while its frame dissolves.
+   Layers: the stage is in front of the window until the hand-off is over (the sand uncovers the window behind it), then
+   the window comes in front (data-up, set by ConceptScenes). */
+.scenes { --cover-h: max(600px, 100svh); position: relative; isolation: isolate; }
+.track { position: relative; z-index: 2; height: calc(var(--cover-h) * (3.8 + var(--dissolve, 0))); }
+.scenes[data-up] > .track { z-index: 0; }
 .storyTrack { position: absolute; top: 0; left: 0; width: 1px; height: calc(var(--cover-h) * 3.8); visibility: hidden; pointer-events: none; }
 .stage { position: sticky; top: 0; height: var(--cover-h); overflow: hidden; overflow: clip; isolation: isolate; }
+/* While the sand sinks off the window, everything on the stage but the sand and its light steps aside, so the window
+   held behind the stage shows above the ridge. */
+.stage[data-handoff] > :not(.sand):not(.handoffLight) { visibility: hidden; }
 /* Layers: sky (+ time-of-day layers) < hero (until the swap) < sand < tint < cactus < gust < pollen < text. */
 .hero { position: absolute; inset: 0; z-index: 1; }
 .sky { position: absolute; inset: 0; z-index: 0; background: #f7fbfe url('/images/hero/hero-sunlight-bg.webp') center / cover no-repeat; }
 /* Same size and centering as Hero's .sand (hidden in desert mode); its vertical position is set from scroll. */
 .sand { position: absolute; top: 0; left: 50%; z-index: 2; width: max(100vw, 1100px); max-width: none; height: auto; transform: translate(-50%, 0); pointer-events: none; user-select: none; will-change: transform; }
-/* Cactus stands on the dunes, in front of the sand. */
+/* Cactus stands on the dunes, in front of the sand (in the hand-off to the window the sand passes in front, z-index 10).
+   The wrapper fades and sinks it at the start of the hand-off. */
+.cactusWrap { position: absolute; inset: 0; z-index: 4; pointer-events: none; }
+/* Hand-off: the sand covering the screen brightens toward the window's white before the window is uncovered. */
+.handoffLight { position: absolute; inset: 0; z-index: 11; pointer-events: none; opacity: 0; background: radial-gradient(ellipse 90% 75% at 50% 35%, #fffdf9 0%, #fff8eef2 45%, #fcf3e4b3 75%, #f6e6cc80 100%); }
 /* Time-of-day layers fade over the daylight sky; nothing flashes, each only crossfades with scroll. */
 .skyLayer { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
 .sunset { background: linear-gradient(180deg, #e98a6e 0%, #f3b07a 45%, #f8d3a0 70%); }

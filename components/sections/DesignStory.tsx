@@ -4,7 +4,7 @@ import type { DesignItem } from "@/data/design";
 import styles from "./DesignStory.module.css";
 
 // Design work after the projects, one window-high page ([data-page]) inside the desert browser window. Same data and wording
-// as DesignGallery; until there are items it shows the quiet "준비 중입니다" note.
+// as the old design gallery; until there are items it shows the quiet "준비 중입니다" note.
 export default function DesignStory({ designItems = [] }: { designItems?: DesignItem[] }) {
   return (
     <section id="design" aria-labelledby="design-story-title" className={styles.section} data-page>

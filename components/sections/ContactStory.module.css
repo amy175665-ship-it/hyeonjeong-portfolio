@@ -1,6 +1,6 @@
-/* Closing GROW. section on the cream page: large serif email with a yellow underline, quiet channel pills, then the
+/* Closing GROW. section on the near-white page: large serif email with a yellow underline, quiet channel pills, then the
    copyright under a hairline. */
-.section { --ink: #202731; --muted: #58636e; --line: #e7dccb; --yellow: #e9a33a; padding: 56px 40px; background: #fbf6ee; color: var(--ink); }
+.section { --ink: #202731; --muted: #58636e; --line: #e6e6e2; --yellow: #e9a33a; padding: 56px 40px; background: #fcfcfb; color: var(--ink); }
 .inner { width: 100%; max-width: 1120px; margin: 0 auto; }
 .kicker { display: flex; align-items: center; gap: 10px; margin: 0 0 14px; color: var(--muted); font: 400 16px/1 var(--font-editorial), Georgia, serif; letter-spacing: .04em; }
 .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--yellow); }
@@ -11,7 +11,7 @@
 .email:hover .arrow, .email:focus-visible .arrow { transform: translate(3px, -3px); }
 .channels { display: flex; flex-wrap: wrap; gap: 10px; margin: 28px 0 0; padding: 0; list-style: none; }
 .channel { display: inline-flex; min-height: 44px; align-items: center; gap: 8px; padding: 0 16px; border: 1px solid var(--line); border-radius: 999px; color: var(--ink); font-size: 14px; font-weight: 500; text-decoration: none; }
-.channel:hover { background: #f6eee1; }
+.channel:hover { background: #f3f3f1; }
 .channel svg { width: 18px; height: 18px; }
 .copyright { margin: 72px 0 0; padding-top: 24px; border-top: 1px solid var(--line); color: var(--muted); font-size: 14px; line-height: 1.7; }
 

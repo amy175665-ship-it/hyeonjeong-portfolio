@@ -38,27 +38,22 @@
 | 1 | 첫 화면 | 햇살 배경, 마우스를 따라보는 3D 얼굴, 모래 언덕. PC에서는 ABSORB. BUILD. GROW. 세리프 단어가 비대칭으로 떠다니고, 글자에 마우스를 올리면 초록색으로 바뀌며 기울어집니다. ABSORB.의 S 위에서 모래가 바람에 휘며 흘러내립니다. |
 | 2 | 모래 전환 | 모래가 올라와 첫 화면을 덮었다가 내려가며 사막 장면이 드러납니다. 로고·메뉴도 모래 능선 뒤로 가려졌다가 다시 나타납니다. |
 | 3 | 컨셉 장면 | 새싹이 선인장으로 자라며 모래바람을 버티고("직접 만들고"), 하늘이 노을·밤·새벽으로 바뀌는 동안 계속 자란 뒤("표면을 설계하고, 경험을 짓다."), 꽃이 피고 모래가 내려앉아 GROW.가 됩니다("웬만해선 시들지 않습니다."). 모래가 내려간 뒤부터는 스크롤하지 않아도 약 11초 동안 저절로 재생되며, 재생하는 동안에는 화면이 고정됩니다. |
-| 4 | 소개·기술 (ABSORB.) | 이야기가 끝나고 휠을 한 번 내리면 모래 아래에서 크림색 브라우저 창이 한 번에 부드럽게 올라와 사막 안에 고정되고, 그 안에서 이어집니다. 창 안은 섹션마다 한 화면 높이이고 스크롤은 자유롭게 움직이며, 메뉴로 이동하면 섹션 하나가 화면에 딱 맞게 보입니다. 소개는 왼쪽 사진·이름, 오른쪽 소개 문장과 교육 목록(연도 / 항목 / 보조정보), 기술은 다음 페이지 |
-| 5 | 대표 프로젝트 (BUILD.) | 같은 창 안에서 이어집니다(주소창이 /about → /projects → /design → /contact로 바뀜). 예시 프로젝트 3개를 한 페이지에 하나씩, 큰 이미지와 설명을 좌우로 번갈아 보여 주고 상세 페이지로 연결 |
+| 4 | 소개·기술 (ABSORB.) | 이야기가 끝나고 휠을 한 번 내리면 선인장과 문구가 사라지고, 모래가 처음처럼 올라와 화면을 덮어 밝아졌다가 능선째 가라앉으며 뒤에 서 있던 브라우저 창이 드러납니다(약 2.6초, 위로 스크롤하면 거꾸로). 이후 창 안에서 이어집니다. 창 안은 섹션마다 한 화면 높이이고 스크롤은 자유롭게 움직이며, 메뉴로 이동하면 섹션 하나가 화면에 딱 맞게 보입니다. 소개는 왼쪽 사진·이름·연락처, 오른쪽 소개 문장과 교육 목록(연도 / 항목 / 보조정보), 아래쪽에 끝없이 흐르는 기술 아이콘 띠. 다음 페이지는 취미를 ABSORB. → BUILD. → GROW.로 나눈 세 칸(전시·카페·음악·여행·봉사 / 보드게임 / 러닝), 그다음 브이로그 영상 자리 |
+| 5 | 대표 프로젝트 (BUILD.) | 창 위쪽 탭(ABOUT·PROJECTS·DESIGN·CONTACT)으로 넘어갑니다. 예시 프로젝트 3개를 한 페이지에 하나씩, 큰 이미지와 설명을 좌우로 번갈아 보여 주고 상세 페이지로 연결 |
 | 6 | 디자인 (BUILD.) | 같은 창 안에서 이어집니다. 디자인 작업물 자리(현재 "준비 중입니다") |
 | 7 | 연락처 · 이력서 (GROW.) | 창의 마지막 섹션. 큰 이메일 링크와 저작권 표기 |
 
-- 헤더는 가운데 선인장 로고(호버 시 종처럼 흔들림)와 햄버거 메뉴로 구성됩니다. 헤더 메뉴(ABOUT·SKILLS·PROJECTS·DESIGN·CONTACT)는 모두 브라우저 창 안의 해당 위치로 이동합니다.
+- 헤더는 가운데 선인장 로고(호버 시 종처럼 흔들림)와 햄버거 메뉴로 구성됩니다. 헤더 메뉴(ABOUT·PROJECTS·DESIGN·CONTACT)는 모두 브라우저 창 안의 해당 위치로 이동합니다.
 - 마우스 사용 PC에서는 물방울 모양 커스텀 커서를 씁니다(링크 위에서 투명한 구로 바뀌고, 클릭하면 작은 물방울이 퍼짐).
 - 모바일에서는 영문 세 단어를 숨기고 얼굴 중심으로 보여주며, 장면 배치를 단순화합니다.
 - 모션 감소 설정에서는 연속 움직임을 멈추고 각 장면의 완성된 모습을 보여줍니다.
 
 ### 현재 상태와 숨김 처리
 
-`app/page.tsx`의 플래그로 구성을 바꿉니다.
-
-| 플래그 | 현재 값 | 설명 |
-| --- | --- | --- |
-| `showConceptIntro` | `true` | 위의 컨셉 흐름을 사용합니다. `false`로 바꾸면 이전 구성(스크롤로 날아오는 브라우저 데모 → 브라우저 창 형태의 소개·기술 → 프로젝트 캐러셀)으로 돌아갑니다. |
-| `showLowerSections` | `false` | 이전 구성용 보조 프로젝트·디자인 갤러리·푸터(연락처)를 숨깁니다. 컨셉 구성에서는 디자인·연락처가 브라우저 창 안에 들어 있습니다. |
-
-- 마무리(GROW.)·연락처 섹션은 아직 구성 중입니다. 그래서 헤더 메뉴의 DESIGN·CONTACT는 현재 이동할 대상이 없습니다.
-- 음성 소개 플레이어 코드는 남아 있지만, 음성 파일이 없고 현재 화면에서도 쓰지 않습니다.
+- 리디자인("A Living Digital Desert", 방향 B)을 단계별로 진행 중입니다. 승인된 동작 시안은 `artifacts/mockup-living-desert-20261008/index.html`을 브라우저로 열어 볼 수 있습니다.
+- 1단계(완료): 모래 전환으로 드러난 창이 스크롤하면 전면 화면으로 풀리고(창틀 값 `--frame` 1→0), 창 안은 일반 스크롤로 소개 → 취미 → 프로젝트 → 디자인 → 연락처가 이어집니다. 전면이 되면 헤더가 화면 위에 떠서 지금 단계 단어(ABSORB. 등)를 보이고, 아래로 스크롤하면 숨었다가 위로 스크롤하면 돌아옵니다.
+- 이전 구성(스크롤로 날아오는 브라우저 데모, 프로젝트 캐러셀 등)과 음성 소개 코드는 지웠습니다. 필요하면 git 기록에서 찾습니다.
+- 브이로그는 영상이 생길 때까지 숨깁니다. 디자인 작업은 비어 있어 "준비 중"이 보입니다.
 
 ## 개발 환경
 
@@ -105,20 +100,19 @@ npm.cmd run dev -- --port 3001
 ```text
 app/
 ├─ layout.tsx                 공통 레이아웃, 글꼴, 커스텀 커서
-├─ page.tsx                   메인 페이지(구성 플래그)
+├─ page.tsx                   메인 페이지(오프닝 → 브라우저 창 안의 섹션들)
 ├─ globals.css                전역 스타일
 └─ work/[slug]/page.tsx       대표 프로젝트 상세 페이지
 components/
-├─ layout/                    SiteNav, SiteFooter, SmoothScroll, scrollLock
+├─ layout/                    SiteNav(헤더·전체 메뉴), SiteFooter(상세 페이지 푸터), MenuSand, SmoothScroll, scrollLock
+├─ motion/                    SplitText·RollingWord(글자 단위 모션), useScrollDirection
+├─ stage/                     windowState(지금 단계·창이 풀렸는지)
 ├─ sections/
-│  ├─ AboutStory, WorkStory, DesignStory, ContactStory   브라우저 창 안의 소개·기술, 대표 프로젝트, 디자인, 연락처
-│  ├─ About, Skills, ProjectCarousel, WorkGrid, SideProjects, DesignGallery
-│  │                          이전 구성·숨김 섹션(소개·기술 데이터는 About, Skills에서 관리)
-│  ├─ hero/                   Hero, GrowthScene(PC 타이포), HeroAvatar·AvatarCanvas(3D 얼굴), SandStream(모래 줄기),
-│  │                          ScrollHero·PinnedBrowser·HeroBrowserDemo(이전 구성), VoiceIntro
-│  └─ concept/                ConceptScenes(모래 전환·컨셉 장면), scenes.ts, CactusScene, WindGust, PollenGrow, DesertWindow(브라우저 창)
+│  ├─ AboutStory, HobbyFlow, HobbyCactus, WorkStory, DesignStory, ContactStory   브라우저 창 안의 소개·취미, 대표 프로젝트, 디자인, 연락처
+│  ├─ hero/                   Hero, GrowthScene(PC 타이포), HeroAvatar·AvatarCanvas(3D 얼굴), SandStream(모래 줄기)
+│  └─ concept/                ConceptScenes(모래 전환·컨셉 장면), scenes.ts, CactusScene, WindGust, PollenGrow, WindowFrame(브라우저 창)
 └─ ui/                        Reveal, ProjectLinks, ProjectTags, CustomCursor
-data/                         프로젝트·내비게이션·디자인 데이터
+data/                         소개·취미(profile), 기술(skills), 연락처(contact), 프로젝트, 디자인, 메뉴, 이야기 단계(stages)
 assets/                       원본 디자인 소스(커서·모래 PNG). 배포되지 않으며 화면에서 쓰지 않음
 public/                       화면에 쓰는 정적 파일(이미지 WebP, 로고, 3D 모델, 글꼴)
 artifacts/                    화면 캡처와 로컬 확인 결과
@@ -155,14 +149,16 @@ artifacts/                    화면 캡처와 로컬 확인 결과
 | 메뉴 이름·링크 | `data/navigation.ts` |
 | 로고 이미지 | `public/images/logo/logo.png` |
 | 첫 화면 세 단어·색 | `components/sections/hero/GrowthScene.tsx`, `GrowthScene.module.css` |
-| 3D 얼굴 모델 | `public/models/avatar6.glb` |
+| 3D 얼굴 모델 | `public/models/avatar6.glb` (압축 변환본 1.3MB, 원본·변환 스크립트는 `assets/models/`) |
 | 컨셉 장면 문구 | `components/sections/concept/ConceptScenes.tsx` |
-| 이름·사진·소개글·교육·자격증 | `components/sections/About.tsx`의 `profile` |
+| 이름·사진·소개글·교육·자격증 | `data/profile.ts`의 `profile` |
+| 취미·브이로그 | `data/profile.ts`의 `hobbies`, `vlog` |
 | 소개 큰 문장·직무 문구 | `components/sections/AboutStory.tsx` |
-| 기술명·선택적 설명 | `components/sections/Skills.tsx`의 `skills` |
+| 기술명·선택적 설명 | `data/skills.ts` |
 | 프로젝트 목록·상세 내용 | `data/projects.ts` |
 | 디자인 이미지·제목 | `data/design.ts` |
-| 연락처·이력서 링크 | `components/layout/SiteFooter.tsx`의 `contact` |
+| 연락처·이력서 링크 | `data/contact.ts` |
+| 이야기 단계 단어·색 | `data/stages.ts` |
 | 커서 이미지 | 원본 `assets/cursor/`, 화면용 `public/images/cursor/*.webp` |
 | 모래 이미지 | 원본 `assets/hero/hero-sand-bg.png`, 화면용 `public/images/hero/hero-sand-bg.webp` |
 
