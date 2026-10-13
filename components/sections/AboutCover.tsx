@@ -7,7 +7,7 @@ import styles from "./AboutCover.module.css";
 // ABSORB. cover that becomes the about page (user's order, 2026-10-13). The about page (children) is pinned while the
 // cover track scrolls past; tied to the scroll (c, 0 → 1):
 // - start: the profile photo as sand grains on the right with a big "ABSORB." along the bottom (this is what the
-//   cactus grains gather into when the window comes up, SandHandoff reads the canvas);
+//   cactus grains gather into when the window comes up, SandHandoff reads the canvas); the mouse pushes grains aside;
 // - the about sentence set large at the top left (a decorative copy, aria-hidden) soaks word by word from sand to ink
 //   and gets its highlighter stroke;
 // - the grains gather into the page's photo frame and turn into the real photo, the large sentence flies and shrinks
@@ -43,7 +43,10 @@ export default function AboutCover({ className, labelledBy, children }: Props) {
     const rest = Array.from(box.querySelectorAll<HTMLElement>("[data-cover-rest]"));
     let lum: Uint8ClampedArray | null = null, lumW = 0, lumH = 0, ratio = 0.73;
     let W = 0, H = 0, sp = 10, phone = false, sw = 0, sh = 0, x0 = 0, y0 = 0;
-    let gx = new Float32Array(0), gy = gx, size = gx, u = gx, v = gx, band = new Uint8Array(0);
+    let gx = new Float32Array(0), gy = gx, size = gx, u = gx, v = gx, ox = gx, oy = gx, band = new Uint8Array(0);
+    // Mouse position on the stage; `calm`: every grain is back in place (the settled image can be pasted).
+    const pointer = { x: -9999, y: -9999 };
+    let calm = true;
     // Where the photo frame and the sentence sit in the finished page (stage coordinates, transforms cleared).
     let photo = { x: 0, y: 0, w: 0, h: 0 }, landing = { dx: 0, dy: 0, s: 1 };
     let raf = 0, alive = true, lastC = -1;
@@ -81,6 +84,7 @@ export default function AboutCover({ className, labelledBy, children }: Props) {
       }
       gx = Float32Array.from(xs); gy = Float32Array.from(ys); size = Float32Array.from(rs);
       u = Float32Array.from(us); v = Float32Array.from(vs); band = Uint8Array.from(bs);
+      ox = new Float32Array(gx.length); oy = new Float32Array(gx.length); calm = true;
       settled.width = paper.width; settled.height = paper.height;
       const sg = settled.getContext("2d");
       if (sg) { sg.setTransform(dpr, 0, 0, dpr, 0, 0); fill(sg, 0); }
@@ -102,8 +106,11 @@ export default function AboutCover({ className, labelledBy, children }: Props) {
       lastC = -1;
     };
 
-    // Draws the grains; `k` (0 → 1) carries them from the portrait into the page's photo frame.
-    const fill = (target: CanvasRenderingContext2D, k: number) => {
+    // Draws the grains; `k` (0 → 1) carries them from the portrait into the page's photo frame. With `push`, grains
+    // near the mouse are pushed aside and ease back; returns whether any is still moving.
+    const fill = (target: CanvasRenderingContext2D, k: number, push = false) => {
+      let stirring = false;
+      const reach = phone ? 70 : 110, force = phone ? 22 : 34;
       const paths = SAND.map(() => new Path2D());
       // The frame shows the photo with object-fit: cover and object-position 50% 30%.
       const dw = Math.max(photo.w, photo.h * ratio), dh = dw / ratio;
@@ -115,12 +122,21 @@ export default function AboutCover({ className, labelledBy, children }: Props) {
           const inside = tx >= photo.x && tx <= photo.x + photo.w && ty >= photo.y && ty <= photo.y + photo.h;
           x = lerp(x, tx, k); y = lerp(y, ty, k); r = lerp(r, inside ? r * shrink : 0, k);
         }
+        if (push) {
+          let tx = 0, ty = 0;
+          const dx = x - pointer.x, dy = y - pointer.y, d = Math.hypot(dx, dy);
+          if (d < reach && d > 0.01) { const f = Math.pow(1 - d / reach, 2) * force; tx = (dx / d) * f; ty = (dy / d) * f; }
+          ox[n] += (tx - ox[n]) * 0.16; oy[n] += (ty - oy[n]) * 0.16;
+          if (Math.abs(tx - ox[n]) + Math.abs(ty - oy[n]) > 0.1) stirring = true;
+          x += ox[n]; y += oy[n];
+        }
         if (r < 0.15 || x < -10 || x > W + 10 || y < -10 || y > H + 10) continue;
         if (r < 1.6) paths[band[n]].rect(x - r, y - r, r * 2, r * 2);
         else { paths[band[n]].moveTo(x + r, y); paths[band[n]].arc(x, y, r, 0, Math.PI * 2); }
       }
       target.clearRect(0, 0, W, H);
       paths.forEach((path, i) => { target.fillStyle = SAND[i]; target.fill(path); });
+      return stirring;
     };
 
     const show = (element: HTMLElement, amount: number, rise = 0) => {
@@ -129,10 +145,15 @@ export default function AboutCover({ className, labelledBy, children }: Props) {
       element.style.transform = rise && amount < 1 ? `translateY(${((1 - amount) * rise).toFixed(1)}px)` : "";
     };
 
+    // Returns whether grains are still moving (another frame is needed).
     const paint = (c: number) => {
       // Grains: the settled portrait until they gather into the frame (0.5 → 0.8), then the canvas fades (0.8 → 0.88).
+      // With the mouse about (or grains still easing back) they are drawn one by one; otherwise the settled image.
       const gather = easeInOut(ramp(c, 0.5, 0.8));
-      if (gather <= 0) { g.clearRect(0, 0, W, H); g.drawImage(settled, 0, 0, W, H); } else fill(g, gather);
+      const near = c < 0.88 && pointer.x > -150 && pointer.x < W + 150 && pointer.y > -150 && pointer.y < H + 150;
+      let stirring = false;
+      if (gather <= 0 && calm && !near) { g.clearRect(0, 0, W, H); g.drawImage(settled, 0, 0, W, H); }
+      else { stirring = fill(g, gather, true); calm = !stirring && !near; }
       paper.style.opacity = (1 - ramp(c, 0.8, 0.88)).toFixed(3);
       // ABSORB. is up from the start and sinks away while the page forms.
       const sink = easeInOut(ramp(c, 0.5, 0.7));
@@ -150,6 +171,7 @@ export default function AboutCover({ className, labelledBy, children }: Props) {
       // The real photo takes over from the grains, then the rest of the page comes in.
       if (frame) show(frame, ramp(c, 0.74, 0.84));
       rest.forEach((element, i) => show(element, ramp(c, 0.78 + i * 0.02, 0.9 + i * 0.02), 16));
+      return stirring;
     };
 
     const loop = () => {
@@ -157,9 +179,23 @@ export default function AboutCover({ className, labelledBy, children }: Props) {
       const rect = root.getBoundingClientRect(), top = parseFloat(getComputedStyle(box).top) || 0;
       if (rect.bottom < -window.innerHeight || rect.top > window.innerHeight * 2) return;
       const c = clamp((top - rect.top) / Math.max(root.offsetHeight - box.offsetHeight, 1));
-      if (c !== lastC) { paint(c); lastC = c; }
+      if (c !== lastC || moving) {
+        moving = paint(c);
+        lastC = c;
+        if (moving) raf = requestAnimationFrame(loop);
+      }
     };
     const wake = () => { if (!raf && alive) raf = requestAnimationFrame(loop); };
+    let moving = false;
+    // Mouse only (touch has no hover): grains near it move aside.
+    const move = (event: PointerEvent) => {
+      if (event.pointerType !== "mouse") return;
+      const rect = paper.getBoundingClientRect();
+      pointer.x = event.clientX - rect.left; pointer.y = event.clientY - rect.top;
+      moving = true;
+      wake();
+    };
+    const leave = () => { pointer.x = -9999; pointer.y = -9999; moving = true; wake(); };
 
     const image = new Image();
     image.onload = () => {
@@ -178,11 +214,15 @@ export default function AboutCover({ className, labelledBy, children }: Props) {
     const resize = () => { if (lum) { setup(); wake(); } };
     window.addEventListener("scroll", wake, { passive: true });
     window.addEventListener("resize", resize);
+    window.addEventListener("pointermove", move, { passive: true });
+    document.addEventListener("pointerleave", leave);
     return () => {
       alive = false;
       cancelAnimationFrame(raf);
       window.removeEventListener("scroll", wake);
       window.removeEventListener("resize", resize);
+      window.removeEventListener("pointermove", move);
+      document.removeEventListener("pointerleave", leave);
     };
   }, []);
 
