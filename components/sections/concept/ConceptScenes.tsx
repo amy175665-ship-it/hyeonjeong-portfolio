@@ -9,6 +9,7 @@ import { glideTo, lockScroll, scrollToY, unlockScroll } from "@/components/layou
 import WindGust from "./WindGust";
 import PollenGrow from "./PollenGrow";
 import WindowFrame from "./WindowFrame";
+import SandHandoff, { HANDOFF, HANDOFF_SECONDS } from "./SandHandoff";
 import { COVER, COVER_SCROLL, DISSOLVE_SCREENS, PLAY_SECONDS, SCENES, sceneProgress, skyAt, type SceneName, type Wind } from "./scenes";
 import styles from "./ConceptScenes.module.css";
 
@@ -36,14 +37,10 @@ const REWIND_FROM = COVER_SCROLL - 0.01;
 // Logo click on this page: seconds for the slow glide from the end of the cover back to the top.
 const RETURN_SECONDS = 3;
 const SHOW_SKIP = true; // TEMP: skip button while the portfolio is being edited (see skip below)
-// Hand-off from the story to the browser window (teacher's feedback: not a slide-up, but out of the last scene): the
-// text drifts away, the dunes rise over the cactus as in the opening cover, the covered sand brightens, then it sinks
-// away along its ridge and uncovers the window held behind the stage.
-// Phases on the window's `raise` value (0..1); lowering the window plays them backwards.
-// The cactus goes first (sinks a little and fades), then the text blurs and drifts off; the sand moves in front of
-// everything once the cactus is gone (`front`) and rises over the screen.
-const HANDOFF = { cactus: [0, 0.16], text: [0.06, 0.24], front: 0.16, rise: [0.12, 0.52], lightIn: [0.42, 0.58], lightOut: [0.62, 0.86], sink: [0.6, 1], enter: 0.8 } as const;
-const RAISE_SECONDS = 2.6; // with the scroll (window button, one wheel step)
+// Hand-off from the story to the browser window (teacher's feedback): the last scene scatters into sand and the sand
+// gathers into the window's first page (SandHandoff, phases in HANDOFF on the window's `raise` value 0..1; lowering
+// the window plays it backwards).
+const RAISE_SECONDS = HANDOFF_SECONDS; // with the scroll (window button, one wheel step)
 const JUMP_SECONDS = 1.2; // the logo's way home: quicker, the page glides on anyway
 const ramp = (value: number, [from, to]: readonly [number, number]) => Math.min(Math.max((value - from) / (to - from), 0), 1);
 const smooth = (t: number) => t * t * (3 - 2 * t);
@@ -57,6 +54,13 @@ export default function ConceptScenes({ children, content }: { children: ReactNo
   const stage = useRef<HTMLDivElement>(null);
   const sand = useRef<HTMLImageElement>(null);
   const hero = useRef<HTMLDivElement>(null);
+  const cactusWrap = useRef<HTMLDivElement>(null);
+  const pollenLayer = useRef<HTMLDivElement>(null);
+  const closing = useRef<HTMLDivElement>(null);
+  // What the hand-off scatters (the cactus's 3D canvas, the sand "GROW." canvas, the closing text) and what it forms
+  // (the window's first page).
+  const handoffSources = () => [...(cactusWrap.current?.querySelectorAll("canvas") ?? []), ...(pollenLayer.current?.querySelectorAll("canvas") ?? []), ...(closing.current ? [closing.current] : [])];
+  const handoffTarget = () => document.querySelector("[data-window-content] > *");
   const wind = useRef<Wind>({ value: 0 });
   const [desktop, setDesktop] = useState(true);
   const [reduced, setReduced] = useState(false);
@@ -82,18 +86,14 @@ export default function ConceptScenes({ children, content }: { children: ReactNo
   const raise = useMotionValue(0);
   const raised = useRef(false);
   const gliding = useRef(false);
-  // The story text and the sand "GROW." step aside early while the window rises over them.
-  const textFade = useTransform([outro, raise], ([fade, up]: number[]) => fade * (1 - smooth(ramp(up, HANDOFF.text))));
-  // Sand hand-off: the cactus sinks and fades, the text blurs and drifts off with the wind, the dunes rise over the
-  // screen and brighten, then sink away and uncover the window (see placeSand).
-  const cactusGone = useTransform(raise, up => smooth(ramp(up, HANDOFF.cactus)));
-  const cactusFade = useTransform([outro, cactusGone], ([fade, gone]: number[]) => fade * (1 - gone));
-  const cactusSink = useTransform(cactusGone, value => `${(value * 6).toFixed(2)}%`);
-  const scatter = useTransform(raise, up => ramp(up, HANDOFF.text));
-  const textBlur = useTransform(scatter, value => (value > 0 ? `blur(${(value * 8).toFixed(2)}px)` : "none"));
-  const textDrift = useTransform(scatter, value => value * 48);
-  const closingX = useTransform(textDrift, value => `calc(-50% + ${value.toFixed(1)}px)`);
-  const handoffLight = useTransform(raise, up => 0.9 * Math.min(smooth(ramp(up, HANDOFF.lightIn)), 1 - smooth(ramp(up, HANDOFF.lightOut))));
+  // Sand hand-off: from its first frame the grains (SandHandoff) stand in for the cactus, the sand "GROW." and the
+  // closing text, so those step aside at once; the desert behind them fades to the window's white.
+  const textFade = useTransform([outro, raise], ([fade, up]: number[]) => (up <= 0 ? fade : 0));
+  const cactusFade = textFade;
+  const handoffWhite = useTransform(raise, up => smooth(ramp(up, HANDOFF.white)));
+  // The window's title bar and page fade in as the grains finish forming them.
+  const barIn = useTransform(raise, up => smooth(ramp(up, HANDOFF.bar)));
+  const pageIn = useTransform(raise, up => smooth(ramp(up, HANDOFF.settle)));
   const windowClip = useMotionValue(HIDDEN_CLIP);
   const rewinding = useRef(false);
   // Once the story has finished and the page is free again, a small falling-grain cue at the bottom says "keep going";
@@ -192,26 +192,18 @@ export default function ConceptScenes({ children, content }: { children: ReactNo
     const horizon = height * HORIZON - imageHeight * CREST;
     const local = sceneProgress(value, "cover");
     const ease = smooth;
-    let y = local < COVER.risen ? rest + (covered - rest) * ease(local / COVER.risen)
+    const y = local < COVER.risen ? rest + (covered - rest) * ease(local / COVER.risen)
       : local < COVER.sink ? covered
       : covered + (horizon - covered) * ease((local - COVER.sink) / (1 - COVER.sink));
-    // Hand-off to the window: rise from the story's position to covered, then sink until the crest is below the stage.
-    const up = raise.get();
-    if (up > 0) {
-      const gone = height - imageHeight * CREST + 24;
-      y += (covered - y) * ease(ramp(up, HANDOFF.rise));
-      y += (gone - y) * ease(ramp(up, HANDOFF.sink));
-    }
     image.style.transform = `translate(-50%, ${y}px)`;
     const sandBox = image.getBoundingClientRect();
     coverHeader(local, sandBox);
-    // During the hand-off the sand passes in front of everything: its own ridge (the sky above it is transparent) covers
-    // the scene and then uncovers the window. The window waits behind the stage, hidden until the screen is covered;
-    // from then on everything on the stage but the sand and its light steps aside (data-handoff) so the window shows
-    // above the sinking ridge, and once the window is fully up it comes in front of the stage (data-up).
-    image.style.zIndex = up >= HANDOFF.front && up < 1 ? "10" : "";
-    windowClip.set(up < HANDOFF.sink[0] ? HIDDEN_CLIP : "none");
-    box.toggleAttribute("data-handoff", up >= HANDOFF.sink[0]);
+    // The window waits behind the stage, hidden until the hand-off has turned the screen white; from then on the stage
+    // steps aside (data-handoff) so the window shows under the gathering grains, and once it is fully up it comes in
+    // front of the stage (data-up).
+    const up = raise.get();
+    windowClip.set(up < HANDOFF.shown ? HIDDEN_CLIP : "none");
+    box.toggleAttribute("data-handoff", up >= HANDOFF.shown);
     scenes.current?.toggleAttribute("data-up", up >= 1);
     if (hero.current) {
       const hidden = local >= COVER.swap;
@@ -228,8 +220,9 @@ export default function ConceptScenes({ children, content }: { children: ReactNo
   const syncPlayback = () => {
     const cover = sandProgress.get();
     // Resets on the real scroll, not the trailing spring, so a jump into the window (menu, link with a hash) that the
-    // spring follows up from the top does not undo the skipped story.
-    if (coverScroll.get() < CACTUS_FROM) {
+    // spring follows up from the top does not undo the skipped story; nor while the window is up (a menu jump settles
+    // the spring before the page has scrolled down).
+    if (coverScroll.get() < CACTUS_FROM && !raised.current) {
       playback.current?.stop();
       playback.current = null;
       playhead.set(-1);
@@ -239,8 +232,10 @@ export default function ConceptScenes({ children, content }: { children: ReactNo
     }
     if (cover < SCENES.cover[1] - 0.003 || rewinding.current) return;
     if (reduced) {
-      // No timed playback with reduced motion: the finished scene shows at once (the hold scroll raises the window).
+      // No timed playback with reduced motion: the finished scene shows at once (the hold scroll raises the window,
+      // or straight away if the page has already scrolled past the cover before the spring settled).
       if (playhead.get() < 1) playhead.set(1);
+      if (!raised.current && scrollYProgress.get() > COVER_SCROLL + 0.005) setRaised(true, false);
     } else if (playhead.get() < 0 && scrollYProgress.get() >= REWIND_FROM) {
       playhead.set(0);
       playback.current = animate(playhead, 1, { duration: PLAY_SECONDS, ease: "linear", onComplete: finishPlayback });
@@ -308,9 +303,9 @@ export default function ConceptScenes({ children, content }: { children: ReactNo
   // "past the story" from the browser's own anchor jump, so the scroll handler would not see a change to react to).
   const enterWindow = () => {
     jumpPastStory();
+    raised.current = true;
     // The cover would otherwise replay on its trailing spring behind the window; settle it on the desert at once.
     sandProgress.jump(SCENES.cover[1]);
-    raised.current = true;
     raise.jump(1);
   };
   // The toolbar's × / − buttons: from anywhere in the window, back to its top, then the hand-off plays backwards.
@@ -380,14 +375,13 @@ export default function ConceptScenes({ children, content }: { children: ReactNo
         <motion.div className={`${styles.tint} ${styles.tintSunset}`} style={{ opacity: sunsetTint }} aria-hidden="true" />
         <motion.div className={`${styles.tint} ${styles.tintNight}`} style={{ opacity: nightTint }} aria-hidden="true" />
         <motion.div className={styles.groundFade} style={{ opacity: groundFade }} aria-hidden="true" />
-        {/* The wrapper carries the hand-off sink (the cactus box has its own CSS transform). */}
-        <motion.div className={styles.cactusWrap} style={{ opacity: cactusFade, y: cactusSink }} aria-hidden="true">
+        <motion.div ref={cactusWrap} className={styles.cactusWrap} style={{ opacity: cactusFade }} aria-hidden="true">
           <div className={styles.cactus}>
             <CactusScene progress={story} wind={wind} reduced={reduced} running={visible && !reduced && cactusActive} />
           </div>
         </motion.div>
         <WindGust progress={story} wind={wind} reduced={reduced} running={visible} desktop={desktop} />
-        <motion.div className={styles.pollenLayer} style={{ opacity: textFade, filter: textBlur, x: textDrift }} aria-hidden="true">
+        <motion.div ref={pollenLayer} className={styles.pollenLayer} style={{ opacity: textFade }} aria-hidden="true">
           <PollenGrow progress={story} desktop={desktop} />
         </motion.div>
         <motion.p className={styles.phrase} style={buildText}>직접 만들고</motion.p>
@@ -396,16 +390,17 @@ export default function ConceptScenes({ children, content }: { children: ReactNo
           <span className={styles.statementLight}>경험을 짓다.</span>
         </motion.p>
         <p className="sr-only">GROW.</p>
-        <motion.div className={styles.closing} style={{ ...finalText, x: closingX, filter: textBlur }}>
+        <motion.div ref={closing} className={styles.closing} style={{ ...finalText, x: "-50%" }}>
           <p className={styles.closingLead}>웬만해선 시들지 않습니다.</p>
           <p className={styles.closingNote}>선인장처럼, 어떤 환경에서도 생각보다 잘 자라는 사람입니다.</p>
         </motion.div>
         <motion.div className={styles.scrollCue} style={{ opacity: cue }} aria-hidden="true"><i /></motion.div>
         {skippable && <button type="button" className={styles.skip} onClick={skip}>SKIP</button>}
-        <motion.div className={styles.handoffLight} style={{ opacity: handoffLight }} aria-hidden="true" />
+        <motion.div className={styles.handoffWhite} style={{ opacity: handoffWhite }} aria-hidden="true" />
       </div>
     </div>
-    {content && <WindowFrame rise={raise} clip={windowClip} enterAt={HANDOFF.enter} upAt={HANDOFF.sink[0]} onNavigate={enterWindow} onClose={closeWindow}>{content}</WindowFrame>}
+    {content && <WindowFrame rise={raise} clip={windowClip} barIn={barIn} pageIn={pageIn} upAt={HANDOFF.bar[0]} onNavigate={enterWindow} onClose={closeWindow}>{content}</WindowFrame>}
+    {content && <SandHandoff raise={raise} sources={handoffSources} target={handoffTarget} enabled={!reduced} />}
     </div>
   );
 }

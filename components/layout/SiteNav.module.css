@@ -17,11 +17,18 @@
 .barTopOpen { transform: translateY(var(--bar-shift)) rotate(45deg); }
 .barBottomOpen { transform: translateY(calc(var(--bar-shift) * -1)) rotate(-45deg); }
 .barMiddle { display: none; transition: opacity .2s ease; }
-/* Desktop: while the desert window is up its tabs are the menu, so the menu button steps aside (WindowFrame sets
-   html[data-window-up]). */
+/* Desktop: while the desert window is up its toolbar holds the menu (tabs) and the logo, so the menu button and logo
+   step aside (WindowFrame sets html[data-window-up]). */
 @media (min-width: 1024px) {
   .toggle { transition: opacity .25s ease, visibility .25s; }
   :global(html[data-window-up]) .toggle { opacity: 0; visibility: hidden; pointer-events: none; }
+  /* The window's floating toolbar holds the logo while the window is up. */
+  .logo { transition: opacity .25s ease, visibility .25s; }
+  :global(html[data-window-up]) .logo { opacity: 0; visibility: hidden; pointer-events: none; }
+  /* Once the window has dissolved, its floating toolbar stays on as the header (WindowFrame), so this header (logo,
+     stage word, menu button) is not shown on desktops at all. */
+  .floating { visibility: hidden; }
+  .floating .logo, .floating .toggle, .floating .stageWord { pointer-events: none; }
 }
 .barMiddleOpen { opacity: 0; }
 /* Phones and tablets: a slightly smaller logo (64px) and a light three-bar icon, so the two do not compete and the
@@ -32,6 +39,10 @@
   .barMiddle { display: block; }
   /* Warm dark brown instead of the ink, so the icon sits in the sand palette next to the green logo. */
   .bar { background: #5b3f2a; }
+  /* Over a dark full-screen project panel (WorkStory sets html[data-on-dark]) or the BLOOM night (ContactStory, data-bloom-dark) the floating stage word and closed menu
+     icon turn white. */
+  :global(html:is([data-on-dark], [data-bloom-dark])) .floating .stageWord { color: #fff; }
+  :global(html:is([data-on-dark], [data-bloom-dark])) .floating .bar:not(.barTopOpen):not(.barBottomOpen):not(.barMiddleOpen) { background: #fff; }
 }
 .spacer { display: none; }
 .mobile {

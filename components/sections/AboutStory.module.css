@@ -4,16 +4,17 @@
 .section { padding: 44px 40px; }
 /* The about page starts at the top of its window page instead of floating in the middle. */
 .page > .section[data-page] { justify-content: flex-start; }
-/* Wider than the other window pages (1120px) so the about page uses the full-screen window on large screens; the
-   portrait, gap and type grow with the screen width and stop at 1440px wide. */
+/* A little wider than the other window pages (1120px) and centred in the window; the portrait, gap and type grow with
+   the screen width. */
 /* Auto block margins split the page's spare height above and below the profile, instead of leaving it all in one
    gap over the skill strip (which stays at the foot of the page). */
-.inner { width: 100%; max-width: 1440px; margin: auto; }
+.inner { width: 100%; max-width: clamp(1200px, 70vw, 1440px); margin: auto; }
 
 /* About: portrait + name on the left, statement and record rows on the right. */
 /* Portrait width: grows with the screen width but also stays short enough that the page fits the window (--page-h):
    everything else on the page takes about 380px of height, and the portrait is 4:5. */
-.profile { --photo: clamp(240px, min(20vw, (var(--page-h, 800px) - 380px) * .8), 380px); display: grid; grid-template-columns: var(--photo) minmax(0, 1fr); gap: clamp(72px, 6.25vw, 120px); align-items: start; margin-top: 36px; }
+/* The statement and records are centred against the portrait and name. */
+.profile { --photo: clamp(240px, min(23vw, (var(--page-h, 800px) - 380px) * .8), 360px); display: grid; grid-template-columns: var(--photo) minmax(0, 1fr); gap: clamp(64px, 6.7vw, 96px); align-items: center; }
 .card { min-width: 0; }
 .portrait { position: relative; margin: 0; aspect-ratio: 4 / 5; overflow: hidden; border-radius: 8px; background: linear-gradient(160deg, #f3e6d1, var(--sand)); }
 /* Keeps the face in frame when the photo is a little taller than 4:5. */
@@ -22,15 +23,19 @@
 .placeholder span { font: 400 56px/1 var(--font-editorial), Georgia, serif; letter-spacing: -.04em; }
 .placeholder small { font-size: 13px; }
 .identity { margin-top: 20px; }
-.name { margin: 0; font: 600 clamp(20px, 1.25vw, 24px)/1.3 var(--font-pretendard), sans-serif; }
+.name { margin: 0; font: 600 clamp(20px, 1.25vw, 24px)/1.3 var(--font-pretendard), sans-serif; word-break: keep-all; }
 .nameEn { margin-left: 4px; color: var(--muted); font-size: 13px; font-weight: 400; letter-spacing: .01em; opacity: .75; white-space: nowrap; }
 .role { margin: 4px 0 0; color: var(--muted); font-size: clamp(14px, .9vw, 16px); line-height: 1.6; }
 .info { min-width: 0; }
 /* Same family as the body (Pretendard), set bold and tight; the key phrase sits on a soft coral highlighter stroke. */
-.statement { max-width: 24em; margin: 0; font: 700 clamp(22px, 2vw, 38px)/1.45 var(--font-pretendard), sans-serif; letter-spacing: -.035em; word-break: keep-all; }
+.statement { max-width: 24em; margin: 0; font: 700 clamp(22px, 2.4vw, 38px)/1.45 var(--font-pretendard), sans-serif; letter-spacing: -.035em; word-break: keep-all; }
 .mark { padding: 0 .08em; background: linear-gradient(transparent 58%, #e96b5a40 58%, #e96b5a40 92%, transparent 92%) 0 0 / 100% 100% no-repeat; color: inherit; }
 .introduction { max-width: 40em; margin: 16px 0 0; font-size: 16px; line-height: 1.7; word-break: keep-all; }
 .group { margin-top: 40px; }
+/* Certificates and education side by side, so the right column is used across and the page gets shorter. */
+.lists { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); gap: 56px; margin-top: 48px; }
+.lists .group { margin-top: 0; }
+@media (max-width: 1199px) { .lists { grid-template-columns: minmax(0, 1fr); gap: 28px; margin-top: 36px; } }
 /* Group headings (자격증, 교육) in the site's heading serif (본명조) and clearly larger than the rows, so they read as
    headings rather than as one more line of the list. */
 .groupTitle { margin: 0 0 14px; font: 600 clamp(22px, 1.5vw, 28px)/1.3 var(--font-editorial), var(--font-hangul-serif, serif); letter-spacing: -.01em; }
@@ -40,56 +45,54 @@
 /* Statement lines (the entrance slides each one up out of its own mask). */
 .line { display: block; overflow: hidden; padding-bottom: .04em; }
 .line > span { display: block; }
-.rows li { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 14px; padding: 7px 0; font-size: clamp(16px, 1vw, 19px); line-height: 1.6; word-break: keep-all; }
-/* Fixed-width year column so the items line up under each other. */
-.year { flex: none; width: 2.9em; font-weight: 700; font-variant-numeric: tabular-nums; }
+/* Year / item, with the muted note on the line below the item; the fixed year column lines the items up. */
+.rows li { display: grid; grid-template-columns: 2.9em minmax(0, 1fr); gap: 2px 12px; padding: 8px 0; font-size: clamp(16px, 1vw, 17px); line-height: 1.55; word-break: keep-all; }
+.year { font-weight: 700; font-variant-numeric: tabular-nums; }
 .item { min-width: 0; }
-.note { color: var(--muted); font-size: clamp(14px, .85vw, 16px); }
+.note { grid-column: 2; color: var(--muted); font-size: clamp(13px, .85vw, 15px); }
 
 
 @media (max-width: 899px) {
   .section { padding: 40px 24px; }
   /* Small portrait beside the name, the record rows below. */
-  .profile { grid-template-columns: 1fr; gap: 28px; margin-top: 28px; }
+  .profile { grid-template-columns: 1fr; gap: 28px; }
   .card { display: flex; align-items: flex-end; gap: 18px; }
   .portrait { width: 112px; flex: none; }
   .placeholder span { font-size: 30px; }
   .placeholder small { font-size: 11px; }
   .identity { margin: 0; }
   .statement { font-size: 21px; }
-  .group { margin-top: 28px; }
+  .lists { gap: 28px; margin-top: 28px; }
   .rows li { font-size: 15px; }
 }
 /* Wide but not tall desktop windows (e.g. 1920×860): the larger type needs a little less vertical spacing to fit. */
 @media (min-width: 900px) and (max-height: 880px) {
-  .profile { margin-top: 24px; }
-  .group { margin-top: 28px; }
+  .lists { margin-top: 32px; }
   .rows li { padding: 5px 0; }
 }
 /* Short desktop windows (e.g. 1280×720): tighter spacing so the about page still fits one window. */
 @media (min-width: 900px) and (max-height: 790px) {
   .section { padding: 28px 40px; }
-  .profile { margin-top: 28px; gap: 56px; }
+  .profile { gap: 56px; }
   .portrait { width: 240px; }
   .profile { grid-template-columns: 240px minmax(0, 1fr); }
   .statement { font-size: 22px; }
-  .group { margin-top: 24px; }
+  .lists { margin-top: 24px; }
   .groupTitle { margin-bottom: 8px; }
   .rows li { padding: 4px 0; font-size: 15px; }
 }
 /* Phones: smaller portrait and type, each record as year + item with the note under it. */
 @media (max-width: 899px) {
   .section { padding: 20px 24px; }
-  .profile { margin-top: 16px; gap: 16px; }
+  .profile { gap: 16px; }
   .portrait { width: 100px; }
   .placeholder span { font-size: 24px; }
   .statement { font-size: 17px; line-height: 1.4; }
-  .group { margin-top: 14px; }
+  .lists { gap: 14px; margin-top: 14px; }
   .groupTitle { margin-bottom: 4px; font-size: 18px; }
   .rows { padding-left: 14px; }
-  .rows li { display: grid; grid-template-columns: 2.9em minmax(0, 1fr); gap: 0 10px; padding: 3px 0; font-size: 14px; line-height: 1.4; }
-  .year { width: auto; }
-  .note { grid-column: 2; font-size: 12px; }
+  .rows li { gap: 0 10px; padding: 3px 0; font-size: 14px; line-height: 1.4; }
+  .note { font-size: 12px; }
 }
 
 /* Skill marquee: pinned to the bottom of the about page, two identical groups slide left by one group width (-50%)
@@ -97,8 +100,11 @@
 /* It runs the full width of the window (negative margins undo the section's side padding), so it fades out at the
    window's edges instead of cutting words off in the middle of the page. */
 .marquee { margin: 0 -40px; padding-top: 32px; overflow: hidden; -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); }
-.track { display: flex; width: max-content; animation: skillMarquee 26s linear infinite; }
+/* Each copy repeats the list three times (SKILL_REPEAT), so the loop takes three times as long for the same speed. */
+.track { display: flex; width: max-content; animation: skillMarquee 78s linear infinite; }
 .marquee:hover .track { animation-play-state: paused; }
+/* Held still during the sand hand-off (WindowFrame), so the grains settle where the icons really are. */
+:global([data-sand-handoff]) .track { animation-play-state: paused; }
 .skillGroup { display: flex; flex: none; gap: 56px; margin: 0; padding: 18px 56px 18px 0; list-style: none; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
 /* Quiet but readable grey (one step behind the body text); the hovered item turns ink while the strip pauses. */
 .skillGroup li { display: flex; flex: none; align-items: center; gap: 12px; color: #8b9198; transition: color .2s; font: 700 22px/1 var(--font-pretendard), sans-serif; letter-spacing: -.01em; white-space: nowrap; }

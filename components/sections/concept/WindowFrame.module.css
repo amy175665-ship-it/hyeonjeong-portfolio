@@ -6,14 +6,15 @@
 .anchor { position: relative; height: 0; margin-top: calc(-1 * max(600px, 100svh)); }
 .ruler { position: absolute; top: 0; width: 1px; height: max(600px, 100svh); visibility: hidden; pointer-events: none; }
 .window { --frame: 1; --chrome: 96px; --page-h: calc(max(600px, 100svh) - var(--chrome)); position: relative; z-index: 1; background: #fcfcfb; }
-.content { padding-top: var(--chrome); }
+/* --bar-in / --page-in (WindowFrame, from the sand hand-off): the title bar and the page fade in as the grains form them. */
+.content { padding-top: var(--chrome); opacity: var(--page-in, 1); }
 /* Toolbar: Mac-style window buttons in the ABSORB. / GROW. / BUILD. accents, then the main menu as browser tabs.
    No hairlines: the grey toolbar and the white page are told apart by their fill alone. */
 /* The window does not clip (so a hovered tab can rise out over its top edge); the toolbar rounds its own top corners
    and the viewport clips the content. */
 /* The title bar is fixed to the top of the screen (to the held window while it has a transform) and slides up out of
    view as the frame dissolves. */
-.bar { position: fixed; z-index: 3; top: 0; left: 0; right: 0; display: flex; align-items: center; gap: 24px; height: 96px; padding: 28px 4.2% 0; border-radius: 0; background: #f0f0ed; transform: translateY(calc((var(--frame) - 1) * 100%)); opacity: min(1, calc(var(--frame) * 1.6)); }
+.bar { position: fixed; z-index: 3; top: 0; left: 0; right: 0; display: flex; align-items: center; gap: 24px; height: 96px; padding: 28px 4.2% 0; border-radius: 0; background: #f0f0ed; transform: translateY(calc((var(--frame) - 1) * 100%)); opacity: calc(min(1, var(--frame) * 1.6) * var(--bar-in, 1)); }
 .window[data-hidden] .bar { visibility: hidden; }
 /* The 28px top padding centres the window buttons and tab words on the header's logo line (62px down: the header
    row is as tall as its 76px menu button, from 24px); the side padding matches the
@@ -48,17 +49,16 @@
 }
 @media (prefers-reduced-motion: reduce) { .tab { transition: background-color .2s, color .2s; } }
 
-/* Desktop title bar: window buttons on the left, the logo in the middle (the fixed header), the tabs on the right
-   where the menu button was (the header hides it while the window is up: the tabs are the same menu). Each tab is as
-   tall as the bar, so its word sits on the same line as the buttons and the logo; its white face fills up from the
-   bottom on hover (mouse) and stays full on the current tab, joining the page below. */
+/* Desktop tabs (inside the floating toolbar, see below): the header hides its menu button and logo while the window is
+   up, since the toolbar holds the same menu and logo. A tab's white face fills up from the bottom on hover (mouse)
+   and stays full on the current tab. */
 @media (min-width: 1024px) {
   .tabs { margin-left: auto; }
   .tabs ol { align-items: stretch; }
   .tabs li { display: flex; }
   .tab, .tab:hover, .tabCurrent, .tabCurrent:hover { height: auto; background: none; box-shadow: none; }
   .tab { isolation: isolate; transition: color .2s; }
-  .tab::before { content: ""; position: absolute; inset: 0; z-index: -1; border-radius: 12px 12px 0 0; background: #fcfcfb; clip-path: inset(100% 0 0 0); transition: clip-path .4s cubic-bezier(.22, 1, .36, 1); }
+  .tab::before { content: ""; position: absolute; inset: 0; z-index: -1; background: #fcfcfb; clip-path: inset(100% 0 0 0); transition: clip-path .4s cubic-bezier(.22, 1, .36, 1); }
   .tabCurrent::before { clip-path: inset(0); }
 }
 @media (min-width: 1024px) and (hover: hover) and (pointer: fine) {
@@ -66,10 +66,32 @@
   .tab:hover::before { clip-path: inset(0); }
 }
 @media (min-width: 1024px) and (prefers-reduced-motion: reduce) { .tab::before { transition: none; } }
-/* Narrower desktops: tighter tabs so they stay clear of the centred logo. */
+/* Logo inside the toolbar: desktop only (phones keep the header's logo above the card). */
+.home { display: none; }
+/* Desktop toolbar (header C, 2026-10-12): no full-width grey bar; one floating capsule at the top centre holds the window
+   buttons, the logo and the tabs, so the page runs white to the top. The current part is a white pill inside it; a
+   hovered tab's white face fills up from the bottom. */
+@media (min-width: 1024px) {
+  /* It stays on as the page header after the frame has dissolved (the site header steps aside then), and slides up out
+     of view while a part shows something full screen (data-immersive, an opened hobby). */
+  .bar { top: 22px; left: 50%; right: auto; gap: 22px; height: 54px; padding: 0 10px 0 22px; border-radius: 27px; background: #f0f0edeb; box-shadow: 0 8px 28px -14px #20273159; opacity: var(--bar-in, 1); transform: translate(-50%, 0); transition: transform .45s cubic-bezier(.16, 1, .3, 1); }
+  .window[data-immersive] .bar,
+  .window[data-toolbar-tucked] .bar { transform: translate(-50%, calc(-100% - 40px)); pointer-events: none; }
+  /* Offscreen links stay tabbable; focus reveals the capsule immediately so the focused link is visible. */
+  .window .bar:focus-within { transform: translate(-50%, 0); pointer-events: auto; transition: none; }
+  .dots > * { width: 12px; height: 12px; }
+  .home { display: block; flex: none; width: 34px; }
+  .homeImage { display: block; width: 100%; height: auto; }
+  .tabs { align-self: center; margin-left: 0; }
+  .tabs ol { align-items: center; }
+  .tab { padding: 13px 18px; border-radius: 20px; }
+  .tab::before { border-radius: 20px; }
+  .tabCurrent, .tabCurrent:hover { box-shadow: 0 1px 3px #2027311f; }
+}
+/* Narrower desktops: tighter tabs. */
 @media (min-width: 1024px) and (max-width: 1279px) {
   .bar { gap: 16px; }
-  .tab { padding: 0 13px; font-size: 12px; letter-spacing: .05em; }
+  .tab { padding: 12px 13px; font-size: 12px; letter-spacing: .05em; }
 }
 @media (max-width: 1023px) {
   .window { --chrome: 120px; }
@@ -91,3 +113,5 @@
   .tabs::-webkit-scrollbar { display: none; }
   .tab { padding: 0 8px; font-size: 10px; letter-spacing: .04em; }
 }
+
+@media (min-width: 1024px) and (prefers-reduced-motion: reduce) { .bar { transition: none; } }

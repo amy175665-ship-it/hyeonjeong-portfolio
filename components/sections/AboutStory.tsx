@@ -9,10 +9,13 @@ import styles from "./AboutStory.module.css";
 // Entrance delay (ms) of one piece of the about page; the animations live in the CSS ([data-enter], set by WindowFrame
 // each time the window comes up or a menu link enters the about part).
 const delay = (ms: number) => ({ "--d": `${ms}ms` }) as CSSProperties;
+// The skill strip loops two identical copies, so one copy must be wider than the screen: it repeats the list this often
+// (6 skills ≈ 1250px, three times ≈ 3700px). Only the first list is read out.
+const SKILL_REPEAT = 3;
 
 // About inside the desert browser window, one window-high page ([data-page]).
-// Portrait and name on the left, the statement and plain year / item / note rows (education, certificates)
-// on the right, a looping skill icon strip along the bottom. Content comes from data/profile.ts and data/skills.ts.
+// Portrait and name on the left, the statement and plain year / item / note rows (certificates and education side by
+// side) on the right, centred in the window; a looping skill icon strip along the bottom. Content comes from data/profile.ts and data/skills.ts.
 export default function AboutStory() {
   const certificates = profile.certificates ?? [];
   const educationAt = certificates.length ? 700 : 480;
@@ -42,6 +45,8 @@ export default function AboutStory() {
                 <span className={styles.line}><span style={delay(280)}><mark className={styles.mark}>결과로 증명하는</mark> 백현정입니다.</span></span>
               </p>
               {profile.introduction && <p className={`${styles.introduction} ${styles.rise}`} style={delay(420)}>{profile.introduction}</p>}
+              {/* Certificates and education side by side (stacked on narrower screens). */}
+              <div className={styles.lists}>
               {certificates.length > 0 && <div className={styles.group}>
                 <h3 className={`${styles.groupTitle} ${styles.rise}`} style={delay(480)}>자격증</h3>
                 <ul className={styles.rows} style={delay(520)}>
@@ -54,6 +59,7 @@ export default function AboutStory() {
                   {profile.education.map((item, i) => <li key={item.program} className={styles.rise} style={delay(educationAt + 80 + i * 70)}><span className={styles.year}>{item.year}</span><span className={styles.item}>{item.school} {item.program}</span><span className={styles.note}>{[item.status, item.period].filter(Boolean).join(" ")}</span></li>)}
                 </ul>
               </div>
+              </div>
             </div>
           </div>
         </div>
@@ -63,8 +69,8 @@ export default function AboutStory() {
           <div className={styles.track}>
             {[0, 1].map(copy => (
               <ul key={copy} className={styles.skillGroup} aria-label={copy ? undefined : "학습·사용 기술"} aria-hidden={copy ? true : undefined}>
-                {skills.map(skill => (
-                  <li key={skill.name}>
+                {Array.from({ length: SKILL_REPEAT }, () => skills).flat().map((skill, i) => (
+                  <li key={i} aria-hidden={!copy && i >= skills.length ? true : undefined}>
                     {skill.icon && <img src={skill.icon} alt="" width={28} height={28} className={styles.skillIcon} />}
                     <span lang="en">{skill.name}</span>
                   </li>
@@ -74,7 +80,7 @@ export default function AboutStory() {
           </div>
         </div>
       </section>
-      {/* Hobbies: one window page each for ABSORB., BUILD. and GROW. (HobbyFlow). */}
+      {/* Hobbies: hover/focus/touch selects content in the left preview (HobbyFlow). */}
       <HobbyFlow />
       {/* Vlog: one 16:9 video sized to fit the window page; hidden until a video file is added (data/profile.ts). */}
       {vlog.video && <section aria-label="브이로그" className={`${styles.section} ${styles.hobbySection}`} data-page>

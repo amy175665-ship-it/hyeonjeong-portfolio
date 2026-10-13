@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>헤더 방향 시안</title>
+<!-- Three header directions over the real about page (page-1440.png, captured without the title bar and header).
+     Open with #a, #b or #c to see one; without a hash, all three are stacked. -->
+<style>
+  @font-face { font-family: Pretendard; src: url("assets/PretendardVariable.woff2") format("woff2"); font-weight: 100 900; }
+  html, body { margin: 0; background: #2a2c30; font-family: Pretendard, sans-serif; }
+  .frame { position: relative; width: 1440px; height: 900px; margin: 0 auto 40px; overflow: hidden; background: #fcfcfb url("page-1440.png") 0 0 / 1440px 900px no-repeat; }
+  .dots { display: flex; gap: 8px; }
+  .dots i { display: block; width: 12px; height: 12px; border-radius: 50%; background: #e96b5a; }
+  .dots i:nth-child(2) { background: #e9a33a; }
+  .dots i:nth-child(3) { background: #7f9657; }
+  .logo { display: block; height: auto; }
+  .menu { display: flex; align-items: center; margin: 0; padding: 0; list-style: none; }
+  .menu li { color: #58636e; font: 600 13px/1 Pretendard, sans-serif; letter-spacing: .08em; white-space: nowrap; }
+  .menu li.on { color: #202731; }
+
+  /* A. A real browser's slim title bar: 52px, everything on its middle line; the tabs sit right after the window
+     buttons like browser tabs, each with the site icon; the current tab is white and joins the page. The page moves
+     up by the 44px the bar no longer takes. */
+  .a { background-position: 0 -44px; }
+  .a .bar { position: absolute; inset: 0 0 auto; height: 52px; display: flex; align-items: flex-end; gap: 22px; padding: 0 24px; background: #f0f0ed; }
+  .a .dots { align-self: center; }
+  .a .menu { align-self: stretch; align-items: flex-end; gap: 2px; padding-top: 8px; }
+  .a .menu li { display: flex; align-items: center; gap: 8px; height: 44px; padding: 0 18px 0 14px; border-radius: 10px 10px 0 0; }
+  .a .menu li.on { background: #fcfcfb; }
+  .a .menu .logo { width: 20px; }
+
+  /* B. No grey bar: the page runs to the top; the logo sits at the left on the same line as the menu words at the right,
+     everything centred in the 96px the bar took. The current part has its stage colour as a small dot. */
+  .b .bar { position: absolute; inset: 0 0 auto; height: 96px; display: flex; align-items: center; padding: 0 4.2%; }
+  .b .logo { width: 52px; }
+  .b .menu { margin-left: auto; gap: 40px; }
+  .b .menu li { position: relative; }
+  .b .menu li.on::after { content: ""; position: absolute; left: 50%; bottom: -12px; width: 5px; height: 5px; border-radius: 50%; background: #e96b5a; transform: translateX(-50%); }
+
+  /* C. A floating toolbar: the page runs to the top, and one rounded capsule at the top centre holds the window buttons,
+     the logo and the menu; the current part is a white pill inside it. */
+  .c .bar { position: absolute; top: 22px; left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: 22px; height: 54px; padding: 0 10px 0 22px; border-radius: 27px; background: #f0f0edeb; box-shadow: 0 8px 28px -14px #20273159; }
+  .c .logo { width: 34px; }
+  .c .menu { gap: 2px; }
+  .c .menu li { padding: 13px 18px; border-radius: 20px; }
+  .c .menu li.on { background: #fcfcfb; box-shadow: 0 1px 3px #2027311f; }
+</style>
+</head>
+<body>
+<div class="frame a" id="a">
+  <div class="bar">
+    <span class="dots"><i></i><i></i><i></i></span>
+    <ul class="menu">
+      <li class="on"><img class="logo" src="assets/logo.png" alt="">ABOUT</li>
+      <li><img class="logo" src="assets/logo.png" alt="">PROJECTS</li>
+      <li><img class="logo" src="assets/logo.png" alt="">DESIGN</li>
+      <li><img class="logo" src="assets/logo.png" alt="">CONTACT</li>
+    </ul>
+  </div>
+</div>
+<div class="frame b" id="b">
+  <div class="bar">
+    <img class="logo" src="assets/logo.png" alt="">
+    <ul class="menu"><li class="on">ABOUT</li><li>PROJECTS</li><li>DESIGN</li><li>CONTACT</li></ul>
+  </div>
+</div>
+<div class="frame c" id="c">
+  <div class="bar">
+    <span class="dots"><i></i><i></i><i></i></span>
+    <img class="logo" src="assets/logo.png" alt="">
+    <ul class="menu"><li class="on">ABOUT</li><li>PROJECTS</li><li>DESIGN</li><li>CONTACT</li></ul>
+  </div>
+</div>
+<script>
+  // #a / #b / #c: show only that direction.
+  const show = () => document.querySelectorAll(".frame").forEach(frame => frame.style.display = !location.hash || location.hash === "#" + frame.id ? "" : "none");
+  show(); addEventListener("hashchange", show);
+</script>
+</body>
+</html>

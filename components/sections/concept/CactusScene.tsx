@@ -207,7 +207,7 @@ function FrameControl({ running, reduced, progress }: { running: boolean; reduce
 
 export default function CactusScene({ progress, wind, reduced, running }: Props) {
   return (
-    <Canvas resize={{ offsetSize: true }} shadows frameloop={running ? "always" : "demand"} dpr={[1, 1.5]} camera={{ position: [0, 1.7, 8.5], fov: 34 }} gl={{ alpha: true, antialias: true }} style={{ pointerEvents: "none" }}
+    <Canvas resize={{ offsetSize: true }} shadows frameloop={running ? "always" : "demand"} dpr={[1, 1.5]} camera={{ position: [0, 1.7, 8.5], fov: 34 }} gl={{ alpha: true, antialias: true, preserveDrawingBuffer: true }} style={{ pointerEvents: "none" }}
       onCreated={({ camera }) => camera.lookAt(0, 1.35, 0)}>
       <Lights progress={progress} />
       <Cactus progress={progress} wind={wind} reduced={reduced} />

@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>프로젝트 배치 시안</title>
+<!-- Project pages inside the window (PC 1440×900 with header C, mobile 390×844 with the floating header), using the
+     real placeholder data from data/projects.ts. Text left (about 1/3), large desktop screen right with the phone
+     overlapping its bottom-right corner, and the project's featureTags flowing as a band in the space below. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@600&display=swap">
+<style>
+  @font-face { font-family: Pretendard; src: url("assets/PretendardVariable.woff2") format("woff2"); font-weight: 100 900; }
+  @font-face { font-family: "DM Serif Display"; src: url("assets/DMSerifDisplay-Regular.ttf"); }
+  :root { --bg: #fcfcfb; --ink: #202731; --muted: #58636e; --line: #e6e6e2; --serif: "DM Serif Display", "Noto Serif KR", serif; }
+  html, body { margin: 0; background: #2a2c30; font-family: Pretendard, sans-serif; color: var(--ink); }
+  p, h2, h3, ul { margin: 0; }
+  ul { padding: 0; list-style: none; }
+  .caption { width: 1440px; margin: 32px auto 12px; color: #d8d6d0; font-size: 15px; line-height: 1.6; }
+  .caption b { color: #fff; }
+  .row { display: flex; gap: 32px; justify-content: center; align-items: flex-start; flex-wrap: wrap; width: 1440px; margin: 0 auto 40px; }
+  .row img.ref { width: 704px; border-radius: 6px; }
+  .row img.refM { width: 390px; border-radius: 6px; }
+
+  /* ---------- PC frame (window, header C) ---------- */
+  .pc { position: relative; width: 1440px; height: 900px; margin: 0 auto 40px; overflow: hidden; background: var(--bg); --chrome: 96px; }
+  .bar { position: absolute; z-index: 5; top: 22px; left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: 22px; height: 54px; padding: 0 10px 0 22px; border-radius: 27px; background: #f0f0edeb; box-shadow: 0 8px 28px -14px #20273159; }
+  .dots { display: flex; gap: 8px; }
+  .dots i { display: block; width: 12px; height: 12px; border-radius: 50%; background: #e96b5a; }
+  .dots i:nth-child(2) { background: #e9a33a; } .dots i:nth-child(3) { background: #7f9657; }
+  .bar img { width: 34px; }
+  .menu { display: flex; gap: 2px; }
+  .menu li { padding: 13px 18px; border-radius: 20px; color: #58636e; font: 600 13px/1 Pretendard, sans-serif; letter-spacing: .08em; }
+  .menu li.on { background: var(--bg); color: var(--ink); box-shadow: 0 1px 3px #2027311f; }
+
+  /* One project page = the window height under the chrome. */
+  .page { position: absolute; left: 0; right: 0; top: var(--chrome); bottom: 0; display: flex; flex-direction: column; }
+  .stage { flex: 1; min-height: 0; display: grid; grid-template-columns: 380px minmax(0, 1fr); gap: 64px; align-items: center; padding: 8px 40px 0; }
+
+  .text { min-width: 0; }
+  .sectionTitle { font: 600 36px/1.2 var(--serif); letter-spacing: -.02em; }
+  .note { margin-top: 12px; color: var(--muted); font-size: 14px; line-height: 1.7; word-break: keep-all; }
+  .sectionHead { padding-bottom: 28px; margin-bottom: 28px; border-bottom: 1px solid var(--line); }
+  .name { font: 600 24px/1.35 var(--serif); letter-spacing: -.02em; word-break: keep-all; }
+  .tagline { margin-top: 10px; font-size: 16px; line-height: 1.7; word-break: keep-all; }
+  .sub { display: grid; gap: 6px; margin-top: 22px; color: var(--muted); font-size: 14px; line-height: 1.5; }
+  .sub b { display: inline-block; width: 4.4em; color: var(--ink); font-weight: 600; }
+  .sub .stack { font-family: "DM Serif Display", serif; font-size: 16px; color: var(--ink); }
+  .feat { display: flex; flex-wrap: wrap; gap: 4px 12px; margin-top: 14px; color: var(--muted); font-size: 13px; font-weight: 500; }
+  .detail { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; margin-top: 18px; color: var(--ink); font-size: 14px; font-weight: 600; text-decoration: underline; text-decoration-color: var(--accent); text-decoration-thickness: 2px; text-underline-offset: 6px; }
+
+  /* Large desktop screen, phone overlapping its bottom-right corner. */
+  .media { position: relative; width: 100%; aspect-ratio: 16 / 9.6; }
+  .desk { position: absolute; left: 0; top: 0; width: 89%; aspect-ratio: 16 / 10; overflow: hidden; border: 1px solid var(--line); border-radius: 12px; background: #f0f0ec; box-shadow: 0 30px 60px -34px #20273166; }
+  .phone { position: absolute; right: 0; bottom: 0; width: 19%; aspect-ratio: 9 / 19; overflow: hidden; border: 5px solid #202731; border-radius: 24px; background: var(--bg); box-shadow: 0 18px 36px -14px #20273177; }
+  .desk img, .phone img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: top; }
+  .badge { position: absolute; left: 14px; top: 14px; padding: 4px 10px; border-radius: 999px; background: #ffffffe6; color: var(--muted); font-size: 12px; font-weight: 500; }
+
+  /* Feature band: the project's featureTags flowing in the free space under the screens (decorative, aria-hidden;
+     the same features are read once as the small list in the text column). */
+  .band { position: relative; height: 132px; flex: none; overflow: hidden; -webkit-mask: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); mask: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); }
+  .band .track { position: absolute; top: 50%; display: flex; width: max-content; transform: translateY(-50%); animation: flow 38s linear infinite; }
+  .band span { padding-right: 56px; font: 600 72px/1 "Noto Serif KR", serif; letter-spacing: -.03em; white-space: nowrap; color: color-mix(in srgb, var(--accent) 34%, var(--bg)); }
+  .band span::after { content: "·"; padding-left: 56px; }
+  @keyframes flow { to { transform: translate(-50%, -50%); } }
+
+  /* ---------- Mobile frames (floating header after the window has opened) ---------- */
+  .mobiles { display: flex; gap: 32px; justify-content: center; width: 1440px; margin: 0 auto 60px; }
+  .m { position: relative; width: 390px; height: 844px; overflow: hidden; background: var(--bg); --chrome: 120px; }
+  .mHead { position: absolute; z-index: 5; left: 0; right: 0; top: 0; height: 96px; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; padding: 0 20px; }
+  .mHead img { grid-column: 2; width: 52px; }
+  .mHead .r { justify-self: end; display: flex; align-items: center; gap: 14px; font: 400 17px/1 "DM Serif Display", serif; }
+  .mHead .r b { font-weight: 400; color: #7f9657; }
+  .burger { display: grid; gap: 6px; width: 22px; } .burger i { height: 2px; background: #5b3f2a; }
+  .m .page { padding: 0 24px 0; overflow: hidden; }
+  .m .sectionTitle { font-size: 28px; }
+  .m .note { font-size: 13px; margin-top: 8px; }
+  .m .sectionHead { padding-bottom: 16px; margin-bottom: 18px; }
+  /* The phone hangs below the desktop screen instead of covering it, so both stay readable at 390px. */
+  .m .media { aspect-ratio: auto; height: auto; padding-bottom: 92px; }
+  .m .desk { position: relative; width: 88%; }
+  .m .phone { width: 27%; border-width: 3px; border-radius: 15px; bottom: 0; }
+  .m .band { height: 58px; margin: 6px -24px 0; }
+  .m .band span { font-size: 30px; padding-right: 24px; }
+  .m .band span::after { padding-left: 24px; }
+  .m .name { margin-top: 10px; font-size: 20px; }
+  .m .tagline { font-size: 15px; margin-top: 6px; }
+  .m .sub { margin-top: 12px; font-size: 13px; gap: 4px; }
+  .m .feat { margin-top: 10px; font-size: 12px; }
+  .m .detail { margin-top: 6px; }
+
+  @media (prefers-reduced-motion: reduce) { .band .track { animation: none; } }
+</style>
+</head>
+<body>
+
+<p class="caption"><b>지금 화면</b> — 구조(왼쪽 글 · 오른쪽 PC+모바일)는 이미 같습니다. 바뀌는 것은 이미지 비중, 기능 띠, 작은 라벨 정리, 모바일 겹침입니다.</p>
+<div class="row"><img class="ref" src="current-pc.png" alt="지금 프로젝트 화면 PC"><img class="refM" src="current-mobile.png" alt="지금 프로젝트 화면 모바일"></div>
+
+<p class="caption"><b>시안 · PC 1440×900</b> — 프로젝트마다 한 화면. 첫 화면만 제목·안내 문구가 글 칸 위에 함께 들어갑니다.</p>
+<div id="pc"></div>
+
+<p class="caption"><b>시안 · 모바일 390×844</b> — PC 화면 → 기능 띠 → 이름·설명 순. 모바일 화면은 PC 화면을 덜 가리도록 아래로 내려 겹침을 줄였습니다.</p>
+<div class="mobiles" id="mobile"></div>
+
+<script>
+// Placeholder data copied from data/projects.ts (title, tagline, stack, categoryTags, featureTags, accent).
+const projects = [
+  { title: "PLACEHOLDER — 카페 소개 웹사이트", tagline: "매장 소개와 메뉴를 담는 반응형 사이트 구성 예시", stack: ["HTML", "CSS", "JavaScript"], cats: ["반응형", "개인 프로젝트"], feats: ["모바일메뉴", "카테고리필터", "앵커이동"], accent: "#7f9657" },
+  { title: "PLACEHOLDER — 상품 목록 페이지", tagline: "검색과 필터를 연습하는 상품 목록 구성 예시", stack: ["React", "CSS"], cats: ["반응형", "클론코딩"], feats: ["상품검색", "카테고리필터", "가격정렬"], accent: "#e96b5a" },
+  { title: "PLACEHOLDER — 행사 안내 페이지", tagline: "일정 안내와 신청 폼을 담는 랜딩 페이지 구성 예시", stack: ["Next.js", "React", "Tailwind CSS"], cats: ["반응형", "리뉴얼"], feats: ["일정선택", "아코디언메뉴", "폼검증"], accent: "#e9a33a" },
+];
+const head = `<div class="sectionHead"><h2 class="sectionTitle">대표 프로젝트</h2><p class="note">프로젝트 등록 준비 중입니다. 아래 항목은 구성과 설명을 위한 예시이며, 실제 작업물과 화면으로 교체할 예정입니다.</p></div>`;
+const text = (p, i) => `<div class="text">${i === 0 ? head : ""}
+  <h3 class="name">${p.title}</h3><p class="tagline">${p.tagline}</p>
+  <div class="sub"><p><b>기술</b><span class="stack">${p.stack.join(" · ")}</span></p><p><b>분류</b>${p.cats.join(" · ")} · 작성 예시</p></div>
+  <ul class="feat" aria-label="구현 기능">${p.feats.map(f => `<li>#${f}</li>`).join("")}</ul>
+  <a class="detail" href="#">상세 보기 <span aria-hidden="true">↗</span></a></div>`;
+const media = () => `<div class="media"><div class="desk"><img src="assets/project-desktop-placeholder.svg" alt=""></div><div class="phone"><img src="assets/project-mobile-placeholder.svg" alt=""></div><span class="badge">작성 예시</span></div>`;
+const band = p => { const one = Array(4).fill(p.feats).flat().map(f => `<span>${f}</span>`).join(""); return `<div class="band" aria-hidden="true"><div class="track">${one}${one}</div></div>`; };
+const bar = `<div class="bar"><span class="dots"><i></i><i></i><i></i></span><img src="assets/logo.png" alt=""><ul class="menu"><li>ABOUT</li><li class="on">PROJECTS</li><li>DESIGN</li><li>CONTACT</li></ul></div>`;
+
+document.getElementById("pc").innerHTML = projects.map((p, i) =>
+  `<div class="pc" style="--accent:${p.accent}">${bar}<div class="page"><div class="stage">${text(p, i)}${media()}</div>${band(p)}</div></div>`).join("");
+document.getElementById("mobile").innerHTML = projects.slice(0, 2).map((p, i) =>
+  `<div class="m" style="--accent:${p.accent}"><div class="mHead"><img src="assets/logo.png" alt=""><span class="r"><span>BUILD<b>.</b></span><span class="burger"><i></i><i></i><i></i></span></span></div>
+   <div class="page">${i === 0 ? head : ""}${media()}${band(p)}${text(p, -1)}</div></div>`).join("");
+</script>
+</body>
+</html>

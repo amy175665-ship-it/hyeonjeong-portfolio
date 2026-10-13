@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>모래 흩어짐 전환 시안</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #1b1d20; overflow: hidden; }
+  /* The 1440×900 capture is scaled to fit the browser window. */
+  .stage { position: absolute; left: 50%; top: 50%; width: 1440px; height: 900px; transform-origin: 0 0; background: #fcfcfb; overflow: hidden; }
+  .stage img, .stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+  .hint { position: fixed; left: 50%; bottom: 14px; transform: translateX(-50%); color: #c9ccd1; font: 13px/1.4 system-ui, sans-serif; letter-spacing: .02em; text-align: center; pointer-events: none; }
+  .controls { position: fixed; right: 14px; top: 14px; display: flex; gap: 6px; }
+  .controls button { font: 13px system-ui, sans-serif; padding: 6px 12px; border: 0; border-radius: 6px; background: #ffffffd9; color: #202731; cursor: pointer; }
+</style>
+</head>
+<body>
+<div class="stage" id="stage">
+  <img id="bg" alt="" src="%%BG%%">
+  <img id="fg" alt="" src="%%FG%%">
+  <canvas id="sand" width="1440" height="900"></canvas>
+  <img id="bar" alt="" src="%%ABOUT%%" style="opacity:0; clip-path: inset(0 0 804px 0)">
+  <img id="about" alt="" src="%%ABOUT%%" style="opacity:0">
+</div>
+<div class="controls"><button id="play">▶ 재생</button><button id="back">◀ 되감기</button><button id="slow">느리게 ×1</button></div>
+<div class="hint">아래로 스크롤 = 다음(흩어지고 모임) · 위로 스크롤 = 되돌아감</div>
+<script>
+(() => {
+  const W = 1440, H = 900, STEP = 2;            // one grain per 2×2 pixels, so the grains fill the shapes completely
+  const WHITE = [252, 252, 251];                 // window background (#FCFCFB)
+  const SAND = [[168, 118, 63], [184, 134, 76], [148, 98, 51], [196, 149, 90], [227, 191, 145]];
+  // Timeline in seconds.
+  const T = { scatterSpread: 0.5, bgOut: [0.15, 1.2], gather: 0.85, gatherSpread: 0.6, gatherTime: 1.1, bar: [1.5, 2.2], settle: [2.6, 3.1], end: 3.2 };
+  const BAR = 96;                                // window title bar height: it fades in as a whole instead of pouring in
+
+  const stage = document.getElementById("stage");
+  const fit = () => {
+    const s = Math.min(innerWidth / W, innerHeight / H);
+    stage.style.transform = `scale(${s}) translate(-50%, -50%)`;
+  };
+  fit(); addEventListener("resize", fit);
+
+  const load = img => img.complete ? Promise.resolve() : new Promise(r => img.onload = r);
+  const pixels = img => {
+    const c = document.createElement("canvas"); c.width = W; c.height = H;
+    const x = c.getContext("2d"); x.drawImage(img, 0, 0, W, H);
+    return x.getImageData(0, 0, W, H).data;
+  };
+  const rand = (() => { let s = 7; return () => (s = (s * 16807) % 2147483647) / 2147483647; })();
+
+  Promise.all(["bg", "fg", "about"].map(id => load(document.getElementById(id)))).then(() => {
+    const fgImg = document.getElementById("fg"), bgImg = document.getElementById("bg"), aboutImg = document.getElementById("about"), barImg = document.getElementById("bar");
+    // Sources: every visible pixel of the cactus and text. Targets: every pixel of the intro page that is not window white.
+    const src = [], dst = [];
+    const fp = pixels(fgImg), ap = pixels(aboutImg);
+    for (let y = 0; y < H; y += STEP) for (let x = 0; x < W; x += STEP) {
+      const i = (y * W + x) * 4;
+      if (fp[i + 3] > 40) src.push([x, y, fp[i], fp[i + 1], fp[i + 2], fp[i + 3]]);
+      const d = Math.abs(ap[i] - WHITE[0]) + Math.abs(ap[i + 1] - WHITE[1]) + Math.abs(ap[i + 2] - WHITE[2]);
+      if (d > (y < BAR ? 60 : 14)) dst.push([x, y, ap[i], ap[i + 1], ap[i + 2], 255]);
+    }
+    // Pair them roughly left-to-right so grains travel in one sweeping flow instead of criss-crossing.
+    const key = p => p[0] + p[1] * 0.35 + rand() * 260;
+    src.forEach(p => p.k = key(p)); dst.forEach(p => p.k = key(p));
+    src.sort((a, b) => a.k - b.k); dst.sort((a, b) => a.k - b.k);
+    const N = Math.max(src.length, dst.length);
+    const P = [];
+    for (let n = 0; n < N; n++) {
+      // The longer list sets the grain count; grains sharing a source or target simply overlap there.
+      const s = src[Math.floor(n * src.length / N)], d = dst[Math.floor(n * dst.length / N)];
+      const sand = SAND[Math.floor(rand() * SAND.length)];
+      P.push({
+        sx: s[0], sy: s[1], sc: s.slice(2, 6), t: d, sand,
+        // Scatter: a gust from the left, so the left side goes first and grains drift right and up.
+        d: (s[0] / W) * T.scatterSpread + rand() * 0.18,
+        vx: 90 + rand() * 220, vy: -30 - rand() * 120, ax: 60 + rand() * 160,
+        wob: 6 + rand() * 22, ph: rand() * 6.28, f: 2 + rand() * 3,
+        // Gather: top of the page settles first, as if the sand pours down into the layout.
+        g: T.gather + (d[1] / H) * T.gatherSpread + rand() * 0.22,
+      });
+    }
+
+    const canvas = document.getElementById("sand"), ctx = canvas.getContext("2d");
+    const image = ctx.createImageData(W, H), buf = new Uint32Array(image.data.buffer);
+    const clamp = v => v < 0 ? 0 : v > 1 ? 1 : v;
+    const smooth = (a, b, v) => { const k = clamp((v - a) / (b - a)); return k * k * (3 - 2 * k); };
+    const ease = k => k < .5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;
+    const mix = (a, b, k) => a + (b - a) * k;
+
+    const draw = time => {
+      buf.fill(0);
+      const settle = smooth(T.settle[0], T.settle[1], time);
+      for (const p of P) {
+        const ts = Math.max(0, time - p.d);
+        let x = p.sx + p.vx * ts + 0.5 * p.ax * ts * ts, y = p.sy + p.vy * ts + Math.sin(p.ph + ts * p.f) * p.wob * Math.min(ts, 1);
+        const dusty = clamp(ts / 0.45);
+        let r = mix(p.sc[0], p.sand[0], dusty), g = mix(p.sc[1], p.sand[1], dusty), b = mix(p.sc[2], p.sand[2], dusty), a = mix(p.sc[3], 235, dusty);
+        const k = ease(clamp((time - p.g) / T.gatherTime));
+        x = mix(x, p.t[0], k); y = mix(y, p.t[1], k);
+        const c = k * k;
+        r = mix(r, p.t[2], c); g = mix(g, p.t[3], c); b = mix(b, p.t[4], c); a = mix(a, 255, c) * (1 - settle);
+        if (a < 4) continue;
+        const px = x | 0, py = y | 0;
+        if (px < 0 || py < 0 || px >= W - 1 || py >= H - 1) continue;
+        const color = (a << 24) | (b << 16) | (g << 8) | r;
+        const i = py * W + px;
+        buf[i] = buf[i + 1] = buf[i + W] = buf[i + W + 1] = color;
+      }
+      ctx.putImageData(image, 0, 0);
+      fgImg.style.opacity = time > 0 ? 0 : 1;
+      bgImg.style.opacity = 1 - smooth(T.bgOut[0], T.bgOut[1], time);
+      aboutImg.style.opacity = settle;
+      barImg.style.opacity = smooth(T.bar[0], T.bar[1], time);
+    };
+
+    let time = 0, dir = 0, last = 0, speed = 1;
+    const tick = now => {
+      const dt = Math.min((now - last) / 1000, 0.05) * speed; last = now;
+      time = Math.min(Math.max(time + dir * dt, 0), T.end);
+      draw(time);
+      if ((dir > 0 && time < T.end) || (dir < 0 && time > 0)) requestAnimationFrame(tick); else dir = 0;
+    };
+    const run = d => { if (dir === d) return; const idle = dir === 0; dir = d; if (idle) { last = performance.now(); requestAnimationFrame(tick); } };
+    draw(0);
+    addEventListener("wheel", e => run(e.deltaY > 0 ? 1 : -1), { passive: true });
+    addEventListener("keydown", e => { if (["ArrowDown", "PageDown", " "].includes(e.key)) run(1); if (["ArrowUp", "PageUp"].includes(e.key)) run(-1); });
+    document.getElementById("play").onclick = () => { time = 0; draw(0); run(1); };
+    document.getElementById("back").onclick = () => run(-1);
+    const slow = document.getElementById("slow");
+    slow.onclick = () => { speed = speed === 1 ? 0.4 : 1; slow.textContent = speed === 1 ? "느리게 ×1" : "느리게 ×0.4"; };
+    // For the capture script: jump to a moment.
+    window.__seek = t => { time = t; draw(t); };
+    window.__info = { src: src.length, dst: dst.length, grains: P.length };
+  });
+})();
+</script>
+</body>
+</html>

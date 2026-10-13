@@ -1,0 +1,360 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>취미 방향 시안</title>
+<!-- Three directions for the hobby part (HobbyFlow), each a working scroll demo with the site's real hobbies, group
+     words and photos, and a note on how the motion is built. Switch with the buttons at the top right (#a, #b, #c). -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@600&display=swap">
+<style>
+  @font-face { font-family: Pretendard; src: url("assets/PretendardVariable.woff2") format("woff2"); font-weight: 100 900; }
+  @font-face { font-family: "DM Serif Display"; src: url("assets/DMSerifDisplay-Regular.ttf"); }
+  :root { --bg: #fcfcfb; --ink: #202731; --muted: #58636e; --line: #e6e6e2; --serif: "DM Serif Display", "Noto Serif KR", serif; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--bg); color: var(--ink); font-family: Pretendard, sans-serif; }
+  p, h2, h3, ul { margin: 0; }
+  ul { padding: 0; list-style: none; }
+  .demo { display: none; }
+  .demo.on { display: block; }
+
+  /* Direction switcher (mockup only). */
+  .switch { position: fixed; z-index: 50; top: 16px; right: 16px; display: flex; gap: 4px; padding: 4px; border-radius: 999px; background: #20273199; backdrop-filter: blur(8px); }
+  .switch a { padding: 8px 14px; border-radius: 999px; color: #fff; font: 600 13px/1 Pretendard, sans-serif; text-decoration: none; }
+  .switch a.on { background: #fff; color: var(--ink); }
+
+  /* Notes before each demo. */
+  .note { max-width: 1040px; margin: 0 auto; padding: 96px 40px 72px; }
+  .note h2 { font: 400 clamp(44px, 5vw, 72px)/1.05 var(--serif); letter-spacing: -.02em; }
+  .note .feel { margin-top: 14px; color: var(--muted); font-size: 19px; line-height: 1.6; }
+  .note .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; margin-top: 48px; }
+  .note h3 { margin-bottom: 12px; font: 600 22px/1.3 var(--serif); }
+  .note li { position: relative; padding: 6px 0 6px 18px; font-size: 15.5px; line-height: 1.65; word-break: keep-all; }
+  .note li::before { content: ""; position: absolute; left: 0; top: 16px; width: 6px; height: 6px; border-radius: 50%; background: var(--dot, #e96b5a); }
+  .note code { padding: 1px 6px; border-radius: 4px; background: #eeeeea; font-size: 13.5px; }
+  .note .go { margin-top: 40px; color: var(--muted); font-size: 14px; }
+  .after { height: 60vh; display: grid; place-items: center; color: var(--muted); font-size: 15px; }
+  @media (max-width: 800px) { .note .cols { grid-template-columns: 1fr; } }
+
+  .track { position: relative; }
+  .stage { position: sticky; top: 0; height: 100vh; overflow: hidden; }
+  .word { font: 400 1em/0.9 var(--serif); letter-spacing: -.035em; white-space: nowrap; }
+  .placeholder { display: flex; flex-direction: column; justify-content: space-between; padding: 22px; }
+  .placeholder small { color: #20273199; font-size: 13px; }
+  .placeholder b { font: 400 clamp(26px, 2.6vw, 40px)/1 var(--serif); letter-spacing: -.01em; }
+
+  /* ---- A. Film strip ---- */
+  #a .strip { position: absolute; top: 0; left: 0; height: 100%; display: flex; align-items: center; gap: 4vw; padding: 0 8vw; will-change: transform; }
+  #a .slab { flex: none; padding-right: 2vw; font-size: 17vw; }
+  #a .slab p { margin-top: 2vw; color: var(--muted); font-size: 20px; letter-spacing: 0; font-family: Pretendard, sans-serif; }
+  #a .card { position: relative; flex: none; height: 62vh; overflow: hidden; border-radius: 10px; background: #eee; transform-origin: 50% 100%; will-change: transform; }
+  #a .card.tall { height: 72vh; }
+  #a .card.short { height: 50vh; align-self: flex-end; margin-bottom: 14vh; }
+  #a .card img { position: absolute; top: 0; left: -8%; width: 116%; height: 100%; object-fit: cover; will-change: transform; }
+  #a .name { position: absolute; left: 0; bottom: -46px; font: 400 28px/1 var(--serif); white-space: nowrap; }
+  #a .card .name { display: none; }
+  #a .hobby { position: relative; flex: none; display: flex; gap: 2vw; align-items: center; height: 100%; }
+  #a .card.placeholder { height: 44vh; align-self: center; }
+  /* The hobby passing the middle of the screen, named at the bottom left (it changes as the cards pass). */
+  #a .now { position: absolute; left: 8vw; bottom: calc(5vh + 22px); display: flex; align-items: center; gap: 14px; font: 400 34px/1 var(--serif); }
+  #a .now i { width: 10px; height: 10px; border-radius: 50%; background: var(--accent, var(--ink)); transition: background-color .3s; }
+  #a .progress { position: absolute; left: 8vw; right: 8vw; bottom: 5vh; height: 3px; border-radius: 2px; background: var(--line); }
+  #a .progress i { position: absolute; inset: 0 auto 0 0; border-radius: 2px; background: var(--ink); }
+
+  /* ---- B. Big word + card deck ---- */
+  #b .bigword { position: absolute; left: 0; right: 0; top: 12vh; display: flex; justify-content: center; font-size: 22vw; pointer-events: none; }
+  #b .bigword .letters { position: absolute; display: flex; }
+  #b .bigword .letters span { display: inline-block; overflow: hidden; padding: 0 .01em .08em; }
+  #b .bigword .letters span i { display: inline-block; font-style: normal; }
+  #b .meaning { position: absolute; left: 6vw; top: calc(12vh + 22vw * .95); font-size: 20px; color: var(--muted); }
+  #b .deck { position: absolute; left: 50%; top: 52%; width: min(30vw, 46vh); aspect-ratio: 5 / 6; transform: translate(-50%, -50%); }
+  #b .deck .card { position: absolute; inset: 0; overflow: hidden; border-radius: 14px; background: #ddd; box-shadow: 0 30px 60px -30px #20273173; will-change: transform; }
+  #b .deck .card img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  #b .list { position: absolute; left: 0; right: 0; bottom: 6vh; display: flex; justify-content: center; gap: 3.2vw; }
+  #b .list li { position: relative; color: #20273166; font: 400 clamp(20px, 2vw, 32px)/1 var(--serif); white-space: nowrap; transition: color .3s; }
+  #b .list li.on { color: var(--accent, var(--ink)); }
+  #b .bar { position: absolute; bottom: calc(6vh - 14px); height: 3px; border-radius: 2px; background: var(--accent, var(--ink)); transition: left .5s cubic-bezier(.34, 1.56, .64, 1), width .5s cubic-bezier(.34, 1.56, .64, 1), background-color .3s; }
+  #b .spark { position: absolute; width: 7px; height: 7px; border-radius: 50%; pointer-events: none; }
+
+  /* ---- C. Tile grid ---- */
+  #c .grid { position: absolute; inset: 7vh 4vw; display: grid; grid-template-columns: repeat(5, 1fr); grid-template-rows: 1fr 1fr; grid-template-areas: "ex ex mu tr ru" "ex ex vo bg bg"; gap: 14px; }
+  #c .tile { position: relative; overflow: hidden; border-radius: 14px; }
+  #c .tile img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  #c .tile .tag { position: absolute; left: 20px; bottom: 18px; color: #fff; font: 400 clamp(22px, 2.2vw, 34px)/1 var(--serif); text-shadow: 0 2px 16px #0006; }
+  #c .tile.placeholder .tag { position: static; color: var(--ink); text-shadow: none; }
+  #c .tile .group { font: 400 clamp(14px, 1.1vw, 17px)/1 var(--serif); }
+  #c .overlay { position: absolute; inset: 0; z-index: 5; overflow: hidden; pointer-events: none; visibility: hidden; will-change: clip-path, opacity; }
+  #c .overlay .media { position: absolute; inset: 0; }
+  #c .overlay .media img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: opacity .7s ease; }
+  #c .overlay .shade { position: absolute; inset: 0; background: linear-gradient(90deg, #000a, #0000 60%); }
+  #c .overlay .text { position: absolute; left: 6vw; bottom: 10vh; color: #fff; }
+  #c .overlay.placeholder .text { color: var(--ink); }
+  #c .overlay .text .gw { font-size: 9vw; }
+  #c .overlay .text h3 { margin-top: 1.5vw; font: 400 clamp(28px, 3vw, 48px)/1 var(--serif); }
+  #c .overlay .text p { margin-top: 12px; font-size: 18px; opacity: .85; }
+</style>
+</head>
+<body>
+<nav class="switch"><a href="#a">A 필름</a><a href="#b">B 카드 더미</a><a href="#c">C 타일</a></nav>
+
+<!-- ============ A ============ -->
+<div class="demo" id="a">
+  <section class="note" style="--dot:#e96b5a">
+    <h2>A. 가로로 흐르는 필름</h2>
+    <p class="feel">세로로 스크롤하면 화면이 멈춘 채 사진 카드들이 가로로 줄지어 지나갑니다. 빨리 굴리면 카드가 바람에 밀리듯 기울었다가 튕기며 바로 섭니다(슈융). 그룹 단어는 화면을 가득 채운 크기로 카드 사이를 지나갑니다.</p>
+    <div class="cols">
+      <div><h3>어떻게 움직이나</h3><ul>
+        <li>세로 스크롤 진행률(0→1)을 가로 이동 거리로 바꿉니다. 카드 줄 전체가 <code>translateX</code>로 움직입니다.</li>
+        <li>스크롤을 바로 따르지 않고 매 프레임 12%씩 따라가게 해서(관성), 휠을 멈춰도 미끄러지듯 멈춥니다.</li>
+        <li>그 차이(속도)만큼 카드를 <code>skewX</code>로 기울입니다. 빨리 굴릴수록 많이 기울고, 멈추면 바로 섭니다.</li>
+        <li>카드 안 사진은 카드보다 넓게 두고 반대 방향으로 조금 움직여(시차) 깊이감을 줍니다.</li>
+        <li>큰 단어(ABSORB. 등)는 카드보다 느리게 지나가서 뒤에 있는 것처럼 보입니다.</li>
+      </ul></div>
+      <div><h3>사이트에 넣을 때</h3><ul>
+        <li>HobbyFlow의 고정 무대(sticky)와 스크롤 구간 구조는 그대로 쓰고, 안쪽만 가로 줄로 바꿉니다.</li>
+        <li>움직임은 <code>transform</code>만 써서 레이아웃을 다시 계산하지 않습니다. 화면 밖 카드는 사진을 늦게 불러옵니다.</li>
+        <li>모션 감소 설정에서는 관성·기울기·시차를 끄고, 스크롤에 맞춰 줄만 이동합니다.</li>
+        <li>모바일은 같은 방식이되 카드 높이를 줄이고 큰 단어를 화면 폭에 맞춥니다.</li>
+        <li>장점: 화면 폭을 다 써서 여백이 없습니다. 단점: 스크롤 거리가 길어집니다.</li>
+      </ul></div>
+    </div>
+    <p class="go">↓ 아래로 스크롤해 보세요</p>
+  </section>
+  <section class="track" style="height:700vh"><div class="stage"><div class="strip"></div><p class="now"><i></i><span></span></p><div class="progress"><i></i></div></div></section>
+  <div class="after">다음 섹션</div>
+</div>
+
+<!-- ============ B ============ -->
+<div class="demo" id="b">
+  <section class="note" style="--dot:#7f9657">
+    <h2>B. 큰 단어 + 카드 더미</h2>
+    <p class="feel">화면 뒤에 그룹 단어를 아주 크게 깔고, 가운데에 사진 카드 더미를 둡니다. 스크롤 한 칸마다 맨 위 카드가 옆으로 휙 날아가고(슈융), 그룹이 바뀌면 큰 단어의 글자가 차례로 굴러 바뀌며(슥삭), 아래 취미 이름의 밑줄이 튕기듯 옮겨 가며 모래알이 톡 튑니다(핑).</p>
+    <div class="cols">
+      <div><h3>어떻게 움직이나</h3><ul>
+        <li>스크롤 구간을 카드 수만큼 칸으로 나눕니다. 칸이 바뀌는 순간에만 동작이 재생되고, 스크롤 위치와 동작 시간은 분리됩니다.</li>
+        <li>날아가는 카드: 0.55초, 처음엔 느리다 확 빨라지는 곡선(<code>cubic-bezier(.55,0,1,.45)</code>)으로 오른쪽 위로 회전하며 나갑니다.</li>
+        <li>남은 카드: 0.6초, 살짝 넘쳤다 돌아오는 곡선(<code>cubic-bezier(.34,1.56,.64,1)</code>)으로 한 단계씩 앞으로 올라옵니다.</li>
+        <li>큰 단어: 글자마다 25ms 간격으로 위로 빠지고, 새 단어 글자가 아래에서 올라옵니다(글자 상자에 가림).</li>
+        <li>밑줄은 튕기며 옮겨 가고, 도착하는 순간 그룹 색 점 10개가 퍼졌다 사라집니다(Web Animations API).</li>
+        <li>위로 스크롤하면 날아간 카드가 같은 길로 되돌아옵니다.</li>
+      </ul></div>
+      <div><h3>사이트에 넣을 때</h3><ul>
+        <li>HobbyFlow의 스크롤 칸 구조(<code>SEGMENTS</code>)를 그대로 쓰고, 칸 번호가 바뀔 때만 상태를 바꿉니다. 그래서 스크롤이 느려도 동작은 늘 같은 속도입니다.</li>
+        <li>카드는 사진이 있는 취미는 사진들로, 없는 취미는 그룹 색 카드("사진 준비 중")로 만듭니다.</li>
+        <li>선 그림 선인장(물방울·열매·꽃)은 점이 튀는 자리에서 하나씩 튀어나오게 붙일 수 있습니다.</li>
+        <li>모션 감소에서는 날아가기·굴리기 없이 바로 바뀝니다.</li>
+        <li>장점: 동작이 가장 크고 다른 섹션과 다릅니다. 단점: 한 번에 사진 한 장씩만 보입니다.</li>
+      </ul></div>
+    </div>
+    <p class="go">↓ 아래로 스크롤해 보세요</p>
+  </section>
+  <section class="track"><div class="stage">
+    <div class="bigword"></div><p class="meaning"></p>
+    <div class="deck"></div>
+    <ul class="list"></ul><i class="bar"></i>
+  </div></section>
+  <div class="after">다음 섹션</div>
+</div>
+
+<!-- ============ C ============ -->
+<div class="demo" id="c">
+  <section class="note" style="--dot:#e9a33a">
+    <h2>C. 타일 그리드</h2>
+    <p class="feel">취미 여섯 개가 타일로 화면을 채운 채 시작합니다. 스크롤하면 한 타일이 화면 전체로 부드럽게 열려 그 취미를 보여 주고, 다시 제자리로 닫히면 다음 타일이 열립니다. 효과는 "열리고 닫히기" 하나만 씁니다.</p>
+    <div class="cols">
+      <div><h3>어떻게 움직이나</h3><ul>
+        <li>취미마다 스크롤 구간을 나눠, 앞 35%는 열기, 가운데 30%는 전체 화면 유지, 뒤 35%는 닫기에 씁니다.</li>
+        <li>스크롤을 바로 따르지 않고 매 프레임 8%씩 따라가게 해서(관성), 휠 한 칸에도 툭 끊기지 않고 미끄러지듯 움직입니다. 열고 닫는 곡선도 시작과 끝이 완만한 사인 곡선입니다.</li>
+        <li>열기는 화면 전체를 덮는 덮개의 잘라 내는 영역(<code>clip-path: inset()</code>)만 타일 크기에서 화면 크기로 넓힙니다. 크기·위치를 바꾸지 않아 레이아웃 계산이 없고, 사진이 늘어나지 않습니다.</li>
+        <li>덮개는 열기 첫 15% 동안 타일 위에서 서서히 나타나, 타일과 덮개가 바뀌는 순간이 보이지 않습니다.</li>
+        <li>나머지 타일은 흐려지기만 하고, 글자는 거의 다 열린 뒤 서서히 나타납니다. 사진이 여러 장이면 열려 있는 동안 천천히 바뀝니다.</li>
+      </ul></div>
+      <div><h3>사이트에 넣을 때</h3><ul>
+        <li>그리드는 CSS Grid(영역 이름)로 짜고, 덮개만 JS로 위치를 계산합니다. 창 크기가 바뀌면 타일 위치를 다시 잽니다.</li>
+        <li>취미가 늘면 그리드 영역만 고치면 됩니다. 사진이 없는 타일은 그룹 색으로 채웁니다.</li>
+        <li>모션 감소에서는 확대 없이 그리드에서 선택한 타일의 내용만 바뀝니다.</li>
+        <li>모바일은 2열 그리드로 바꾸고 같은 확대를 씁니다.</li>
+        <li>장점: 처음에 취미 전체가 한눈에 보입니다. 단점: 사진 없는 타일이 많으면 색 면이 많아 보입니다.</li>
+      </ul></div>
+    </div>
+    <p class="go">↓ 아래로 스크롤해 보세요</p>
+  </section>
+  <section class="track"><div class="stage"><div class="grid"></div><div class="overlay"><div class="media"></div><div class="shade"></div><div class="text"></div></div></div></section>
+  <div class="after">다음 섹션</div>
+</div>
+
+<script>
+// ---------- data (same as data/profile.ts and HobbyFlow) ----------
+const GROUPS = {
+  absorb: { word: "ABSORB.", accentAt: 0, color: "#e96b5a", meaning: "보고 듣고 흡수하는 것", tints: ["#f6ddd5", "#efc6ba", "#f3d3ca", "#f8e3dc"] },
+  build: { word: "BUILD.", accentAt: 1, color: "#7f9657", meaning: "규칙을 파악하고 전략을 짜는 것", tints: ["#d9e0c8"] },
+  grow: { word: "GROW.", accentAt: 0, color: "#e9a33a", meaning: "꾸준히 끝까지 가는 것", tints: ["#f2dcb3"] },
+};
+const photo = n => `assets/exhibition-cafe-0${n}.webp`;
+const HOBBIES = [
+  { title: "EXHIBITION & CAFE", group: "absorb", photos: [1, 2, 3, 4, 5, 6, 7].map(photo), focus: { [photo(1)]: "26% 50%" } },
+  { title: "MUSIC", group: "absorb" }, { title: "TRAVEL", group: "absorb" }, { title: "VOLUNTEER", group: "absorb" },
+  { title: "BOARD GAME", group: "build" }, { title: "RUNNING", group: "grow" },
+];
+const tintOf = hobby => { const g = GROUPS[hobby.group]; const i = HOBBIES.filter(h => h.group === hobby.group).indexOf(hobby); return g.tints[i % g.tints.length]; };
+// Group word with the accent letter and the period in the group colour (as in the hero).
+const wordHTML = (key, tag = "span") => { const g = GROUPS[key]; return [...g.word].map((c, i) => `<${tag}${i === g.accentAt || c === "." ? ` style="color:${g.color}"` : ""}>${c}</${tag}>`).join(""); };
+const img = (src, focus) => `<img src="${src}" alt="" style="object-position:${focus || "50% 50%"}">`;
+const placeholder = hobby => `<small>사진 준비 중</small><b>${hobby.title}</b>`;
+const clamp = (v, a = 0, b = 1) => Math.min(Math.max(v, a), b);
+const ease = t => (t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+const progressOf = track => clamp((scrollY - track.offsetTop) / (track.offsetHeight - innerHeight));
+
+// ---------- A. film strip ----------
+const A = (() => {
+  const root = document.getElementById("a"), track = root.querySelector(".track"), strip = root.querySelector(".strip"), bar = root.querySelector(".progress i"), now = root.querySelector(".now");
+  let html = "";
+  for (const key of Object.keys(GROUPS)) {
+    html += `<div class="slab word" data-depth=".45">${wordHTML(key)}<p>${GROUPS[key].meaning}</p></div>`;
+    for (const hobby of HOBBIES.filter(h => h.group === key)) {
+      const sizes = ["tall", "", "short"];
+      const cards = hobby.photos
+        ? hobby.photos.map((src, i) => `<div class="card ${sizes[i % 3]}" style="aspect-ratio:${[16 / 9, 9 / 16, 9 / 16, 3 / 4, 16 / 9, 4 / 3, 3 / 4][i]}">${img(src, hobby.focus?.[src])}</div>`).join("")
+        : `<div class="card placeholder" style="aspect-ratio:5/6;background:${tintOf(hobby)}">${placeholder(hobby)}</div>`;
+      html += `<div class="hobby" data-title="${hobby.title}" data-color="${GROUPS[key].color}">${cards}</div>`;
+    }
+  }
+  strip.innerHTML = html;
+  let smooth = 0, last = 0, skew = 0;
+  return () => {
+    const target = progressOf(track);
+    smooth += (target - smooth) * .12;
+    const distance = strip.scrollWidth - innerWidth, x = -smooth * distance;
+    strip.style.transform = `translate3d(${x}px,0,0)`;
+    const velocity = (smooth - last) * distance; last = smooth;
+    skew += (clamp(velocity * -.35, -14, 14) - skew) * .2;
+    strip.querySelectorAll(".card").forEach(card => {
+      const r = card.getBoundingClientRect(), off = (r.left + r.width / 2 - innerWidth / 2) / innerWidth;
+      card.style.transform = `skewX(${skew.toFixed(2)}deg) scale(${(1 - Math.min(Math.abs(off), 1) * .08).toFixed(3)})`;
+      const im = card.querySelector("img"); if (im) im.style.transform = `translateX(${(off * -6).toFixed(2)}%)`;
+    });
+    strip.querySelectorAll("[data-depth]").forEach(el => el.style.transform = `translateX(${(-x * (1 - el.dataset.depth) * .35).toFixed(1)}px)`);
+    bar.style.width = `${(smooth * 100).toFixed(2)}%`;
+    // Name the hobby whose cards cover the middle of the screen (or the nearest one).
+    let best = null, gap = Infinity;
+    strip.querySelectorAll(".hobby").forEach(h => { const r = h.getBoundingClientRect(), d = r.left > innerWidth / 2 ? r.left - innerWidth / 2 : r.right < innerWidth / 2 ? innerWidth / 2 - r.right : 0; if (d < gap) { gap = d; best = h; } });
+    if (best && now.dataset.title !== best.dataset.title) {
+      now.dataset.title = best.dataset.title; now.querySelector("span").textContent = best.dataset.title; now.style.setProperty("--accent", best.dataset.color);
+      now.querySelector("span").animate([{ transform: "translateY(60%)", opacity: 0 }, { transform: "none", opacity: 1 }], { duration: 450, easing: "cubic-bezier(.34,1.56,.64,1)" });
+    }
+  };
+})();
+
+// ---------- B. big word + card deck ----------
+const B = (() => {
+  const root = document.getElementById("b"), track = root.querySelector(".track"), stage = root.querySelector(".stage");
+  const deck = root.querySelector(".deck"), list = root.querySelector(".list"), bar = root.querySelector(".bar"), big = root.querySelector(".bigword"), meaning = root.querySelector(".meaning");
+  // One card per step: the first three exhibition photos, then one card for each other hobby.
+  const cards = [];
+  HOBBIES.forEach((hobby, h) => { if (hobby.photos) hobby.photos.slice(0, 3).forEach(src => cards.push({ h, html: img(src, hobby.focus?.[src]) })); else cards.push({ h, html: placeholder(hobby), tint: tintOf(hobby) }); });
+  track.style.height = `${(cards.length + 1) * 100}vh`;
+  let seed = 3; const rand = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  const tilt = cards.map(() => (rand() - .5) * 12);
+  deck.innerHTML = cards.map((c, i) => `<div class="card${c.tint ? " placeholder" : ""}" style="z-index:${cards.length - i};${c.tint ? `background:${c.tint}` : ""}">${c.html}</div>`).join("");
+  list.innerHTML = HOBBIES.map(h => `<li>${h.title}</li>`).join("");
+  const els = [...deck.children], items = [...list.children];
+  let step = -1, group = null;
+  const fling = "transform .55s cubic-bezier(.55,0,1,.45), opacity .55s", spring = "transform .6s cubic-bezier(.34,1.56,.64,1), opacity .3s";
+  const place = () => els.forEach((el, i) => {
+    const d = i - step;
+    if (d < 0) { el.style.transition = fling; el.style.transform = `translate(85vw,-30vh) rotate(${32 + tilt[i]}deg)`; el.style.opacity = "0"; }
+    else { el.style.transition = spring; el.style.transform = `translate(${d * 6}px,${d * 16}px) rotate(${(d === 0 ? tilt[i] * .3 : tilt[i])}deg) scale(${1 - d * .045})`; el.style.opacity = d > 3 ? "0" : "1"; }
+  });
+  const setWord = (key, animate) => {
+    const old = big.querySelector(".letters"), fresh = document.createElement("div");
+    fresh.className = "letters word"; fresh.innerHTML = wordHTML(key, "i").replace(/<i/g, "<span><i").replace(/<\/i>/g, "</i></span>");
+    big.append(fresh);
+    meaning.textContent = GROUPS[key].meaning;
+    if (!animate) { old?.remove(); return; }
+    old?.querySelectorAll("i").forEach((l, i) => l.animate([{ transform: "none" }, { transform: "translateY(-115%) rotate(-10deg)" }], { duration: 420, delay: i * 25, easing: "cubic-bezier(.55,0,1,.45)", fill: "forwards" }));
+    setTimeout(() => old?.remove(), 700);
+    fresh.querySelectorAll("i").forEach((l, i) => l.animate([{ transform: "translateY(115%) rotate(10deg)" }, { transform: "none" }], { duration: 620, delay: 160 + i * 35, easing: "cubic-bezier(.34,1.56,.64,1)", fill: "backwards" }));
+    meaning.animate([{ opacity: 0, transform: "translateY(10px)" }, { opacity: 1, transform: "none" }], { duration: 500, delay: 300, fill: "backwards" });
+  };
+  const sparks = color => {
+    const r = bar.getBoundingClientRect(), s = stage.getBoundingClientRect();
+    for (let i = 0; i < 10; i++) {
+      const dot = document.createElement("i"); dot.className = "spark"; dot.style.background = color;
+      dot.style.left = `${r.left - s.left + r.width / 2}px`; dot.style.top = `${r.top - s.top}px`; stage.append(dot);
+      const a = -Math.PI * (i + .5) / 10, dist = 26 + Math.random() * 30;
+      dot.animate([{ transform: "translate(-50%,-50%) scale(1)", opacity: 1 }, { transform: `translate(calc(-50% + ${Math.cos(a) * dist}px), calc(-50% + ${Math.sin(a) * dist}px)) scale(.3)`, opacity: 0 }], { duration: 600, easing: "cubic-bezier(.22,1,.36,1)" }).onfinish = () => dot.remove();
+    }
+  };
+  return () => {
+    const next = Math.min(Math.floor(progressOf(track) * cards.length), cards.length - 1);
+    if (next === step) return;
+    const first = step < 0; step = next; place();
+    const hobby = HOBBIES[cards[step].h], color = GROUPS[hobby.group].color;
+    if (hobby.group !== group) { setWord(hobby.group, !first); group = hobby.group; }
+    stage.style.setProperty("--accent", color);
+    items.forEach((li, i) => li.classList.toggle("on", i === cards[step].h));
+    const li = items[cards[step].h], lr = li.getBoundingClientRect(), sr = stage.getBoundingClientRect();
+    const moved = bar.style.left !== `${lr.left - sr.left}px`;
+    bar.style.left = `${lr.left - sr.left}px`; bar.style.width = `${lr.width}px`;
+    if (!first && moved) setTimeout(() => sparks(color), 380);
+  };
+})();
+
+// ---------- C. tile grid ----------
+const C = (() => {
+  const root = document.getElementById("c"), track = root.querySelector(".track"), stage = root.querySelector(".stage"), grid = root.querySelector(".grid");
+  const overlay = root.querySelector(".overlay"), media = overlay.querySelector(".media"), text = overlay.querySelector(".text");
+  const areas = ["ex", "mu", "tr", "vo", "bg", "ru"];
+  track.style.height = `${(1 + HOBBIES.length * 1.3 + .4) * 100}vh`;
+  grid.innerHTML = HOBBIES.map((h, i) => h.photos
+    ? `<div class="tile" style="grid-area:${areas[i]}">${img(h.photos[0], h.focus?.[h.photos[0]])}<span class="tag">${h.title}</span></div>`
+    : `<div class="tile placeholder" style="grid-area:${areas[i]};background:${tintOf(h)}"><span class="group word">${wordHTML(h.group)}</span><span class="tag">${h.title}</span></div>`).join("");
+  const tiles = [...grid.children];
+  let active = -1;
+  const show = i => {
+    const h = HOBBIES[i], g = GROUPS[h.group];
+    overlay.classList.toggle("placeholder", !h.photos);
+    overlay.style.background = h.photos ? "#111" : tintOf(h);
+    media.innerHTML = h.photos ? h.photos.map((src, k) => img(src, h.focus?.[src]).replace("<img", `<img data-k="${k}" style="opacity:${k ? 0 : 1};object-position:${h.focus?.[src] || "50% 50%"}"`)).join("") : "";
+    overlay.querySelector(".shade").style.display = h.photos ? "" : "none";
+    text.innerHTML = `<div class="gw word">${wordHTML(h.group)}</div><h3>${h.title}</h3><p>${g.meaning}</p>`;
+  };
+  // The scroll is followed a little at a time (inertia), so a wheel step glides instead of jumping.
+  let smooth = 0;
+  const soft = t => (1 - Math.cos(Math.PI * t)) / 2; // gentle in and out
+  return () => {
+    smooth += (progressOf(track) - smooth) * .08;
+    const p = smooth * (HOBBIES.length + .4) - .2; // a short hold on the full grid at each end
+    const i = clamp(Math.floor(p), 0, HOBBIES.length - 1), t = clamp(p - i);
+    // Each hobby: 35% opening, 30% held full screen, 35% closing.
+    const open = p < 0 || p > HOBBIES.length ? 0 : t < .35 ? soft(t / .35) : t < .65 ? 1 : soft(1 - (t - .65) / .35);
+    if (i !== active) { active = i; show(i); }
+    // The overlay always covers the stage; only its clip opens from the tile's box to the full screen (no layout work).
+    const s = stage.getBoundingClientRect(), r = tiles[i].getBoundingClientRect(), k = 1 - open;
+    const top = (r.top - s.top) * k, left = (r.left - s.left) * k, right = (s.right - r.right) * k, bottom = (s.bottom - r.bottom) * k;
+    overlay.style.clipPath = `inset(${top.toFixed(1)}px ${right.toFixed(1)}px ${bottom.toFixed(1)}px ${left.toFixed(1)}px round ${(14 * k).toFixed(1)}px)`;
+    // It fades in over its tile at the start of the opening, so the tile and the overlay never jump.
+    overlay.style.opacity = clamp(open / .15);
+    overlay.style.visibility = open > 0.001 ? "visible" : "hidden";
+    text.style.opacity = clamp((open - .7) / .3);
+    tiles.forEach((el, n) => { el.style.opacity = n === i ? 1 : 1 - open * .7; });
+    if (HOBBIES[i].photos && open === 1) { const n = clamp(Math.floor((t - .35) / .3 * HOBBIES[i].photos.length), 0, HOBBIES[i].photos.length - 1); media.querySelectorAll("img").forEach(im => im.style.opacity = +im.dataset.k === n ? 1 : 0); }
+  };
+})();
+
+// ---------- run the visible demo ----------
+const demos = { a: A, b: B, c: C };
+let current = "a";
+const pick = () => {
+  current = (location.hash || "#a").slice(1); if (!demos[current]) current = "a";
+  document.querySelectorAll(".demo").forEach(d => d.classList.toggle("on", d.id === current));
+  document.querySelectorAll(".switch a").forEach(a => a.classList.toggle("on", a.getAttribute("href") === "#" + current));
+  scrollTo(0, 0);
+};
+addEventListener("hashchange", pick); pick();
+const loop = () => { demos[current](); requestAnimationFrame(loop); };
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>

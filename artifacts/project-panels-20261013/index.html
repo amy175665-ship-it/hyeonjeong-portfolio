@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>프로젝트 전면 패널 시안</title>
+<!-- BUILD panels from the approved "Living Desert" mockup (artifacts/mockup-living-desert-20261008), filled with the
+     placeholder data from data/projects.ts. Scroll: each project panel arrives zoomed in and settles, its big title
+     rises letter by letter, the featureTags band slides across, the desktop and phone screens come up from the bottom
+     right, then the next panel slides over it while it shrinks and blurs. The full-screen background stands in for
+     the project's real desktop screenshot. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@600&display=swap">
+<style>
+  @font-face { font-family: Pretendard; src: url("assets/PretendardVariable.woff2") format("woff2"); font-weight: 100 900; }
+  @font-face { font-family: "DM Serif Display"; src: url("assets/DMSerifDisplay-Regular.ttf"); }
+  :root { --bg: #fcfcfb; --ink: #202731; --muted: #58636e; --line: #e6e6e2; --night: #121b33; --serif: "DM Serif Display", "Noto Serif KR", serif; --ease: cubic-bezier(.16, 1, .3, 1); }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--bg); color: var(--ink); font-family: Pretendard, sans-serif; overflow-x: clip; }
+  p, h2, h3, ul { margin: 0; }
+  ul { padding: 0; list-style: none; }
+  .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+  /* Header C (the floating toolbar that stays on PC). */
+  .bar { position: fixed; z-index: 50; top: 22px; left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: 22px; height: 54px; padding: 0 10px 0 22px; border-radius: 27px; background: #f0f0edeb; box-shadow: 0 8px 28px -14px #20273159; }
+  .dots { display: flex; gap: 8px; }
+  .dots i { display: block; width: 12px; height: 12px; border-radius: 50%; background: #e96b5a; }
+  .dots i:nth-child(2) { background: #e9a33a; } .dots i:nth-child(3) { background: #7f9657; }
+  .bar img { width: 34px; }
+  .menu { display: flex; gap: 2px; }
+  .menu li { padding: 13px 18px; border-radius: 20px; color: var(--muted); font: 600 13px/1 Pretendard, sans-serif; letter-spacing: .08em; }
+  .menu li.on { background: var(--bg); color: var(--ink); box-shadow: 0 1px 3px #2027311f; }
+
+  /* Lead-in: the existing section heading and placeholder note, before the panels. */
+  .intro { height: 100vh; height: 100svh; display: grid; align-content: center; padding: 96px 4.2% 0; }
+  .intro h2 { font: 600 clamp(40px, 5vw, 72px)/1.1 var(--serif); letter-spacing: -.02em; }
+  .intro p { max-width: 36em; margin-top: 18px; color: var(--muted); font-size: 15px; line-height: 1.7; word-break: keep-all; }
+  .intro .hint { margin-top: 40px; font-size: 13px; letter-spacing: .08em; }
+
+  /* ---------- Stacked full-screen panels ---------- */
+  #build { position: relative; }
+  .panel { position: sticky; top: 0; height: 100vh; height: 100svh; overflow: hidden; background: var(--night); }
+  .spacer { height: var(--dwell, 110vh); }
+  .pin-in { position: absolute; inset: 0; transform-origin: 50% 40%; will-change: transform, filter; }
+  /* Stand-in for the real desktop screenshot, filling the panel. */
+  .shot { position: absolute; inset: 0; background: var(--accent); transform: scale(var(--zoom, 1.18)); transform-origin: 60% 40%; }
+  .shot .hero { position: absolute; inset: 0; background: linear-gradient(115deg, color-mix(in srgb, var(--accent) 62%, #000) 0%, var(--accent) 55%, color-mix(in srgb, var(--accent) 55%, #fff) 100%); }
+  .shot .hero::after { content: ""; position: absolute; right: 8%; top: 18%; width: 34%; aspect-ratio: 1; border-radius: 50%; background: radial-gradient(circle at 35% 30%, rgb(255 255 255 / .55), rgb(255 255 255 / .05) 60%); }
+  .shot .nav { position: absolute; left: 0; right: 0; top: 0; height: 9%; background: rgb(255 255 255 / .92); display: flex; align-items: center; gap: 3%; padding: 0 6%; }
+  .shot .nav i { height: 16%; width: 7%; border-radius: 99px; background: #d9d9d4; }
+  .shot .nav i:first-child { width: 5%; background: var(--ink); }
+  .shot .copy { position: absolute; left: 50%; top: 18%; width: 30%; display: grid; gap: 1.2vh; }
+  .shot .copy i { height: 1.4vh; border-radius: 99px; background: rgb(255 255 255 / .55); }
+  .shot .copy i:first-child { height: 3.2vh; width: 80%; background: rgb(255 255 255 / .8); }
+  .shot .copy i:last-child { width: 55%; }
+  .shade { position: absolute; inset: 0; background: linear-gradient(180deg, rgb(10 12 20 / .2) 0%, rgb(10 12 20 / 0) 30%, rgb(10 12 20 / .6) 100%); }
+
+  .ticker { position: absolute; z-index: 2; left: 0; right: 0; top: 30%; overflow: hidden; opacity: var(--tk, 0); }
+  .ticker .row { display: flex; gap: 4vw; width: max-content; font: 400 clamp(44px, 6.2vw, 104px)/1.1 var(--serif); color: rgb(255 255 255 / .92); white-space: nowrap; transform: translateX(var(--tx, 0px)); }
+
+  .pmeta { position: absolute; z-index: 3; right: 4.2%; top: 110px; display: grid; justify-items: end; gap: 8px; color: #fff; font-size: 14px; text-align: right; opacity: var(--meta, 0); }
+  .pmeta strong { font: 400 18px/1.3 "DM Serif Display", serif; letter-spacing: .01em; }
+  .badge { padding: 4px 10px; border-radius: 999px; background: rgb(255 255 255 / .9); color: var(--muted); font-size: 12px; font-weight: 500; }
+
+  .ptext { position: absolute; z-index: 3; left: 4.2%; bottom: 6%; max-width: 54%; color: #fff; }
+  .ptitle { font: 900 clamp(64px, 10.5vw, 176px)/.9 Pretendard, sans-serif; letter-spacing: -.06em; text-shadow: 0 6px 40px rgb(0 0 0 / .25); }
+  .ptitle .line { display: block; white-space: nowrap; }
+  .ptitle .ch { display: inline-block; }
+  .pfoot { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 28px; margin-top: 22px; opacity: var(--meta, 0); }
+  .pfoot p { font-size: 16px; line-height: 1.6; word-break: keep-all; }
+  .detail { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; color: #fff; font-size: 15px; font-weight: 600; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 6px; }
+  .detail:focus-visible { outline: 2px solid #fff; outline-offset: 4px; }
+
+  .devices { position: absolute; z-index: 3; right: 6%; bottom: 10%; width: 40%; aspect-ratio: 16 / 10; pointer-events: none; }
+  .devices .desk, .devices .phone { position: absolute; overflow: hidden; background: #fff; box-shadow: 0 30px 60px -24px rgb(0 0 0 / .55); }
+  .devices .desk { inset: 0; border-radius: 10px; transform: translateY(var(--dy, 120%)); }
+  .devices .phone { right: -6%; bottom: -12%; width: 26%; aspect-ratio: 9 / 19; border-radius: 18px; border: 5px solid #161a22; transform: translateY(var(--py, 160%)); }
+  .devices img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: top; }
+
+  .outro { height: 100vh; height: 100svh; display: grid; place-items: center; color: var(--muted); font-size: 15px; }
+
+  @media (max-width: 700px) {
+    .bar { display: none; }
+    .ptext { left: 6%; right: 6%; max-width: none; bottom: 7%; }
+    .ptitle { font-size: 16vw; }
+    .pfoot p { font-size: 14px; }
+    .pmeta { top: 76px; right: 6%; font-size: 12px; }
+    .pmeta strong { font-size: 15px; }
+    .ticker { top: 22%; }
+    .ticker .row { font-size: 13vw; }
+    .devices { right: 6%; bottom: auto; top: 34%; width: 64%; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .panel { --tk: 1 !important; --meta: 1 !important; --dy: 0% !important; --py: 0% !important; --zoom: 1 !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="bar" aria-hidden="true"><span class="dots"><i></i><i></i><i></i></span><img src="assets/logo.png" alt=""><ul class="menu"><li>ABOUT</li><li class="on">PROJECTS</li><li>DESIGN</li><li>CONTACT</li></ul></div>
+
+<main>
+  <section class="intro" aria-labelledby="work-title">
+    <h2 id="work-title">대표 프로젝트</h2>
+    <p>프로젝트 등록 준비 중입니다. 아래 항목은 구성과 설명을 위한 예시이며, 실제 작업물과 화면으로 교체할 예정입니다.</p>
+    <p class="hint" aria-hidden="true">↓ 스크롤 (시안 안내)</p>
+  </section>
+  <section id="build" aria-label="프로젝트"></section>
+  <div class="outro">다음 파트(GROW)로 이어지는 자리</div>
+</main>
+
+<script>
+// Placeholder data copied from data/projects.ts. "lines" is the big two-line title (the title without "PLACEHOLDER —").
+const projects = [
+  { lines: ["카페 소개", "웹사이트"], title: "PLACEHOLDER — 카페 소개 웹사이트", tagline: "매장 소개와 메뉴를 담는 반응형 사이트 구성 예시", stack: ["HTML", "CSS", "JavaScript"], cats: ["반응형", "개인 프로젝트"], feats: ["모바일메뉴", "카테고리필터", "앵커이동"], accent: "#7f9657" },
+  { lines: ["상품 목록", "페이지"], title: "PLACEHOLDER — 상품 목록 페이지", tagline: "검색과 필터를 연습하는 상품 목록 구성 예시", stack: ["React", "CSS"], cats: ["반응형", "클론코딩"], feats: ["상품검색", "카테고리필터", "가격정렬"], accent: "#e96b5a" },
+  { lines: ["행사 안내", "페이지"], title: "PLACEHOLDER — 행사 안내 페이지", tagline: "일정 안내와 신청 폼을 담는 랜딩 페이지 구성 예시", stack: ["Next.js", "React", "Tailwind CSS"], cats: ["반응형", "리뉴얼"], feats: ["일정선택", "아코디언메뉴", "폼검증"], accent: "#e9a33a" },
+];
+const build = document.getElementById("build");
+build.innerHTML = projects.map((p, i) => `
+  <article class="panel" style="--accent:${p.accent}" aria-labelledby="pt${i}">
+    <div class="pin-in">
+      <div class="shot" aria-hidden="true"><div class="hero"></div><div class="nav"><i></i><i></i><i></i><i></i></div><div class="copy"><i></i><i></i><i></i></div></div>
+      <div class="shade"></div>
+      <div class="ticker" aria-hidden="true"><div class="row">${Array(3).fill([p.cats[0], ...p.feats].join(" · ")).join(" · ")}</div></div>
+      <div class="pmeta"><span class="badge">작성 예시</span><strong>${p.stack.join(" · ")}</strong><span>${p.cats.join(" · ")}</span></div>
+      <div class="ptext">
+        <h3 class="ptitle" id="pt${i}" aria-label="${p.title}">${p.lines.map(l => `<span class="line" aria-hidden="true">${[...l].map(c => `<span class="ch">${c === " " ? "&nbsp;" : c}</span>`).join("")}</span>`).join("")}</h3>
+        <div class="pfoot"><p>${p.tagline}</p><a class="detail" href="#">상세 보기 <span aria-hidden="true">↗</span></a></div>
+        <ul class="sr-only" aria-label="구현 기능">${p.feats.map(f => `<li>${f}</li>`).join("")}</ul>
+      </div>
+      <div class="devices" aria-hidden="true"><div class="desk"><img src="assets/project-desktop-placeholder.svg" alt=""></div><div class="phone"><img src="assets/project-mobile-placeholder.svg" alt=""></div></div>
+    </div>
+  </article>
+  <div class="spacer"${i === projects.length - 1 ? ' style="--dwell:150vh"' : ""}></div>`).join("");
+
+const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const clamp = (v, a = 0, b = 1) => Math.min(Math.max(v, a), b);
+const ramp = (v, a, b) => clamp((v - a) / (b - a));
+const easeOut = t => 1 - Math.pow(1 - t, 3);
+const panels = [...document.querySelectorAll(".panel")], spacers = [...document.querySelectorAll(".spacer")];
+const chars = panels.map(p => [...p.querySelectorAll(".ch")]);
+const rows = panels.map(p => p.querySelector(".ticker .row"));
+
+const tick = () => {
+  const y = scrollY, vh = innerHeight, m = innerWidth <= 700;
+  const T = build.getBoundingClientRect().top + y, dwell = spacers[0].offsetHeight;
+  // panel i: arrive 0→1 while it slides into view, dwell 0→1 while it is pinned, covered by panel i+1 after that
+  const arrive = i => clamp((y - (T + i * (vh + dwell) - vh)) / vh);
+  const dwellP = i => clamp((y - (T + i * (vh + dwell))) / spacers[i].offsetHeight);
+  panels.forEach((pn, i) => {
+    if (reduce) return;
+    const a = arrive(i), dw = dwellP(i), c = i < panels.length - 1 ? arrive(i + 1) : 0;
+    const inner = pn.firstElementChild;
+    pn.style.visibility = c >= 1 ? "hidden" : "";
+    inner.style.transform = `scale(${(1 - c * .08).toFixed(4)})`;
+    inner.style.filter = c > 0 ? `blur(${(c * 10).toFixed(1)}px) brightness(${(1 - c * .6).toFixed(3)})` : "none";
+    pn.style.setProperty("--zoom", (1.22 - easeOut(a) * .22 + dw * .05).toFixed(4));
+    chars[i].forEach((ch, j) => { const k = easeOut(ramp(a, .35 + j * .03, .75 + j * .03)); ch.style.opacity = k; ch.style.filter = k < 1 ? `blur(${((1 - k) * 14).toFixed(1)}px)` : "none"; ch.style.transform = `translateY(${((1 - k) * 30).toFixed(1)}px)`; });
+    pn.style.setProperty("--meta", ramp(a, .7, 1).toFixed(3));
+    pn.style.setProperty("--tk", (ramp(dw, .05, .25) * (1 - ramp(dw, .85, 1))).toFixed(3));
+    rows[i].style.setProperty("--tx", (-dw * (m ? 900 : 1500)).toFixed(1) + "px");
+    pn.style.setProperty("--dy", ((1 - easeOut(ramp(dw, .2, .55))) * 130).toFixed(1) + "%");
+    pn.style.setProperty("--py", ((1 - easeOut(ramp(dw, .32, .65))) * 170).toFixed(1) + "%");
+  });
+  requestAnimationFrame(tick);
+};
+requestAnimationFrame(tick);
+</script>
+</body>
+</html>

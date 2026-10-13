@@ -85,6 +85,8 @@ export default function PollenGrow({ progress, desktop }: Props) {
       const ratio = Math.min(devicePixelRatio || 1, 2);
       width = canvas.clientWidth;
       height = canvas.clientHeight;
+      // Not laid out yet (or hidden): nothing to sample; the resize observer calls again once it has a size.
+      if (!width || !height) return;
       canvas.width = Math.round(width * ratio);
       canvas.height = Math.round(height * ratio);
       context.setTransform(ratio, 0, 0, ratio, 0, 0);

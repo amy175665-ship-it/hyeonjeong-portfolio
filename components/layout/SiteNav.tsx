@@ -53,9 +53,10 @@ export default function SiteNav() {
   const links = [...navLinks, navCta];
   // Once the window has dissolved into the full-screen layout the header floats over the page: it shows the current
   // stage word next to the menu button and steps out of the way while the page scrolls down (back on the way up).
-  const { stage, floating } = useWindowState();
+  const { stage, floating, immersive } = useWindowState();
   const direction = useScrollDirection();
-  const tucked = floating && direction === "down" && !menuOpen;
+  // Tucked away on the way down, and while a part shows something full screen (an opened hobby).
+  const tucked = floating && (direction === "down" || immersive) && !menuOpen;
   const stageWord = stages.find(item => item.id === stage)?.word ?? stages[0].word;
   // Ignore hovers while a ring is still playing so repeated events never stack.
   const ringLogo = () => {

@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>소개 레이아웃 시안</title>
+<!-- Three layouts for the about page (1440×900 window, header C: the floating toolbar), with the site's real copy and
+     data. Open with #one, #two or #three to see one; without a hash, all three are stacked. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@600&display=swap">
+<style>
+  @font-face { font-family: Pretendard; src: url("assets/PretendardVariable.woff2") format("woff2"); font-weight: 100 900; }
+  @font-face { font-family: "DM Serif Display"; src: url("assets/DMSerifDisplay-Regular.ttf"); }
+  :root { --bg: #fcfcfb; --ink: #202731; --muted: #58636e; --line: #e6e6e2; --coral: #e96b5a; --serif: "DM Serif Display", "Noto Serif KR", serif; }
+  html, body { margin: 0; background: #2a2c30; font-family: Pretendard, sans-serif; color: var(--ink); }
+  .frame { position: relative; width: 1440px; height: 900px; margin: 0 auto 40px; overflow: hidden; background: var(--bg); }
+  p, h3, ul, figure { margin: 0; }
+  ul { padding: 0; list-style: none; }
+
+  /* Header C: floating toolbar at the top centre. */
+  .bar { position: absolute; z-index: 5; top: 22px; left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: 22px; height: 54px; padding: 0 10px 0 22px; border-radius: 27px; background: #f0f0edeb; box-shadow: 0 8px 28px -14px #20273159; }
+  .dots { display: flex; gap: 8px; }
+  .dots i { display: block; width: 12px; height: 12px; border-radius: 50%; background: #e96b5a; }
+  .dots i:nth-child(2) { background: #e9a33a; }
+  .dots i:nth-child(3) { background: #7f9657; }
+  .bar img { width: 34px; }
+  .menu { display: flex; gap: 2px; }
+  .menu li { padding: 13px 18px; border-radius: 20px; color: #58636e; font: 600 13px/1 Pretendard, sans-serif; letter-spacing: .08em; }
+  .menu li.on { background: var(--bg); color: var(--ink); box-shadow: 0 1px 3px #2027311f; }
+
+  /* Shared pieces. */
+  .photo { overflow: hidden; border-radius: 8px; }
+  .photo img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: 50% 30%; }
+  .name { font: 600 22px/1.3 Pretendard, sans-serif; }
+  .name small { margin-left: 6px; color: var(--muted); font-size: 13px; font-weight: 400; opacity: .75; }
+  .facts { color: var(--muted); font-size: 15px; line-height: 1.75; }
+  .statement { font: 700 34px/1.45 Pretendard, sans-serif; letter-spacing: -.035em; word-break: keep-all; }
+  mark { padding: 0 .08em; background: linear-gradient(transparent 58%, #e96b5a40 58%, #e96b5a40 92%, transparent 92%); color: inherit; }
+  .groupTitle { margin-bottom: 14px; font: 600 24px/1.3 var(--serif); letter-spacing: -.01em; }
+  .rows { position: relative; padding-left: 20px; border-left: 1px solid var(--line); }
+  .rows li { padding: 7px 0; font-size: 16px; line-height: 1.55; word-break: keep-all; }
+  .rows b { display: inline-block; width: 3.3em; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .rows .note { color: var(--muted); font-size: 14px; }
+  /* Skill strip across the whole window at the foot of the page (enough copies to always reach the right edge). */
+  .strip { position: absolute; left: 0; right: 0; bottom: 44px; display: flex; gap: 56px; padding: 18px 0 18px 40px; overflow: hidden; border-block: 1px solid var(--line); white-space: nowrap; -webkit-mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent); mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent); }
+  .strip span { display: flex; flex: none; align-items: center; gap: 12px; color: #8b9198; font: 700 22px/1 Pretendard, sans-serif; }
+  .strip img { width: 34px; height: 34px; opacity: .5; }
+
+  /* 1. Tidy two columns: the block is centred in the window (max 1200px) and in the height between the toolbar and the
+     strip; the two record lists sit side by side so the right column is used and the block gets shorter. */
+  .one .body { position: absolute; left: 50%; top: 96px; bottom: 140px; width: 1200px; transform: translateX(-50%); display: grid; grid-template-columns: 330px 1fr; gap: 96px; align-items: center; }
+  .one .photo { aspect-ratio: 4 / 5; }
+  .one .identity { margin-top: 20px; }
+  .one .lists { display: grid; grid-template-columns: 1fr 1.25fr; gap: 56px; margin-top: 48px; }
+  .one .rows li .note { display: block; margin-left: 3.3em; }
+
+  /* 2. Statement first: the sentence opens the page at full width, then one row of three columns below it:
+     portrait and name | certificates | education. */
+  .two .body { position: absolute; left: 50%; top: 150px; width: 1200px; transform: translateX(-50%); }
+  .two .statement { font-size: 44px; line-height: 1.38; }
+  .two .cols { display: grid; grid-template-columns: 220px 1fr 1.3fr; gap: 72px; margin-top: 64px; align-items: start; }
+  .two .photo { aspect-ratio: 4 / 5; }
+  .two .identity { margin-top: 16px; }
+  .two .name { font-size: 20px; }
+  .two .facts { font-size: 14px; }
+  .two .rows li .note { display: block; margin-left: 3.3em; }
+
+  /* 3. Split: the portrait fills the left of the window from the top down to the strip; the text sits in the right part,
+     centred in its height, with the name as the first, largest line. */
+  .three .photo { position: absolute; left: 0; top: 0; bottom: 115px; width: 560px; border-radius: 0; }
+  .three .body { position: absolute; left: 656px; right: 96px; top: 110px; bottom: 140px; display: flex; flex-direction: column; justify-content: center; }
+  .three .name { font: 600 40px/1.2 "Noto Serif KR", serif; }
+  .three .name small { font: 400 15px Pretendard, sans-serif; }
+  .three .facts { margin-top: 10px; display: flex; gap: 22px; }
+  .three .statement { margin-top: 36px; font-size: 28px; }
+  .three .lists { display: grid; gap: 30px; margin-top: 40px; }
+  .three .rows li { padding: 4px 0; font-size: 15px; }
+  .three .rows .note { margin-left: 10px; }
+  .three .groupTitle { margin-bottom: 8px; font-size: 22px; }
+</style>
+</head>
+<body>
+<template id="pieces">
+  <div class="bar"><span class="dots"><i></i><i></i><i></i></span><img src="assets/logo.png" alt=""><ul class="menu"><li class="on">ABOUT</li><li>PROJECTS</li><li>DESIGN</li><li>CONTACT</li></ul></div>
+  <figure class="photo"><img src="assets/profile-front.webp" alt=""></figure>
+  <div class="identity"><p class="name">백현정<small>/ Beak hyeon jeong</small></p><div class="facts"><p>2000년생</p><p>T. 010-0000-0000</p><p>E. example@email.com</p></div></div>
+  <p class="statement">안녕하세요, 새로운 환경에 금방 적응해<br><mark>결과로 증명하는</mark> 백현정입니다.</p>
+  <div class="cert"><h3 class="groupTitle">자격증</h3><ul class="rows">
+    <li><b>2025</b>웹디자인개발기능사 [수정 예정] <span class="note">2025.07 한국산업인력공단</span></li>
+    <li><b>2024</b>GTQ 그래픽기술자격 1급 [수정 예정] <span class="note">2024.10 한국생산성본부</span></li>
+    <li><b>2024</b>컴퓨터활용능력 2급 [수정 예정] <span class="note">2024.08 대한상공회의소</span></li></ul></div>
+  <div class="edu"><h3 class="groupTitle">교육</h3><ul class="rows">
+    <li><b>2025</b>OO아카데미 UI/UX 반응형 웹디자인 &amp; 웹퍼블리셔 양성과정 [수정 예정] <span class="note">수료 2025.01 ~ 2025.06</span></li>
+    <li><b>2024</b>OO온라인캠프 웹퍼블리싱 기초 [수정 예정] <span class="note">수료 2024.11 ~ 2024.12</span></li>
+    <li><b>2024</b>OO대학교 OO학과 [수정 예정] <span class="note">졸업 2020.03 ~ 2024.02</span></li></ul></div>
+  <div class="strip"></div>
+</template>
+
+<div class="frame one" id="one"></div>
+<div class="frame two" id="two"></div>
+<div class="frame three" id="three"></div>
+
+<script>
+  const t = document.getElementById("pieces").content;
+  const piece = cls => t.querySelector("." + cls).cloneNode(true);
+  const el = (cls, ...kids) => { const d = document.createElement("div"); d.className = cls; d.append(...kids); return d; };
+  const skills = [["HTML", "html5"], ["CSS", "css3"], ["Figma", "figma"], ["Photoshop", "photoshop"], ["Illustrator", "illustrator"], ["JavaScript", "javascript"]];
+  const strip = () => { const s = piece("strip"); for (let i = 0; i < 3; i++) skills.forEach(([name, icon]) => s.insertAdjacentHTML("beforeend", `<span><img src="assets/${icon}.svg" alt="">${name}</span>`)); return s; };
+
+  document.getElementById("one").append(piece("bar"),
+    el("body", el("left", piece("photo"), piece("identity")), el("right", piece("statement"), el("lists", piece("cert"), piece("edu")))), strip());
+  document.getElementById("two").append(piece("bar"),
+    el("body", piece("statement"), el("cols", el("left", piece("photo"), piece("identity")), piece("cert"), piece("edu"))), strip());
+  const three = document.getElementById("three");
+  three.append(piece("photo"), piece("bar"), el("body", piece("identity"), piece("statement"), el("lists", piece("cert"), piece("edu"))), strip());
+  // In the split layout the name and its facts read as one block, the facts on one line.
+  const id = three.querySelector(".identity"); id.style.display = "contents";
+
+  const show = () => document.querySelectorAll(".frame").forEach(frame => frame.style.display = !location.hash || location.hash === "#" + frame.id ? "" : "none");
+  show(); addEventListener("hashchange", show);
+</script>
+</body>
+</html>

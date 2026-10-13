@@ -43,7 +43,7 @@ export default function CaseStudyPage({ params }: { params: { slug: string } }) 
           <Reveal>
             <p className="mb-4 inline-flex rounded-full bg-portfolio-sky/40 px-3 py-1.5 text-xs font-medium">{project.type} · {project.placeholder ? "구현 보고서 작성 예시" : "구현 보고서"}</p>
             <h1 className="mb-6 break-keep [overflow-wrap:anywhere] text-3xl font-bold leading-tight tracking-tight md:text-5xl">{project.title}</h1>
-            {project.placeholder && <p className="text-portfolio-muted leading-[1.7] mb-6">실제 완료한 프로젝트가 아닙니다. 화면, 기간, 구현 내용과 문제 해결 사례를 본인의 작업으로 교체할 예정입니다.</p>}
+            {project.placeholder && <p className="text-portfolio-muted leading-[1.7] mb-6">화면, 기간, 구현 내용과 문제 해결 사례는 정리 중이며 실제 작업 내용으로 채울 예정입니다.</p>}
             <p className="text-sm">{project.stack.join(" / ")}</p><ProjectTags project={project} tone="sky" />
           </Reveal>
         </header>
