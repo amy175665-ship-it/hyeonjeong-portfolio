@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import dynamic from "next/dynamic";
 import Image from "next/image";
-import { animate, useMotionValue, useMotionValueEvent, useScroll, useSpring, useTransform, motion, type AnimationPlaybackControls } from "framer-motion";
+import { animate, useMotionValue, useMotionValueEvent, useScroll, useSpring, useTransform, motion, type AnimationPlaybackControls, type MotionStyle } from "framer-motion";
 import sandImage from "@/public/images/hero/hero-sand-bg.webp";
 import { glideTo, lockScroll, scrollToY, unlockScroll } from "@/components/layout/scrollLock";
 import WindGust from "./WindGust";
@@ -36,7 +36,6 @@ const CACTUS_FROM = SCENES.cover[0] + (SCENES.cover[1] - SCENES.cover[0]) * COVE
 const REWIND_FROM = COVER_SCROLL - 0.01;
 // Logo click on this page: seconds for the slow glide from the end of the cover back to the top.
 const RETURN_SECONDS = 3;
-const SHOW_SKIP = true; // TEMP: skip button while the portfolio is being edited (see skip below)
 // Hand-off from the story to the browser window (teacher's feedback): the last scene scatters into sand and the sand
 // gathers into the window's first page (SandHandoff, phases in HANDOFF on the window's `raise` value 0..1; lowering
 // the window plays it backwards).
@@ -103,10 +102,12 @@ export default function ConceptScenes({ children, content }: { children: ReactNo
     unlockScroll();
     animate(cueIn, 1, { duration: 0.6, delay: 0.3 });
   };
-  // TEMP (while the portfolio is being edited): a SKIP button that jumps to the end of the playing story.
-  // Remove SHOW_SKIP, this block, the button below and .skip in the CSS module when the site is finished.
+  // SKIP (kept for good, 2026-10-13): while the story plays (and the scroll is held) it jumps to its end.
   const [skippable, setSkippable] = useState(false);
-  useMotionValueEvent(playhead, "change", value => setSkippable(SHOW_SKIP && value >= 0 && value < 1));
+  useMotionValueEvent(playhead, "change", value => setSkippable(value >= 0 && value < 1));
+  // "프로젝트 바로 보기" on the opening screen fades out as soon as the sand starts to rise (keyboard focus shows it).
+  const jumpFade = useTransform(coverScroll, value => 1 - Math.min(value / (SCENES.cover[1] * 0.12), 1));
+  const jumpPointer = useTransform(jumpFade, value => (value < 0.05 ? "none" : "auto"));
   const skip = () => {
     playback.current?.stop();
     playback.current = null;
@@ -395,7 +396,9 @@ export default function ConceptScenes({ children, content }: { children: ReactNo
           <p className={styles.closingNote}>선인장처럼, 어떤 환경에서도 생각보다 잘 자라는 사람입니다.</p>
         </motion.div>
         <motion.div className={styles.scrollCue} style={{ opacity: cue }} aria-hidden="true"><i /></motion.div>
-        {skippable && <button type="button" className={styles.skip} onClick={skip}>SKIP</button>}
+        {skippable && <button type="button" className={styles.skip} onClick={skip} lang="en">SKIP</button>}
+        {/* Shortcut past the opening straight to the project panels (WindowFrame handles the #project link). */}
+        <motion.a href="/#project" className={styles.jump} style={{ "--fade": jumpFade, pointerEvents: jumpPointer } as unknown as MotionStyle}>프로젝트 바로 보기 <span aria-hidden="true">↓</span></motion.a>
         <motion.div className={styles.handoffWhite} style={{ opacity: handoffWhite }} aria-hidden="true" />
       </div>
     </div>

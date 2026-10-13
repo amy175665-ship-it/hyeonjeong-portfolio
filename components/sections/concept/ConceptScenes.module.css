@@ -71,4 +71,8 @@
 /* TEMP: skip button while the portfolio is being edited (remove with SHOW_SKIP in ConceptScenes.tsx). */
 .skip { position: absolute; right: 32px; bottom: 28px; z-index: 8; min-height: 40px; padding: 0 18px; border: 1px solid #20273133; border-radius: 999px; background: #fffaf2cc; color: #202731; font: 600 13px/1 var(--font-pretendard), sans-serif; letter-spacing: .08em; cursor: pointer; backdrop-filter: blur(6px); }
 .skip:hover { background: #fffaf2; }
-@media (max-width: 1023px) { .skip { right: 20px; bottom: 20px; } }
+/* Shortcut to the projects on the opening screen (same pill as SKIP, bottom left); --fade from ConceptScenes. */
+.jump { position: absolute; left: 32px; bottom: 28px; z-index: 8; display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 20px; border: 1px solid #20273133; border-radius: 999px; background: #fffaf2cc; color: #202731; font: 600 14px/1 var(--font-pretendard), sans-serif; text-decoration: none; backdrop-filter: blur(6px); opacity: var(--fade, 1); transition: background-color .2s; }
+.jump:hover { background: #fffaf2; }
+.jump:focus-visible { opacity: 1; }
+@media (max-width: 1023px) { .skip { right: 20px; bottom: 20px; } .jump { left: 20px; bottom: 20px; } }

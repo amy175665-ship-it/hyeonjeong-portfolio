@@ -4,6 +4,7 @@ import { Noto_Serif_KR } from "next/font/google";
 import "./globals.css";
 import SmoothScroll from "@/components/layout/SmoothScroll";
 import SiteNav from "@/components/layout/SiteNav";
+import SkipLink from "@/components/layout/SkipLink";
 import CustomCursor from "@/components/ui/CustomCursor";
 
 const pretendard = localFont({
@@ -51,6 +52,7 @@ export default function RootLayout({
     <html lang="ko">
       <body className={`${pretendard.variable} ${editorial.variable} ${hangulSerif.variable} font-sans font-normal`}>
         <SmoothScroll>
+          <SkipLink />
           <SiteNav />
           {children}
         </SmoothScroll>
