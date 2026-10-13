@@ -11,11 +11,11 @@
 /* The big word along the bottom left, over the portrait (multiply), its full stop in the ABSORB. coral. */
 .word { position: absolute; z-index: 1; left: calc(4.2% - .06em); bottom: -1.6vw; margin: 0; font: 900 var(--word)/.8 var(--font-pretendard), sans-serif; letter-spacing: -.065em; color: #202731; mix-blend-mode: multiply; pointer-events: none; }
 .word span { color: #e96b5a; mix-blend-mode: normal; }
-/* The sentence in its two lines, set right on top of ABSORB. on the same 4.2% site margin (header line), so the two
-   read as one block at the bottom left; sized so the longer line ends before the portrait. Each word soaks from pale
+/* The sentence in its two lines at the top left, level with the portrait's head (so the top half is not empty), on
+   the same 4.2% site margin as the header and ABSORB.; sized so the longer line ends before the portrait. Each word soaks from pale
    sand to ink in reading order (--i of --n words, driven by --p from AboutCover), then the marked phrase gets its
    highlighter stroke. */
-.large { --p: 0; position: absolute; z-index: 2; left: 4.2%; bottom: calc(var(--word) * .74); margin: 0; font: 700 clamp(24px, 2.5vw, 46px)/1.4 var(--font-pretendard), sans-serif; letter-spacing: -.035em; color: #202731; transform-origin: 0 0; pointer-events: none; }
+.large { --p: 0; position: absolute; z-index: 2; left: 4.2%; top: 16%; margin: 0; font: 700 clamp(28px, 3.2vw, 60px)/1.35 var(--font-pretendard), sans-serif; letter-spacing: -.035em; color: #202731; transform-origin: 0 0; pointer-events: none; }
 .bigLine { display: block; white-space: nowrap; }
 .w { --k: clamp(0, calc((var(--p) * 1.35 - var(--i) / var(--n) * .95) / .16), 1); display: inline-block; color: color-mix(in srgb, #202731 calc(var(--k) * 100%), #eadbc2); }
 .mark { --m: clamp(0, calc((var(--p) - .78) / .2), 1); background: linear-gradient(transparent 58%, #e96b5a40 58%, #e96b5a40 92%, transparent 92%) 0 0 / calc(var(--m) * 100%) 100% no-repeat; }
