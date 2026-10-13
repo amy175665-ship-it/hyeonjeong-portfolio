@@ -1,0 +1,28 @@
+/* The cover track: three window pages tall; the about page (the stage) stays pinned under the window chrome for two
+   of them while the cover turns into it (AboutCover). */
+.cover { position: relative; height: calc(var(--page-h, 600px) * 3); }
+/* Menu links land at 95% of the cover (the finished page): 1.9 of the 2 pinned pages. */
+.anchor { position: absolute; left: 0; top: calc(var(--page-h, 600px) * 1.9); width: 1px; height: 1px; }
+.stage { position: sticky; top: var(--chrome, 0px); height: var(--page-h, 600px); overflow: hidden; }
+/* The page's content sits above the grains. */
+.stage > :not(.grains):not(.word):not(.large):not(:global(.sr-only)) { position: relative; z-index: 1; }
+.grains { position: absolute; inset: 0; z-index: 0; display: block; width: 100%; height: 100%; pointer-events: none; }
+/* The big word along the bottom left, over the portrait (multiply), its full stop in the ABSORB. coral. */
+.word { position: absolute; z-index: 1; left: 3.4%; bottom: -1.6vw; margin: 0; font: 900 clamp(84px, 19vw, 300px)/.8 var(--font-pretendard), sans-serif; letter-spacing: -.065em; color: #202731; mix-blend-mode: multiply; pointer-events: none; }
+.word span { color: #e96b5a; mix-blend-mode: normal; }
+/* The large sentence at the top left: each word soaks from pale sand to ink in reading order (--i of --n words, driven
+   by --p from AboutCover), then the marked phrase gets its highlighter stroke. */
+.large { --p: 0; position: absolute; z-index: 2; left: 6%; top: 11%; width: min(46%, 640px); margin: 0; font: 800 clamp(34px, 4.4vw, 72px)/1.2 var(--font-pretendard), sans-serif; letter-spacing: -.045em; color: #202731; word-break: keep-all; transform-origin: 0 0; pointer-events: none; }
+.w { --k: clamp(0, calc((var(--p) * 1.35 - var(--i) / var(--n) * .95) / .16), 1); display: inline-block; color: color-mix(in srgb, #202731 calc(var(--k) * 100%), #eadbc2); }
+.mark { --m: clamp(0, calc((var(--p) - .78) / .2), 1); background: linear-gradient(transparent 58%, #e96b5a40 58%, #e96b5a40 92%, transparent 92%) 0 0 / calc(var(--m) * 100%) 100% no-repeat; }
+
+@media (max-width: 700px) {
+  .word { left: 4%; bottom: 1svh; font-size: 21vw; }
+  .large { left: 24px; right: 24px; top: 5%; width: auto; font-size: 8.4vw; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cover { height: auto; }
+  .anchor { top: 0; }
+  .stage { position: relative; top: auto; height: auto; }
+  .grains, .word, .large { display: none; }
+}

@@ -54,7 +54,7 @@ README는 프로젝트 소개와 개발 안내, 이 문서는 에이전트의 �
   - 1단계(완료, 2026-10-08): 데이터 정리(`data/`), 단계 설정(`data/stages.ts`), 모션 도구(`components/motion/`), 창 내용을 일반 문서 스크롤로 전환(WindowFrame), 창틀 값(`--frame` 1→0)과 헤더 두 상태, 쓰지 않는 옛 컴포넌트 삭제.
   - 3단계(2026-10-13): BUILD 겹치는 프로젝트 전면 패널(아래 "대표 프로젝트"). 상세 페이지 재디자인은 아직.
   - 2단계(2026-10-13): 전체 메뉴 정리(아래 "헤더"의 메뉴 패널). 헤더 자체는 1단계·캡슐(헤더 C) 그대로.
-  - 4단계(2026-10-13): ABSORB 모래알 초상화·큰 문장(AbsorbScenes, 아래 "ABSORB 장면"). 뿌리 전환은 넣지 않음.
+  - 4단계(2026-10-13): ABSORB 표지가 소개 페이지로 바뀌는 장면(AboutCover, 아래 "ABSORB 표지 → 소개"). 뿌리 전환은 넣지 않음.
   - 5단계(2026-10-13): GROW 모래 원(GrowStory, 아래 "GROW 원")과 BLOOM(ContactStory, 아래 "연락처").
   - 다음 후보: 2단계 헤더·전체 메뉴, 4단계 ABSORB(모래알 하프톤, 문장 채움, 취미 가로 띠, 뿌리 전환), 5단계 GROW 원 변형·BLOOM, 6단계 모션 감소판·접근성·성능 점검.
 - 오프닝(히어로, 3D 얼굴, 모래 덮기, 선인장 이야기, 모래 전환)은 그대로 유지합니다.
@@ -76,7 +76,7 @@ components/
 ├─ motion/                 SplitText(글자·단어 쪼개기), RollingWord(글자가 굴러 바뀌는 단어), useScrollDirection
 ├─ stage/                  windowState(지금 단계와 창이 풀렸는지를 헤더 등에 알림)
 ├─ sections/
-│  ├─ AboutStory, AbsorbScenes, HobbyFlow, WorkStory, GrowStory, DesignStory, ContactStory   창 안의 소개·ABSORB 장면·취미, 대표 프로젝트, GROW 원, 디자인, 연락처
+│  ├─ AboutStory, AboutCover, HobbyFlow, WorkStory, GrowStory, DesignStory, ContactStory   창 안의 소개(ABSORB 표지), 취미, 대표 프로젝트, GROW 원, 디자인, 연락처
 │  ├─ hero/                Hero, GrowthScene, HeroAvatar/AvatarCanvas, SandStream
 │  └─ concept/             ConceptScenes, scenes.ts, CactusScene, WindGust, PollenGrow, SandHandoff(모래알 전환), WindowFrame(브라우저 창)
 └─ ui/                     Reveal, ProjectLinks, ProjectTags, CustomCursor
@@ -238,13 +238,16 @@ artifacts/                 사용자에게 보여 줄 시안·승인된 시안(�
 - 밤 위에서는 `html[data-bloom-dark]`로 모바일 떠 있는 헤더가 흰색입니다. 700px 이하는 얼굴 위, 글자 가운데, 선인장 오른쪽 아래.
 - 모션 감소: 한 화면 높이, 완성 상태, 창 막대·모래 없음.
 
-### ABSORB 장면 (AbsorbScenes, 소개 페이지와 취미 사이)
+### ABSORB 표지 → 소개 (AboutCover, 2026-10-13 사용자 제안 순서)
 
-- 두 장면 모두 sticky 무대, 스크롤에 묶임. 소개 페이지와 같은 내용을 다시 보여 주므로 전체가 aria-hidden입니다.
-- 초상화(2.4화면): 프로필 사진을 160px로 한 번 읽어 밝기로 점 크기(간격 PC 10·900px 이하 8·700px 이하 7px)와 모래색 4가지를 정한 격자. 진행 0~0.42 모래알이 왼쪽 아래에서 날아와 왼쪽부터 자리 잡음 → 0.4~0.7 큰 ABSORB.(Pretendard 900, clamp(84px, 21vw, 330px), multiply, 마침표 코랄)가 글자마다 아래에서 올라옴 → 0.8~1 모래알이 오른쪽으로 날아가고 글자가 흐려짐. 넓은 화면은 초상화가 오른쪽, 좁은 화면은 가운데. 마우스 근처 모래알이 밀려납니다. 루프는 장면 근처에서만.
-- 큰 문장(2.2화면): `data/profile.ts`의 `statement`(lines·mark, 소개 페이지와 공유). Pretendard 800 clamp(34px, 5.3vw, 88px), 단어마다 --p(JS)와 --i/--n(CSS)로 모래색 #EADBC2 → #202731로 차오르고, 진행 0.62~0.78 동안 mark 구절 아래 옅은 코랄 형광펜이 그어짐(구절 안 띄어쓰기는 단어 안 줄바꿈 없는 공백이라 형광펜이 이어짐).
-- 모션 감소: 각 한 화면, 완성 상태(초상화 + ABSORB., 진한 문장 + 형광펜).
-- 성능(2026-10-13 점검): 사진 배경의 연한 모래알은 3개 중 1개만, 반지름 1.6px 미만은 사각형으로 그립니다. 모래알이 다 자리 잡은 구간(0.42~0.8)에 포인터가 근처에 없으면 미리 그린 완성 그림을 붙이고, 움직임이 멈추면 루프가 쉽니다. 휴대폰은 날아오는 동안 연한 모래알을 절반만 그립니다.
+- 창의 첫 파트 맨 앞. 소개 페이지 자체(section, `data-page`)가 3페이지 높이 트랙 안에서 창 크롬 아래에 고정(sticky top var(--chrome), 높이 var(--page-h))된 채 스크롤 진행 c(0→1)에 따라 바뀝니다. 이전의 따로 있던 초상화·큰 문장 장면(AbsorbScenes)은 없앴습니다(소개 문장이 한 번만, 페이지 약 2.2화면 짧아짐).
+- c=0: 오른쪽에 모래알 프로필 초상화(PC는 높이 가득, 700px 이하는 아래쪽 62%), 아래에 큰 ABSORB.(Pretendard 900, multiply, 코랄 마침표). 오프닝 모래 전환(SandHandoff)이 창 첫 파트의 캔버스도 읽으므로 선인장 모래알이 이 초상화와 ABSORB.로 모입니다(숨김 글자 `.sr-only`와 visibility hidden 요소는 읽지 않음).
+- 0.04~0.34: 왼쪽 위 큰 문장(장식 복제본, aria-hidden, Pretendard 800 clamp(34px, 4.4vw, 72px), 폭 min(46%, 640px), 모바일 8.4vw)이 단어마다 모래색→잉크로 차오르고 끝에 형광펜.
+- 0.5~0.8: 모래알이 소개 페이지 사진 칸(object-fit cover, 50% 30% 기준)으로 모이며 작아짐, ABSORB.가 아래로 가라앉음(0.5~0.7), 큰 문장이 실제 문장 첫 줄 자리로 날아가며 글자 크기 비율만큼 줄어듦(위치는 상자 + 반행간으로 계산, 소개 등장 애니메이션 영향 없음). 0.74~0.84 실제 사진이 나타나고 0.76~0.8 큰 문장이 실제 문장으로 바뀜, 0.8~0.88 캔버스 사라짐, 0.78~0.92 이름·자격증·교육·기술 띠가 차례로 올라옴.
+- 움직이는 요소: `data-cover-photo`(사진 칸), `data-cover-statement`(문장), `data-cover-rest`(나머지). 숨은 동안은 visibility hidden.
+- #about은 트랙 1.9페이지 지점 표시라 메뉴로 오면 완성된 소개 페이지(c=0.95)에 도착합니다.
+- 모래알 성능 처리는 이전과 같음(연한 배경 알갱이 1/3, 작은 알갱이는 사각형, 모이기 전에는 미리 그린 그림을 붙이고 바뀔 때만 다시 그림).
+- 모션 감소: 표지 없이 소개 페이지만.
 
 ### 커스텀 커서 (CustomCursor)
 

@@ -3,7 +3,7 @@ import type { CSSProperties } from "react";
 import Reveal from "@/components/ui/Reveal";
 import { profile, vlog } from "@/data/profile";
 import HobbyFlow from "@/components/sections/HobbyFlow";
-import AbsorbScenes from "@/components/sections/AbsorbScenes";
+import AboutCover from "@/components/sections/AboutCover";
 import { skills } from "@/data/skills";
 import styles from "./AboutStory.module.css";
 
@@ -22,17 +22,18 @@ export default function AboutStory() {
   const educationAt = certificates.length ? 700 : 480;
   return (
     <div className={styles.page}>
-      <section id="about" aria-labelledby="about-title" className={styles.section} data-page>
+      {/* ABSORB. cover → the about page (AboutCover pins it and builds it up from the sand portrait). */}
+      <AboutCover className={styles.section} labelledBy="about-title">
         <h2 id="about-title" className="sr-only">소개</h2>
         <div className={styles.inner}>
           <div className={styles.profile}>
             <div className={styles.card}>
-              <figure className={styles.portrait}>
+              <figure className={styles.portrait} data-cover-photo>
                 {profile.photo
                   ? <Image src={profile.photo} alt={`${profile.name} 프로필 사진`} fill sizes="(min-width: 900px) 300px, 120px" className={styles.photo} unoptimized />
                   : <div className={styles.placeholder} role="img" aria-label="프로필 사진 등록 예정"><span aria-hidden="true">HJ.</span><small>사진 준비 중</small></div>}
               </figure>
-              <div className={styles.identity}>
+              <div className={styles.identity} data-cover-rest>
                 <p className={`${styles.name} ${styles.rise}`} style={delay(380)}>{profile.name}<span className={styles.nameEn} lang="en"> / Beak hyeon jeong</span></p>
                 {/* [수정 예정] temporary example values */}
                 <p className={`${styles.role} ${styles.rise}`} style={delay(460)}>2000년생</p>
@@ -42,15 +43,15 @@ export default function AboutStory() {
             </div>
             <div className={styles.info}>
               {/* Each line slides up out of its own mask; the highlighter stroke draws in after. */}
-              <p className={styles.statement}>
+              <p className={styles.statement} data-cover-statement>
                 {profile.statement.lines.map((line, i) => {
                   const [before, after] = profile.statement.mark && line.includes(profile.statement.mark) ? line.split(profile.statement.mark) : [line];
                   return <span key={line} className={styles.line}><span style={delay(160 + i * 120)}>{before}{after !== undefined && <><mark className={styles.mark}>{profile.statement.mark}</mark>{after}</>}</span></span>;
                 })}
               </p>
-              {profile.introduction && <p className={`${styles.introduction} ${styles.rise}`} style={delay(420)}>{profile.introduction}</p>}
+              {profile.introduction && <p className={`${styles.introduction} ${styles.rise}`} style={delay(420)} data-cover-rest>{profile.introduction}</p>}
               {/* Certificates and education side by side (stacked on narrower screens). */}
-              <div className={styles.lists}>
+              <div className={styles.lists} data-cover-rest>
               {certificates.length > 0 && <div className={styles.group}>
                 <h3 className={`${styles.groupTitle} ${styles.rise}`} style={delay(480)}>자격증</h3>
                 <ul className={styles.rows} style={delay(520)}>
@@ -69,7 +70,7 @@ export default function AboutStory() {
         </div>
         {/* Skills: icons drift left in an endless loop at the bottom of the about page. The second copy only closes
             the loop, so screen readers get the list once. */}
-        <div className={`${styles.marquee} ${styles.rise}`} style={delay(1000)}>
+        <div className={`${styles.marquee} ${styles.rise}`} style={delay(1000)} data-cover-rest>
           <div className={styles.track}>
             {[0, 1].map(copy => (
               <ul key={copy} className={styles.skillGroup} aria-label={copy ? undefined : "학습·사용 기술"} aria-hidden={copy ? true : undefined}>
@@ -83,9 +84,7 @@ export default function AboutStory() {
             ))}
           </div>
         </div>
-      </section>
-      {/* ABSORB.: the portrait as sand grains with the big word, then the sentence in large type (AbsorbScenes). */}
-      <AbsorbScenes />
+      </AboutCover>
       {/* Hobbies: hover/focus/touch selects content in the left preview (HobbyFlow). */}
       <HobbyFlow />
       {/* Vlog: one 16:9 video sized to fit the window page; hidden until a video file is added (data/profile.ts). */}

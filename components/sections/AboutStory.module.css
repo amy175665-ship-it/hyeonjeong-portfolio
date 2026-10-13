@@ -3,7 +3,7 @@
 .page { --bg: #fcfcfb; --ink: #202731; --muted: #58636e; --line: #e6e6e2; --coral: #e96b5a; --sand: #e3bf91; background: var(--bg); color: var(--ink); }
 .section { padding: 44px 40px; }
 /* The about page starts at the top of its window page instead of floating in the middle. */
-.page > .section[data-page] { justify-content: flex-start; }
+.page .section[data-page] { justify-content: flex-start; }
 /* A little wider than the other window pages (1120px) and centred in the window; the portrait, gap and type grow with
    the screen width. */
 /* Auto block margins split the page's spare height above and below the profile, instead of leaving it all in one
@@ -167,5 +167,5 @@
 
 /* Desktop: the window pages' side padding follows the header's (4.2%), so the content lines up with the window
    buttons and the menu button above it. */
-@media (min-width: 900px) { .page > .section[data-page] { padding-inline: max(40px, 4.2vw); } }
+@media (min-width: 900px) { .page .section[data-page] { padding-inline: max(40px, 4.2vw); } }
 @media (min-width: 900px) { .marquee { margin-inline: calc(-1 * max(40px, 4.2vw)); } }

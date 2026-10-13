@@ -57,7 +57,8 @@ export default function SandHandoff({ raise, sources, target, enabled }: Props) 
     canvas.height = height;
     const from = scan(width, height, ctx => sources().forEach(element => element instanceof HTMLCanvasElement ? drawCanvas(ctx, element) : drawText(ctx, element)), false);
     const root = target();
-    const to = scan(width, height, ctx => { if (root) { drawImages(ctx, root, width, height); drawText(ctx, root); } }, true);
+    // The page side: its canvases (the about cover's sand portrait), images and text, as they are on screen.
+    const to = scan(width, height, ctx => { if (root) { root.querySelectorAll("canvas").forEach(element => drawCanvas(ctx, element)); drawImages(ctx, root, width, height); drawText(ctx, root); } }, true);
     grains.current = from.length && to.length ? pair(from, to, width, height) : [];
     image.current = canvas.getContext("2d")?.createImageData(width, height) ?? null;
   };
@@ -184,7 +185,8 @@ function drawText(ctx: CanvasRenderingContext2D, element: Element) {
   ctx.textBaseline = "alphabetic";
   for (let node = walker.nextNode(); node; node = walker.nextNode()) {
     const text = node.textContent ?? "", parent = node.parentElement;
-    if (!parent || !text.trim()) continue;
+    // Skip text that is only there for screen readers (visually hidden).
+    if (!parent || !text.trim() || parent.closest(".sr-only")) continue;
     const style = getComputedStyle(parent);
     if (style.display === "none" || style.visibility === "hidden") continue;
     ctx.font = `${style.fontStyle} ${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
