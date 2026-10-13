@@ -40,7 +40,10 @@ export default function AbsorbScenes() {
     let lum: Uint8ClampedArray | null = null, lumW = 0, lumH = 0, ratio = 0.73;
     let W = 0, H = 0, sp = 10, cols = 0, rows = 0, phone = false;
     let ox = new Float32Array(0), oy = ox, scatterX = ox, scatterY = ox, lag = ox, size = ox, band = new Uint8Array(0);
-    let frame = 0, alive = true;
+    let drawn = new Uint32Array(0); // grains that are drawn: all but two in three of the faint background ones
+    let frame = 0, alive = true, lastP = -1, moved = true, calm = true;
+    // The settled portrait (every grain in place), drawn once per setup and pasted while nothing moves.
+    const settled = document.createElement("canvas");
 
     // Lightness (0..1) of the photo at a point given in photo-relative coordinates.
     const lightAt = (u: number, v: number) => {
@@ -56,11 +59,12 @@ export default function AbsorbScenes() {
       const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
       paper.width = Math.round(W * dpr); paper.height = Math.round(H * dpr);
       g.setTransform(dpr, 0, 0, dpr, 0, 0);
-      sp = phone ? 7 : W > 900 ? 10 : 8;
+      sp = phone ? 8 : W > 900 ? 10 : 8;
       cols = Math.ceil(W / sp) + 1; rows = Math.ceil(H / sp) + 1;
       const n = cols * rows, sw = H * ratio, x0 = sw >= W ? (W - sw) / 2 : (W - sw) * 0.9;
       ox = new Float32Array(n); oy = new Float32Array(n); scatterX = new Float32Array(n); scatterY = new Float32Array(n);
       lag = new Float32Array(n); size = new Float32Array(n); band = new Uint8Array(n);
+      const keep: number[] = [];
       let seed = 3;
       const random = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
       for (let j = 0; j < rows; j++) for (let i = 0; i < cols; i++) {
@@ -71,39 +75,66 @@ export default function AbsorbScenes() {
         // Blown in from the left and below; the left side settles first.
         scatterX[k] = -(0.3 + random() * 0.9) * W; scatterY[k] = (random() - 0.3) * H * 0.8;
         lag[k] = (x / W) * 0.6 + random() * 0.4;
+        if (dark >= 0.14 || k % 3 === 0) keep.push(k);
       }
+      drawn = Uint32Array.from(keep);
+      lastP = -1;
+      settled.width = paper.width; settled.height = paper.height;
+      const sg = settled.getContext("2d");
+      if (sg) { sg.setTransform(dpr, 0, 0, dpr, 0, 0); fillGrains(sg, k => [gridX(k), gridY(k)]); }
     };
 
-    // p: the pinned portrait scene, 0 → 1.
-    const paint = (p: number) => {
+    const gridX = (k: number) => { const i = k % cols, j = (k - i) / cols; return i * sp + (j % 2 ? sp / 2 : 0); };
+    const gridY = (k: number) => ((k - (k % cols)) / cols) * sp;
+    // Draws the kept grains where `at` puts them (null skips a grain), one path per sand colour.
+    const fillGrains = (target: CanvasRenderingContext2D, at: (k: number) => [number, number] | null) => {
       const paths = SAND.map(() => new Path2D());
-      for (let j = 0; j < rows; j++) for (let i = 0; i < cols; i++) {
-        const k = j * cols + i;
-        let x = i * sp + (j % 2 ? sp / 2 : 0), y = j * sp;
-        if (!still) {
+      for (let n = 0; n < drawn.length; n++) {
+        const k = drawn[n], point = at(k);
+        if (!point) continue;
+        const [x, y] = point, r = size[k];
+        if (x < -10 || x > W + 10 || y < -10 || y > H + 10) continue;
+        // Small grains as squares: the same at that size and much cheaper to fill than arcs.
+        if (r < 1.6) paths[band[k]].rect(x - r, y - r, r * 2, r * 2);
+        else { paths[band[k]].moveTo(x + r, y); paths[band[k]].arc(x, y, r, 0, Math.PI * 2); }
+      }
+      target.clearRect(0, 0, W, H);
+      paths.forEach((path, i) => { target.fillStyle = SAND[i]; target.fill(path); });
+    };
+
+    // p: the pinned portrait scene, 0 → 1. Returns whether the grains are still moving (easing back from the pointer).
+    const paint = (p: number) => {
+      const near = pointer.x > -150 && pointer.x < W + 150 && pointer.y > -150 && pointer.y < H + 150;
+      let stirring = false;
+      // Every grain is in place between the fly-in and the blow-away; with no pointer about, paste the settled image.
+      if (still || (p >= 0.42 && p <= 0.8 && calm && !near)) {
+        g.clearRect(0, 0, W, H);
+        g.drawImage(settled, 0, 0, W, H);
+      } else {
+        // Phones draw every other light grain while they fly (the settled image has them all).
+        fillGrains(g, k => {
+          if (phone && band[k] < 2 && k % 2) return null;
           const come = easeInOut(clamp((ramp(p, 0, 0.42) - lag[k] * 0.4) / 0.6));
           const go = easeInOut(clamp((ramp(p, 0.8, 1) - (1 - lag[k]) * 0.3) / 0.7));
-          x += scatterX[k] * (1 - come) + (W * 0.9 + lag[k] * W * 0.5) * go;
-          y += scatterY[k] * (1 - come) - lag[k] * H * 0.3 * go;
+          const x = gridX(k) + scatterX[k] * (1 - come) + (W * 0.9 + lag[k] * W * 0.5) * go;
+          const y = gridY(k) + scatterY[k] * (1 - come) - lag[k] * H * 0.3 * go;
           // The pointer pushes grains aside; they ease back.
           let tx = 0, ty = 0;
           const dx = x - pointer.x, dy = y - pointer.y, d = Math.hypot(dx, dy), reach = phone ? 70 : 110;
           if (d < reach && d > 0.01) { const push = Math.pow(1 - d / reach, 2) * (phone ? 22 : 34); tx = (dx / d) * push; ty = (dy / d) * push; }
           ox[k] += (tx - ox[k]) * 0.16; oy[k] += (ty - oy[k]) * 0.16;
-          x += ox[k]; y += oy[k];
-        }
-        if (x < -10 || x > W + 10 || y < -10 || y > H + 10) continue;
-        const r = size[k];
-        paths[band[k]].moveTo(x + r, y); paths[band[k]].arc(x, y, r, 0, Math.PI * 2);
+          if (Math.abs(tx - ox[k]) + Math.abs(ty - oy[k]) > 0.1) stirring = true;
+          return [x + ox[k], y + oy[k]];
+        });
+        calm = !stirring && !near;
       }
-      g.clearRect(0, 0, W, H);
-      paths.forEach((path, i) => { g.fillStyle = SAND[i]; g.fill(path); });
-      if (still) return;
+      if (still) return false;
       chars.forEach((char, i) => {
         const k = easeOut(ramp(p, 0.4 + i * 0.03, 0.6 + i * 0.03)), leave = ramp(p, 0.85, 1);
         char.style.transform = `translateY(${((1 - k) * 105).toFixed(1)}%)`;
         char.style.opacity = (k > 0 ? 1 - leave : 0).toFixed(3);
       });
+      return stirring;
     };
 
     const progress = (element: HTMLElement) => {
@@ -114,9 +145,11 @@ export default function AbsorbScenes() {
       frame = 0;
       const shot = progress(root), text = progress(sentence);
       sentence.style.setProperty("--p", text.p.toFixed(4));
-      // Grains ease toward their places every frame, so this keeps going while the portrait is near the screen.
-      if (shot.top < window.innerHeight * 1.5 && shot.bottom > -window.innerHeight * 0.5) {
-        paint(shot.p);
+      // While the portrait is near the screen, redraw as long as something changes (scroll, pointer, grains easing
+      // back); once all is still the loop stops until the next scroll or pointer move.
+      if (shot.top < window.innerHeight * 1.5 && shot.bottom > -window.innerHeight * 0.5 && (moved || shot.p !== lastP)) {
+        moved = paint(shot.p);
+        lastP = shot.p;
         frame = requestAnimationFrame(loop);
       }
     };
@@ -125,6 +158,8 @@ export default function AbsorbScenes() {
       if (event.pointerType !== "mouse") return;
       const rect = paper.getBoundingClientRect();
       pointer.x = event.clientX - rect.left; pointer.y = event.clientY - rect.top;
+      moved = true;
+      wake();
     };
 
     // The photo (already loaded by the about page) is read once, small, for its lightness.

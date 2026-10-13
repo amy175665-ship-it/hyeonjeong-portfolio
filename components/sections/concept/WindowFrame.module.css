@@ -95,6 +95,7 @@
 }
 @media (max-width: 1023px) {
   .window { --chrome: 120px; }
+  .window[data-frame-gone] .bar { visibility: hidden; }
   .bar { top: calc(var(--frame) * 84px); left: calc(var(--frame) * 8px); right: calc(var(--frame) * 8px); height: 36px; padding: 0 12px; border-radius: calc(var(--frame) * 11px) calc(var(--frame) * 11px) 0 0; transform: translateY(calc((var(--frame) - 1) * 300%)); }
   .dots { gap: 7px; }
   .dots > * { width: 12px; height: 12px; }

@@ -88,6 +88,9 @@ export default function WindowFrame({ rise, clip, barIn, pageIn, upAt, onNavigat
     box.style.clipPath = handoff !== "none" ? handoff : frameClip(frame);
     box.toggleAttribute("data-hidden", handoff === HIDDEN);
     const floating = up >= 1 && frame < 0.5;
+    // Phones: once the frame has dissolved its title bar is gone (the header holds the menu), so its buttons and tabs
+    // leave the tab order too (CSS).
+    box.toggleAttribute("data-frame-gone", up >= 1 && frame < 0.02);
     document.documentElement.toggleAttribute("data-window-up", up > upAt && !floating);
     setWindowState({ floating });
     // Keep the opening visible; after release, require 12px in one direction to change the capsule.

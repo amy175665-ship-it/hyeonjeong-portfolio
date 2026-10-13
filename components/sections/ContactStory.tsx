@@ -49,22 +49,19 @@ export default function ContactStory() {
   const story = useMotionValue(OPEN);
   const wind = useRef<Wind>({ value: 0 });
   const [near, setNear] = useState(false);
-  const [active, setActive] = useState(false);
-  const [reduced, setReduced] = useState(false);
 
   useEffect(() => {
     const root = section.current, box = stage.current;
     if (!root || !box) return;
     const still = matchMedia("(prefers-reduced-motion: reduce)").matches;
-    setReduced(still);
     let shown = false, running = false;
 
     const paint = () => {
       const rect = root.getBoundingClientRect(), H = box.offsetHeight, W = box.offsetWidth;
-      // The 3D views mount once the part comes near and render only while it is on screen.
+      // The 3D views mount once the part comes near; the face renders only while the part is on screen.
       const close = rect.top < H * 1.5 && rect.bottom > -H * 0.5;
       if (close && !shown) { shown = true; setNear(true); }
-      if (close !== running) { running = close; setActive(close); face.current?.toggleAttribute("data-paused", !close); }
+      if (close !== running) { running = close; face.current?.toggleAttribute("data-paused", !close); }
       if (still) return;
       // enter: the night circle opens while the part scrolls in; b: the pinned part (0 → 1).
       const enter = clamp(1 - rect.top / H), b = clamp(-rect.top / Math.max(root.offsetHeight - H, 1));
@@ -114,7 +111,8 @@ export default function ContactStory() {
           <span className={styles.glow} />
         </div>
         <div className={styles.cactus} aria-hidden="true">
-          {near && <CactusScene progress={story} wind={wind} reduced={reduced} running={active && !reduced} />}
+          {/* No wind here: drawn on demand, only when the bloom progress changes (reduced = built, still). */}
+          {near && <CactusScene progress={story} wind={wind} reduced running={false} />}
         </div>
         <div ref={face} className={styles.face} data-pause-scope role="img" aria-label="백현정의 3D 얼굴">
           {near && <AvatarCanvas />}

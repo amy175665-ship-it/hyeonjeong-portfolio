@@ -22,7 +22,8 @@ export default function AboutStory() {
   const educationAt = certificates.length ? 700 : 480;
   return (
     <div className={styles.page}>
-      <section id="about" aria-label="소개" className={styles.section} data-page>
+      <section id="about" aria-labelledby="about-title" className={styles.section} data-page>
+        <h2 id="about-title" className="sr-only">소개</h2>
         <div className={styles.inner}>
           <div className={styles.profile}>
             <div className={styles.card}>

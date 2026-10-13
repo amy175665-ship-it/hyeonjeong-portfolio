@@ -61,7 +61,8 @@ export default function HobbyFlow() {
       <span className={styles.title} lang="en">{item.title}</span>
     </button>;
   };
-  return <section ref={wrap} aria-label="취미" className={styles.hobbies} data-page>
+  return <section ref={wrap} aria-labelledby="hobby-title" className={styles.hobbies} data-page>
+    <h2 id="hobby-title" className="sr-only">취미</h2>
     <div className={styles.grid} data-count={hobbies.length}>
       <div className={styles.previewWrap}>
         <div id="hobby-preview" role="region" aria-label={hobby.title}
