@@ -7,7 +7,7 @@ import { useMotionValue } from "framer-motion";
 import { iconPaths } from "@/components/layout/SiteFooter";
 import { contact } from "@/data/contact";
 import { navProfile } from "@/data/navigation";
-import logoImage from "@/public/images/logo/logo.png";
+import logoImage from "@/public/images/logo/logo.webp";
 import type { Wind } from "@/components/sections/concept/scenes";
 import styles from "./ContactStory.module.css";
 

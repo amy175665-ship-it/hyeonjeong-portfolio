@@ -149,7 +149,7 @@ artifacts/                    시안과 승인된 시안(사진·영상은 git �
 | 수정 항목 | 위치 |
 | --- | --- |
 | 메뉴 이름·링크 | `data/navigation.ts` |
-| 로고 이미지 | `public/images/logo/logo.png` |
+| 로고 이미지 | `public/images/logo/logo.webp` (원본 `assets/logo/logo.png`) |
 | 첫 화면 세 단어·색 | `components/sections/hero/GrowthScene.tsx`, `GrowthScene.module.css` |
 | 3D 얼굴 모델 | `public/models/avatar6.glb` (압축 변환본 1.3MB, 원본·변환 스크립트는 `assets/models/`) |
 | 컨셉 장면 문구 | `components/sections/concept/ConceptScenes.tsx` |

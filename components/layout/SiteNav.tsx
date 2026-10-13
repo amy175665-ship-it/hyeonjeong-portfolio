@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import Image from "next/image";
-import logoImage from "@/public/images/logo/logo.png";
+import logoImage from "@/public/images/logo/logo.webp";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { navLinks, navCta, navProfile } from "@/data/navigation";

@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import Image from "next/image";
 import { useMotionValueEvent, type MotionValue } from "framer-motion";
-import logoImage from "@/public/images/logo/logo.png";
+import logoImage from "@/public/images/logo/logo.webp";
 import { scrollToY } from "@/components/layout/scrollLock";
 import { setWindowState, useWindowState } from "@/components/stage/windowState";
 import { navCta, navLinks, navProfile } from "@/data/navigation";

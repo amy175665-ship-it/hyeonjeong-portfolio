@@ -7,7 +7,7 @@ README는 프로젝트 소개와 개발 안내, 이 문서는 에이전트의 �
 ## 1. 기본 원칙
 
 - 작업 경험, 교육 이력, 자격증, 연락처, 프로젝트 성과, 숙련도를 임의로 만들지 않습니다.
-- 메인 프로젝트 3개(HODUIT·JAJAK·DEEPFINE COPY, 2026-10-13 사용자 결정)·사이드 프로젝트 4개(MORPH·NODE·CHAMVERSE·UI LAB)는 이름·기술·개인/팀·한 줄 성격만 사용자 자료에서 넣었고 화면·주소·상세 내용은 아직이라 `placeholder: true`("작성 예시")입니다. 설명 문구는 사용자 확인 전 초안입니다. 소개의 생년월일·교육·자격증은 자리 표시입니다(소개 항목은 `[수정 예정]`을 붙인 가상의 예시, `data/profile.ts`의 profile). 실제 자료 등록은 사용자가 요청할 때 진행하며, 그 전까지 `placeholder` 표시와 "작성 예시" 문구를 유지합니다. 프로필 사진은 등록되어 있습니다(`public/images/profile/profile-front.webp`, 1075×1463 WebP, 사용자 제공. `assets/`에 원본은 없음).
+- 메인 프로젝트 3개(HODUIT·JAJAK·DEEPFINE COPY, 2026-10-13 사용자 결정)·사이드 프로젝트 4개(MORPH·NODE·CHAMVERSE·UI LAB)는 이름·기술·개인/팀·한 줄 성격만 사용자 자료에서 넣었고 화면·주소·상세 내용은 아직이라 `placeholder: true`("작성 예시")입니다. 설명 문구는 사용자 확인 전 초안입니다. 소개의 생년월일·교육·자격증은 자리 표시입니다(소개 항목은 `[수정 예정]`을 붙인 가상의 예시, `data/profile.ts`의 profile). 실제 자료 등록은 사용자가 요청할 때 진행하며, 그 전까지 `placeholder` 표시와 "작성 예시" 문구를 유지합니다. 프로필 사진은 등록되어 있습니다(`public/images/profile/profile-front.webp`, 720×980 WebP 61KB, 사용자 제공 원본 1075×1463 2MB는 `assets/profile/`).
 - 사용자가 디자인만 요청하면 기존 문구·데이터·링크 목적지를 보존합니다.
 - 외부 링크는 값이 있을 때만 표시하고, 확인용 가짜 주소를 넣지 않습니다.
 - 화면에 넣는 문구는 사용자가 정했거나 이미 있는 문구를 씁니다. 새 문구가 필요하면 후보를 제안하고 확인받습니다.
@@ -141,7 +141,7 @@ artifacts/                 사용자에게 보여 줄 시안·승인된 시안(�
 
 ### 헤더 (SiteNav)
 
-- 가운데 선인장 로고(`public/images/logo/logo.png`, 76px, 홈 링크)와 오른쪽 햄버거 버튼만 둡니다. 메뉴는 전체 화면 패널로 열립니다. 햄버거 막대는 PC 44×4px·간격 18px, 1023px 이하는 세 줄 22×2px·간격 6px, 진한 갈색 #5B3F2A(사용자 제안), 버튼 44px, 로고 64px(짧은 두 줄은 "="처럼 보여 깨진 듯했고, 둥근 흰 버튼도 별로라 바꿈). 가운데 막대(`.barMiddle`)는 모바일에서만 보이고 열면 사라짐. 크기는 `.toggle`의 `--bar-*` 변수로 바꾸며 열림 ×는 이 값으로 계산됩니다.
+- 가운데 선인장 로고(`public/images/logo/logo.webp` 320×275 투명 WebP 25KB, 원본 `assets/logo/logo.png` 1353×1162 1.4MB, 76px, 홈 링크)와 오른쪽 햄버거 버튼만 둡니다. 메뉴는 전체 화면 패널로 열립니다. 햄버거 막대는 PC 44×4px·간격 18px, 1023px 이하는 세 줄 22×2px·간격 6px, 진한 갈색 #5B3F2A(사용자 제안), 버튼 44px, 로고 64px(짧은 두 줄은 "="처럼 보여 깨진 듯했고, 둥근 흰 버튼도 별로라 바꿈). 가운데 막대(`.barMiddle`)는 모바일에서만 보이고 열면 사라짐. 크기는 `.toggle`의 `--bar-*` 변수로 바꾸며 열림 ×는 이 값으로 계산됩니다.
 - 로고 호버: 0.62초 동안 두 번 흔들리는 종 모션(Web Animations API, 재생 중 재호버 무시, 터치·모션 감소 제외).
 - 헤더 두 상태(1단계): PC에서는 창 안에 있는 동안(소개부터 끝까지) 늘 창의 떠 있는 캡슐(로고·탭)이 헤더이고 사이트 헤더는 숨습니다(창이 브라우저 창 모습일 때 `data-window-up`, 풀린 뒤 `.floating`). 아래 떠 있는 헤더 설명은 모바일(1023px 이하)에만 해당합니다(모바일은 창 모습일 때 로고가 카드 위에 남음). 창이 전면으로 풀리면(WindowFrame이 `components/stage/windowState`에 floating을 알림) 헤더가 페이지 위에 떠서 햄버거 왼쪽에 지금 단계 단어(ABSORB./BUILD./GROW./BLOOM., `RollingWord`로 글자가 굴러 바뀜, 장식이라 aria-hidden)를 보이고, 아래로 스크롤하면 위로 숨었다가(`.tucked`) 위로 스크롤하면 돌아옵니다(`useScrollDirection`). `windowState.immersive`일 때 숨기는 처리는 남아 있지만 현재 취미는 이 상태를 설정하지 않습니다. 메뉴가 열려 있으면 숨지 않습니다. 이전의 흰 반투명 헤더 배경(`data-header-solid`)은 없앴습니다. 전체 메뉴 재디자인은 2단계입니다.
 - 메뉴 패널: 링크에 마우스를 올리면 로고 아래 가운데에서 모래알 줄기(`MenuSand`, 캔버스, 글자 뒤, 폭 약 7px, 알갱이 2~3.6px, 모래색 4가지)가 일직선으로 떨어져 그 메뉴 글자 아랫선(글자 박스 아래 − 글꼴 크기×0.24)에서 사라집니다. 떼면 새로 떨어지지 않고 떨어지던 것만 마저 내려갑니다. 시간 기준이라 프레임이 느려도 같은 속도. 마우스에서만, 모션 감소 시 없음. 링크 호버 밑줄은 사용자 요청으로 없앴습니다. 호버·키보드 포커스한 메뉴 글자 발치에는 모래 더미 이미지(`public/images/effects/sand-mound.webp`, 900×163, 원본 `assets/effects/sand-mound.png` 2172×724를 투명 여백 잘라 변환)가 모든 메뉴에서 같은 크기(6.5em, 1440에서 312px)로 글자 뒤에서 아랫부분과 조금 겹치며 위로 자라듯(0.45초) 나타나, 떨어지는 모래가 그 위에 쌓이는 모양이 됩니다. 원본 가장자리의 노랑·빨강 번짐은 밝은 배경에서는 보이지 않아 손대지 않았습니다.
@@ -150,7 +150,7 @@ artifacts/                 사용자에게 보여 줄 시안·승인된 시안(�
 
 ### 히어로 (Hero, GrowthScene, HeroAvatar, SandStream)
 
-- 배경: `public/images/hero/hero-sunlight-bg.webp`(center/cover). GrowthScene이 햇살·그림자 장식을 더합니다.
+- 배경: `public/images/hero/hero-sunlight-bg.webp`(1956×804 WebP 29KB, center/cover. 이전 파일은 확장자만 webp인 PNG 1MB였고 원본은 `assets/hero/hero-sunlight-bg.png`). GrowthScene이 햇살·그림자 장식을 더합니다.
 - 3D 얼굴: AvatarCanvas가 React Three Fiber로 `public/models/avatar6.glb`를 표시합니다. 이 파일은 원본 `assets/models/avatar6.glb`(23.5MB)를 `assets/models/optimize-glb.mjs`로 줄인 1.3MB 변환본입니다(중복 검은 머리 `Hair_Web.001`·안 쓰는 꼭짓점 색/UV 제거, 질감 WebP·모자 천 512px, meshopt 압축. 전후 화면 차이 평균 0.6/255). 원본으로 되돌려도 되도록 코드는 `Hair_Web.001`을 계속 숨깁니다. 모델을 교체하면 스크립트로 다시 변환합니다. 마우스를 따라 회전하고, 1.8초 동안 움직임이 없으면 대기 모션(IDLE_MOTION)으로 바뀝니다. 터치 기기(`(hover: none), (pointer: coarse)`)는 마우스 반응이 없으므로 처음부터 더 큰 모션(TOUCH_MOTION: 좌우 돌아보기 ±0.34rad, 끄덕임, 갸웃, 위아래 0.09)을 씁니다. 모델 로드 후 0.8초 쉬었다가 1.8초 동안 나타납니다.
 - PC 타이포(1024px 이상, GrowthScene): ABSORB.(왼쪽 위 -7deg) / BUILD.(중앙 -3deg) / GROW.(왼쪽 아래, bottom 26%, BUILD. top 31%) 비대칭 배치. 보이는 너비 비율은 약 GROW. 100 / ABSORB. 70 / BUILD. 40입니다. 1024px 미만에서는 숨기고 얼굴 중심 화면을 씁니다. 실제 h1은 시각적으로 숨긴 채 유지합니다.
 - 글자 색: 기본 #202731, ABSORB.의 A·마침표 코랄, BUILD.의 U·마침표 초록, GROW.의 G·마침표 노랑(`:where`로 우선순위를 낮춤).
