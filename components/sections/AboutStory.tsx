@@ -3,6 +3,7 @@ import type { CSSProperties } from "react";
 import Reveal from "@/components/ui/Reveal";
 import { profile, vlog } from "@/data/profile";
 import HobbyFlow from "@/components/sections/HobbyFlow";
+import AbsorbScenes from "@/components/sections/AbsorbScenes";
 import { skills } from "@/data/skills";
 import styles from "./AboutStory.module.css";
 
@@ -41,8 +42,10 @@ export default function AboutStory() {
             <div className={styles.info}>
               {/* Each line slides up out of its own mask; the highlighter stroke draws in after. */}
               <p className={styles.statement}>
-                <span className={styles.line}><span style={delay(160)}>안녕하세요, 새로운 환경에 금방 적응해</span></span>
-                <span className={styles.line}><span style={delay(280)}><mark className={styles.mark}>결과로 증명하는</mark> 백현정입니다.</span></span>
+                {profile.statement.lines.map((line, i) => {
+                  const [before, after] = profile.statement.mark && line.includes(profile.statement.mark) ? line.split(profile.statement.mark) : [line];
+                  return <span key={line} className={styles.line}><span style={delay(160 + i * 120)}>{before}{after !== undefined && <><mark className={styles.mark}>{profile.statement.mark}</mark>{after}</>}</span></span>;
+                })}
               </p>
               {profile.introduction && <p className={`${styles.introduction} ${styles.rise}`} style={delay(420)}>{profile.introduction}</p>}
               {/* Certificates and education side by side (stacked on narrower screens). */}
@@ -80,6 +83,8 @@ export default function AboutStory() {
           </div>
         </div>
       </section>
+      {/* ABSORB.: the portrait as sand grains with the big word, then the sentence in large type (AbsorbScenes). */}
+      <AbsorbScenes />
       {/* Hobbies: hover/focus/touch selects content in the left preview (HobbyFlow). */}
       <HobbyFlow />
       {/* Vlog: one 16:9 video sized to fit the window page; hidden until a video file is added (data/profile.ts). */}

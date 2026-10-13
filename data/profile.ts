@@ -3,6 +3,9 @@ export type Profile = {
   birth?: string;
   photo?: string;
   introduction?: string;
+  // The about sentence, one entry per line; `mark` is the highlighted phrase. Shown small on the about page and large
+  // in the ABSORB statement scene.
+  statement: { lines: string[]; mark?: string };
   // period / date: shown as the muted note after the item (e.g. "2025.01 ~ 2025.06").
   education: { year: string; school: string; program: string; status: "수료" | "졸업" | "재학"; period?: string }[];
   certificates?: { year: string; name: string; issuer: string; date?: string }[];
@@ -14,6 +17,7 @@ export const profile: Profile = {
   name: "백현정",
   birth: "[수정 예정]",
   photo: "/images/profile/profile-front.webp",
+  statement: { lines: ["안녕하세요, 새로운 환경에 금방 적응해", "결과로 증명하는 백현정입니다."], mark: "결과로 증명하는" },
   education: [
     { year: "2025", school: "OO아카데미", program: "UI/UX 반응형 웹디자인 & 웹퍼블리셔 양성과정 [수정 예정]", status: "수료", period: "2025.01 ~ 2025.06" },
     { year: "2024", school: "OO온라인캠프", program: "웹퍼블리싱 기초 [수정 예정]", status: "수료", period: "2024.11 ~ 2024.12" },
