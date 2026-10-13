@@ -20,17 +20,11 @@ const clamp = (value: number) => Math.min(Math.max(value, 0), 1);
 const ramp = (value: number, from: number, to: number) => clamp((value - from) / (to - from));
 const lerp = (from: number, to: number, t: number) => from + (to - from) * t;
 const easeInOut = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
-// The large sentence breaks by meaning: each line of the statement is split after a comma and after the highlighted
-// phrase ("안녕하세요," / "새로운 환경에 금방 적응해" / "결과로 증명하는" / "백현정입니다."). Words keep one running
-// index for the soak order and are flagged when they belong to the highlighted phrase.
-const mark = profile.statement.mark ?? "";
-const markWords = new Set(mark.split(/\s+/).filter(Boolean));
-const bigLines = profile.statement.lines
-  .flatMap(line => line.split(/(?<=,)\s+/))
-  .flatMap(line => (mark && line.includes(mark) && line.trim() !== mark ? line.replace(mark, mark + "\n").split("\n") : [line]))
-  .map(line => line.trim()).filter(Boolean);
+// The large sentence keeps the statement's own two lines. Words keep one running index for the soak order and are
+// flagged when they belong to the highlighted phrase.
+const markWords = new Set((profile.statement.mark ?? "").split(/\s+/).filter(Boolean));
 let wordIndex = 0;
-const lines = bigLines.map(line => line.split(/\s+/).map(text => ({ text, mark: markWords.has(text), i: wordIndex++ })));
+const lines = profile.statement.lines.map(line => line.trim().split(/\s+/).map(text => ({ text, mark: markWords.has(text), i: wordIndex++ })));
 const wordCount = wordIndex;
 
 type Props = { className: string; labelledBy: string; children: ReactNode };
