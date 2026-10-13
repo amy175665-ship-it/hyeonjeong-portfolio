@@ -10,6 +10,8 @@ import RollingWord from "@/components/motion/RollingWord";
 import useScrollDirection from "@/components/motion/useScrollDirection";
 import { useWindowState } from "@/components/stage/windowState";
 import { stages } from "@/data/stages";
+import { contact } from "@/data/contact";
+import type { CSSProperties } from "react";
 import styles from "./SiteNav.module.css";
 
 const listVariants = {
@@ -58,6 +60,9 @@ export default function SiteNav() {
   // Tucked away on the way down, and while a part shows something full screen (an opened hobby).
   const tucked = floating && (direction === "down" || immersive) && !menuOpen;
   const stageWord = stages.find(item => item.id === stage)?.word ?? stages[0].word;
+  // The part each menu link leads to, with its stage colour; the current part (once inside the window) is marked.
+  const linkStage = (href: string) => stages.find(item => href.endsWith("#" + item.part));
+  const currentPart = floating ? stages.find(item => item.id === stage)?.part : undefined;
   // Ignore hovers while a ring is still playing so repeated events never stack.
   const ringLogo = () => {
     const logo = logoRef.current;
@@ -117,10 +122,15 @@ export default function SiteNav() {
               animate="visible"
               exit="hidden"
             >
-              {links.map((link) => (
+              {links.map((link) => {
+                const linkPart = linkStage(link.href);
+                const current = !!linkPart && linkPart.part === currentPart;
+                return (
                 <motion.a
                   key={link.href}
                   href={link.href}
+                  aria-current={current ? "location" : undefined}
+                  style={{ "--accent": linkPart?.accent ?? "#7f9657" } as CSSProperties}
                   onClick={() => setMenuOpen(false)}
                   onPointerEnter={event => { if (event.pointerType === "mouse") pourTo(event.currentTarget); }}
                   onPointerLeave={() => setSand(null)}
@@ -128,12 +138,16 @@ export default function SiteNav() {
                   variants={itemVariants}
                   transition={{ duration: prefersReducedMotion ? 0 : 0.35, ease: [0.2, 0.65, 0.3, 1] }}
                 >
-                  {link.label}
+                  <span lang="en">{link.label}</span>
+                  {/* The current part ends in its stage colour's full stop, like ABSORB. / BUILD. (decorative). */}
+                  {current && <span className={styles.menuDot} aria-hidden="true">.</span>}
                   {/* Sand mound piled at the foot of the hovered word, where the falling sand lands (decorative). */}
                   <Image src="/images/effects/sand-mound.webp" alt="" aria-hidden="true" width={900} height={163} className={styles.mound} unoptimized />
                 </motion.a>
-              ))}
+                );
+              })}
             </motion.div>
+            {contact.email && <motion.a href={`mailto:${contact.email}`} className={styles.menuMail} variants={itemVariants} initial="hidden" animate="visible" exit="hidden" transition={{ duration: prefersReducedMotion ? 0 : 0.35, delay: prefersReducedMotion ? 0 : 0.35 }}>{contact.email}</motion.a>}
           </motion.nav>
         )}
       </AnimatePresence>

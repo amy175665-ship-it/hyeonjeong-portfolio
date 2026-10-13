@@ -54,15 +54,23 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-direction: column;
+  gap: 48px;
   padding: 120px 24px 64px;
-  background: radial-gradient(120% 70% at 50% 0%, #eaf4fc 0%, #fff9f1 60%, #fff9f1 100%);
+  /* The window's near-white with a low band of sand along the bottom, like a horizon. */
+  background: linear-gradient(180deg, #fcfcfb 0%, #fcfcfb 62%, #f6ead8 100%);
   overflow-y: auto;
 }
 .menuList { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; gap: clamp(8px, 2vw, 16px); }
-.menuLink { position: relative; isolation: isolate; padding: 8px 12px; color: #202731; font-size: clamp(28px, 6vw, 48px); font-weight: 600; letter-spacing: -.01em; text-align: center; }
+/* Menu words in the site's display serif, like the hero's ABSORB. / BUILD. / GROW. */
+.menuLink { position: relative; isolation: isolate; padding: 4px 12px; color: #202731; font: 400 clamp(40px, 6vw, 76px)/1.05 var(--font-editorial), Georgia, serif; letter-spacing: -.01em; text-align: center; text-decoration: none; }
+.menuDot { color: var(--accent); }
+/* The email under the words, for a quick hello. */
+.menuMail { position: relative; z-index: 1; color: #58636e; font-size: 15px; font-weight: 500; text-decoration: underline; text-decoration-color: #e3bf91; text-decoration-thickness: 2px; text-underline-offset: 6px; }
+.menuMail:hover { color: #202731; }
 /* Sand mound piled at the foot of the word on hover or keyboard focus: the same size under every word (in em, so it
    follows the menu type size), behind the letters and reaching a little up behind their lower part, growing upward. */
-.mound { position: absolute; left: 50%; top: calc(100% - 8px - .72em); z-index: -1; width: 6.5em; max-width: none; height: auto; opacity: 0; pointer-events: none; transform: translateX(-50%) scale(.6, 0); transform-origin: 50% 75%; transition: transform .45s cubic-bezier(.2, .8, .3, 1), opacity .25s ease; }
+.mound { position: absolute; left: 50%; top: calc(100% - 4px - .62em); z-index: -1; width: min(5em, 330px); max-width: none; height: auto; opacity: 0; pointer-events: none; transform: translateX(-50%) scale(.6, 0); transform-origin: 50% 75%; transition: transform .45s cubic-bezier(.2, .8, .3, 1), opacity .25s ease; }
 .menuLink:hover .mound, .menuLink:focus-visible .mound { opacity: 1; transform: translateX(-50%) scale(1); }
 @media (min-width: 1024px) {
   .toggle { grid-column: 3; justify-self: end; }
