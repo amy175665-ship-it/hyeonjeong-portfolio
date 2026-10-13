@@ -8,12 +8,15 @@
 .heading { margin: 0; font: 600 clamp(40px, 5vw, 72px)/1.1 var(--font-editorial), var(--font-hangul-serif, serif), Georgia, serif; letter-spacing: -.02em; }
 .note { max-width: 36em; margin: 18px 0 0; color: var(--muted); font-size: 15px; line-height: 1.7; word-break: keep-all; }
 
-/* Stacked panels: every panel is sticky inside .build and followed by a spacer, so it stays pinned while its spacer
-   scrolls past and the next panel slides over it. WorkStory sets the scroll-driven values; the defaults below are the
-   settled state (no script, reduced motion). */
+/* One pinned stage for the main projects: the track is the stage plus 1.5 stage heights per project (SEGMENT in
+   WorkStory); the panels lie on top of each other in the stage, later ones above, and fade in over the previous one.
+   --out (0 → 1) fades a panel's words and screens out while the next one fades in. WorkStory sets the scroll-driven
+   values; the defaults below are the settled state (no script, reduced motion). */
 .build { position: relative; }
-.panel { --zoom: 1; --meta: 1; --band: 1; --band-x: 0px; --desk-y: 0%; --phone-y: 0%; position: sticky; top: 0; height: var(--stage); overflow: hidden; background: var(--night); color: #fff; }
-.spacer { height: calc(var(--stage) * 1.1); }
+.track { position: relative; height: calc(var(--stage) * (1 + 1.5 * var(--count, 3))); }
+.pin { position: sticky; top: 0; height: var(--stage); overflow: hidden; background: var(--night); }
+.panel { --zoom: 1; --meta: 1; --band: 1; --band-x: 0px; --desk-y: 0%; --phone-y: 0%; --out: 0; position: absolute; inset: 0; overflow: hidden; background: var(--night); color: #fff; }
+.panel + .panel { opacity: 0; }
 .panelInner { position: absolute; inset: 0; transform-origin: 50% 40%; }
 .shot { position: absolute; inset: 0; transform: scale(var(--zoom)); transform-origin: 60% 40%; background: linear-gradient(115deg, color-mix(in srgb, var(--accent) 62%, #000) 0%, var(--accent) 55%, color-mix(in srgb, var(--accent) 55%, #fff) 100%); }
 .shot::after { content: ""; position: absolute; right: 8%; top: 18%; width: 34%; aspect-ratio: 1; border-radius: 50%; background: radial-gradient(circle at 35% 30%, rgb(255 255 255 / .5), rgb(255 255 255 / .04) 60%); }
@@ -21,15 +24,15 @@
 .shade { position: absolute; inset: 0; background: linear-gradient(180deg, rgb(10 12 20 / .25) 0%, rgb(10 12 20 / 0) 30%, rgb(10 12 20 / .6) 100%); }
 
 /* The project's features (first category + featureTags) flowing across; decorative, read once as the sr-only list. */
-.ticker { position: absolute; z-index: 2; left: 0; right: 0; top: 30%; overflow: hidden; opacity: var(--band); pointer-events: none; }
+.ticker { position: absolute; z-index: 2; left: 0; right: 0; top: 30%; overflow: hidden; opacity: calc(var(--band) * clamp(0, 1 - var(--out) * 1.8, 1)); pointer-events: none; }
 .tickerRow { display: flex; width: max-content; font: 400 clamp(44px, 6.2vw, 104px)/1.15 var(--font-editorial), var(--font-hangul-serif, serif), Georgia, serif; color: rgb(255 255 255 / .92); white-space: nowrap; transform: translateX(var(--band-x)); }
 .tickerRow span { padding-right: .3em; }
 
-.meta { position: absolute; z-index: 3; right: 4.2%; top: 112px; display: grid; justify-items: end; gap: 8px; font-size: 14px; text-align: right; opacity: var(--meta); }
+.meta { position: absolute; z-index: 3; right: 4.2%; top: 112px; display: grid; justify-items: end; gap: 8px; font-size: 14px; text-align: right; opacity: calc(var(--meta) * clamp(0, 1 - var(--out) * 1.8, 1)); }
 .meta strong { font: 400 18px/1.3 var(--font-editorial), Georgia, serif; letter-spacing: .01em; }
 .badge { padding: 4px 10px; border-radius: 999px; background: rgb(255 255 255 / .9); color: var(--muted); font-size: 12px; font-weight: 500; }
 
-.text { position: absolute; z-index: 3; left: 4.2%; bottom: 6%; max-width: 54%; }
+.text { position: absolute; z-index: 3; left: 4.2%; bottom: 6%; max-width: 54%; opacity: clamp(0, 1 - var(--out) * 1.8, 1); }
 .title { margin: 0; font: 900 clamp(64px, 10.5vw, 176px)/.9 var(--font-pretendard), sans-serif; letter-spacing: -.06em; text-shadow: 0 6px 40px rgb(0 0 0 / .25); }
 .title a { color: inherit; text-decoration: none; }
 .title a:focus-visible { outline: 3px solid #fff; outline-offset: 8px; }
@@ -41,7 +44,7 @@
 .detail:focus-visible { outline: 2px solid #fff; outline-offset: 4px; }
 
 /* Desktop screen with the phone over its bottom-right corner, rising into place while the panel is pinned. */
-.devices { position: absolute; z-index: 3; right: 6%; bottom: 10%; width: 40%; aspect-ratio: 16 / 10; pointer-events: none; }
+.devices { position: absolute; z-index: 3; right: 6%; bottom: 10%; width: 40%; aspect-ratio: 16 / 10; pointer-events: none; opacity: clamp(0, 1 - var(--out) * 1.8, 1); }
 .desk, .phone { position: absolute; overflow: hidden; background: #fff; box-shadow: 0 30px 60px -24px rgb(0 0 0 / .55); }
 .desk { inset: 0; border-radius: 10px; transform: translateY(var(--desk-y)); }
 .phone { right: -6%; bottom: -12%; width: 26%; aspect-ratio: 9 / 19; border: 5px solid #161a22; border-radius: 18px; transform: translateY(var(--phone-y)); }
@@ -95,4 +98,12 @@
   .tagline { font-size: 14px; }
   .devices { top: 28%; bottom: auto; width: 64%; }
   .phone { border-width: 3px; border-radius: 12px; }
+}
+
+/* Reduced motion: no pinned stage, the panels one after another, each one screen. */
+@media (prefers-reduced-motion: reduce) {
+  .track { height: auto; }
+  .pin { position: static; height: auto; overflow: visible; }
+  .panel { position: relative; height: var(--stage); }
+  .panel + .panel { opacity: 1; }
 }

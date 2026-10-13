@@ -1,25 +1,29 @@
 "use client";
 
-import { Fragment, useEffect, useRef, type CSSProperties } from "react";
+import { useEffect, useRef, type CSSProperties } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import ProjectLinks from "@/components/ui/ProjectLinks";
+import { scrollToY } from "@/components/layout/scrollLock";
 import { mainProjects, sideProjects, type Project, type SideProject } from "@/data/projects";
 import { stages } from "@/data/stages";
 import styles from "./WorkStory.module.css";
 
-// BUILD.: the section heading and placeholder note on one window page, then one full-screen panel per project, stacked
-// (approved mockup artifacts/project-panels-20261013). Each panel is sticky and followed by a spacer: while the panel
-// slides in it settles from a zoom and its big title rises letter by letter; while it is pinned (the spacer scrolls
-// past) the project's features flow across as a band and the desktop and phone screens come up at the bottom right;
-// then the next panel slides over it while it shrinks and dims. After the last one the side projects come up over it as
-// a plain dark list (rows open the sites), then a dark screen (the closer) shrinks into the GROW circle underneath
-// (GrowStory). Everything is tied to the scroll position. Placeholders stay labelled as examples.
+// BUILD.: the section heading and placeholder note on one window page, then the main projects on one pinned stage
+// (2026-10-13, user: no paper-like covering). The stage stays on screen while the track scrolls past; each project
+// has one segment of it. Moving to the next project, its panel fades in over the current one, so the background colour
+// turns smoothly from one project's accent to the next while the old project's words and screens fade out; within its
+// segment the big title rises letter by letter, the features band flows across and the desktop and phone screens come
+// up. The first panel settles from a zoom as the stage comes in. After the stage the side projects follow as a plain
+// dark list (rows open the sites), then a dark screen (the closer) shrinks into the GROW circle underneath (GrowStory).
+// Everything is tied to the scroll position. Placeholders stay labelled as examples.
 const BUILD_ACCENT = stages.find(stage => stage.id === "build")?.accent ?? "#7f9657";
 const clamp = (value: number) => Math.min(Math.max(value, 0), 1);
 const ramp = (value: number, from: number, to: number) => clamp((value - from) / (to - from));
 const easeOut = (t: number) => 1 - Math.pow(1 - t, 3);
 const easeInOut = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+// Scroll per project, in stage heights, and the share of it spent fading over from the previous project.
+const SEGMENT = 1.5, FADE = 0.3;
 
 // One side project row: number, name, then the description and tags; the whole row links to the site when it has one.
 function SideRow({ project, index }: { project: SideProject; index: number }) {
@@ -97,30 +101,34 @@ export default function WorkStory() {
     // Reduced motion: the panels stay in their settled state (the CSS defaults); only the header tone follows the scroll.
     const still = matchMedia("(prefers-reduced-motion: reduce)").matches;
     const panels = Array.from(root.querySelectorAll<HTMLElement>("[data-panel]"));
-    const spacers = Array.from(root.querySelectorAll<HTMLElement>("[data-spacer]"));
+    const track = root.querySelector<HTMLElement>("[data-track]");
     const chars = panels.map(panel => Array.from(panel.querySelectorAll<HTMLElement>("[data-char]")));
-    const side = root.querySelector<HTMLElement>("[data-side]");
     const closer = root.querySelector<HTMLElement>("[data-closer]"), closerSpacer = root.querySelector<HTMLElement>("[data-closer-spacer]");
-    if (!panels.length || !closer || !closerSpacer) return;
+    if (!panels.length || !track || !closer || !closerSpacer) return;
     // The closer's pinned progress: 0 → 1 while its spacer scrolls past.
     const closing = (height: number) => clamp((height - closerSpacer.getBoundingClientRect().top) / closerSpacer.offsetHeight);
+    // Keyboard focus in a panel that is faded out brings its segment on screen.
+    const reveal = (index: number) => () => {
+      const height = panels[0].offsetHeight, top = track.getBoundingClientRect().top + window.scrollY;
+      scrollToY(Math.round(top + (index + 0.6) * SEGMENT * height));
+    };
+    const focusers = panels.map((panel, index) => { const go = reveal(index); panel.addEventListener("focusin", go); return go; });
 
     const paint = () => {
       if (still) return;
       const height = panels[0].offsetHeight, phone = window.innerWidth <= 700;
-      const tops = spacers.map(spacer => spacer.getBoundingClientRect().top);
-      // A panel's own place in the flow is right above its spacer: arrive 0 → 1 while that place slides up into the
-      // screen, dwell 0 → 1 while the spacer scrolls past under the pinned panel.
-      const arrive = (index: number) => clamp((2 * height - tops[index]) / height);
-      const dwell = (index: number) => clamp((height - tops[index]) / spacers[index].offsetHeight);
+      const top = track.getBoundingClientRect().top, scrolled = -top / (SEGMENT * height);
+      // u: progress through each project's segment; fade: how far its panel has faded in over the previous one.
+      const u = (index: number) => scrolled - index;
+      const fade = (index: number) => (index === 0 ? 1 : easeInOut(ramp(u(index), 0, FADE)));
       panels.forEach((panel, index) => {
-        // The last panel is covered by the side list (or the closer) sliding up over it.
-        const a = arrive(index), d = dwell(index);
-        const covered = index < panels.length - 1 ? arrive(index + 1) : clamp(1 - (side ?? closer).getBoundingClientRect().top / height);
-        const inner = panel.firstElementChild as HTMLElement;
-        panel.style.visibility = covered >= 1 ? "hidden" : "";
-        inner.style.transform = covered > 0 ? `scale(${(1 - covered * 0.08).toFixed(4)})` : "";
-        inner.style.filter = covered > 0 ? `blur(${(covered * 10).toFixed(1)}px) brightness(${(1 - covered * 0.6).toFixed(3)})` : "";
+        // arrive: the first panel as the stage comes up into the screen, the others as they fade in.
+        const a = index === 0 ? clamp(1 - top / height) : fade(index);
+        const d = ramp(u(index), index === 0 ? 0 : FADE * 0.5, 1);
+        const out = index < panels.length - 1 ? fade(index + 1) : 0;
+        panel.style.opacity = index === 0 ? "" : a.toFixed(3);
+        panel.style.pointerEvents = a < 0.5 || out > 0.5 ? "none" : "";
+        panel.style.setProperty("--out", out.toFixed(3));
         panel.style.setProperty("--zoom", (1.22 - easeOut(a) * 0.22 + d * 0.05).toFixed(4));
         chars[index].forEach((char, order) => {
           const k = easeOut(ramp(a, 0.35 + order * 0.03, 0.75 + order * 0.03));
@@ -161,6 +169,7 @@ export default function WorkStory() {
       cancelAnimationFrame(frame);
       window.removeEventListener("scroll", schedule);
       window.removeEventListener("resize", schedule);
+      panels.forEach((panel, index) => panel.removeEventListener("focusin", focusers[index]));
       document.documentElement.removeAttribute("data-on-dark");
     };
   }, []);
@@ -173,12 +182,12 @@ export default function WorkStory() {
         {mainProjects.some(project => project.placeholder) && <p className={styles.note}>프로젝트 화면과 설명을 정리하고 있습니다. '작성 예시'로 표시된 부분은 실제 작업 내용으로 채울 예정입니다.</p>}
       </div>
       <div ref={build} className={styles.build}>
-        {mainProjects.map((project, index) => (
-          <Fragment key={project.slug}>
-            <ProjectPanel project={project} />
-            <div className={styles.spacer} data-spacer aria-hidden="true" />
-          </Fragment>
-        ))}
+        {/* One pinned stage for all main projects; the track gives each project SEGMENT stage heights of scroll. */}
+        <div className={styles.track} data-track style={{ "--count": mainProjects.length } as CSSProperties}>
+          <div className={styles.pin}>
+            {mainProjects.map(project => <ProjectPanel key={project.slug} project={project} />)}
+          </div>
+        </div>
         {sideProjects.length > 0 && <div className={styles.side} data-side>
           <h3 className={styles.sideTitle}>사이드 프로젝트</h3>
           <ol className={styles.sideList}>
