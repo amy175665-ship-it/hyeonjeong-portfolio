@@ -20,9 +20,18 @@ const clamp = (value: number) => Math.min(Math.max(value, 0), 1);
 const ramp = (value: number, from: number, to: number) => clamp((value - from) / (to - from));
 const lerp = (from: number, to: number, t: number) => from + (to - from) * t;
 const easeInOut = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
-// The sentence as words, flagged when they belong to the highlighted phrase.
-const markWords = new Set((profile.statement.mark ?? "").split(/\s+/).filter(Boolean));
-const words = profile.statement.lines.join(" ").split(/\s+/).map(text => ({ text, mark: markWords.has(text) }));
+// The large sentence breaks by meaning: each line of the statement is split after a comma and after the highlighted
+// phrase ("안녕하세요," / "새로운 환경에 금방 적응해" / "결과로 증명하는" / "백현정입니다."). Words keep one running
+// index for the soak order and are flagged when they belong to the highlighted phrase.
+const mark = profile.statement.mark ?? "";
+const markWords = new Set(mark.split(/\s+/).filter(Boolean));
+const bigLines = profile.statement.lines
+  .flatMap(line => line.split(/(?<=,)\s+/))
+  .flatMap(line => (mark && line.includes(mark) && line.trim() !== mark ? line.replace(mark, mark + "\n").split("\n") : [line]))
+  .map(line => line.trim()).filter(Boolean);
+let wordIndex = 0;
+const lines = bigLines.map(line => line.split(/\s+/).map(text => ({ text, mark: markWords.has(text), i: wordIndex++ })));
+const wordCount = wordIndex;
 
 type Props = { className: string; labelledBy: string; children: ReactNode };
 
@@ -235,11 +244,15 @@ export default function AboutCover({ className, labelledBy, children }: Props) {
         <p ref={word} className={styles.word} aria-hidden="true" lang="en">ABSORB<span>.</span></p>
         {/* The sentence set large (decorative copy of the page's own sentence). Inside the marked phrase the space goes
             into the word (a no-break space), so the highlighter runs on. */}
-        <p ref={large} className={styles.large} aria-hidden="true" style={{ "--n": words.length } as CSSProperties}>
-          {words.map((item, i) => {
-            const joined = item.mark && words[i + 1]?.mark;
-            return <span key={i}>{i > 0 && !(item.mark && words[i - 1].mark) && " "}<span className={item.mark ? `${styles.w} ${styles.mark}` : styles.w} style={{ "--i": i } as CSSProperties}>{item.text}{joined && "\u00a0"}</span></span>;
-          })}
+        <p ref={large} className={styles.large} aria-hidden="true" style={{ "--n": wordCount } as CSSProperties}>
+          {lines.map((line, l) => (
+            <span key={l} className={styles.bigLine}>
+              {line.map((item, i) => {
+                const joined = item.mark && line[i + 1]?.mark;
+                return <span key={item.i}>{i > 0 && !(item.mark && line[i - 1].mark) && " "}<span className={item.mark ? `${styles.w} ${styles.mark}` : styles.w} style={{ "--i": item.i } as CSSProperties}>{item.text}{joined && "\u00a0"}</span></span>;
+              })}
+            </span>
+          ))}
         </p>
         {children}
       </section>
