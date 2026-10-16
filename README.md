@@ -103,6 +103,7 @@ npm.cmd run dev -- --port 3001
 app/
 ├─ layout.tsx                 공통 레이아웃, 글꼴, 커스텀 커서
 ├─ page.tsx                   메인 페이지(오프닝 → 브라우저 창 안의 섹션들)
+├─ reset.css                  브라우저 기본 스타일 초기화(globals.css보다 먼저 불러옴)
 ├─ globals.css                전역 스타일
 └─ work/[slug]/page.tsx       대표 프로젝트 상세 페이지
 components/
