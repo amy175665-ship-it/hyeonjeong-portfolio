@@ -17,6 +17,8 @@ const pretendard = localFont({
 });
 
 export const metadata: Metadata = {
+  // The deployed address (Vercel), so shared links point their preview image (opengraph-image) here.
+  metadataBase: new URL("https://hyeonjeong-portfolio-blush.vercel.app"),
   title: "백현정 | 포트폴리오",
   description:
     "6개월 부트캠프를 수료하고 웹 퍼블리셔로 첫 시작을 준비하고 있습니다. HTML·CSS·JavaScript로 화면을 만들고, React와 Next.js를 활용한 컴포넌트 구성과 접근성 있는 반응형 구현을 학습하고 있습니다.",

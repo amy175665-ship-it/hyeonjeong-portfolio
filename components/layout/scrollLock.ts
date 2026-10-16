@@ -48,8 +48,11 @@ export function scrollToY(y: number) {
 }
 
 // Glides to a scroll position over `duration` seconds. Wheel, touch and scroll keys on the way are ignored, or, with
-// `onInterrupt`, end the glide there: `onInterrupt` runs instead of `onDone` and should settle the page (a jump with
-// scrollToY also stops the glide), after which the input scrolls the page as usual.
+// `onInterrupt`, a new gesture ends the glide there: `onInterrupt` runs instead of `onDone` and should settle the page
+// (a jump with scrollToY also stops the glide), after which the input scrolls the page as usual. The gesture that
+// started the glide does not count: a finger still moving, or wheel and key events that keep coming (trackpad momentum,
+// a held key) are ignored; a new touch, or a wheel step or key after a short pause, is a new gesture.
+const NEW_GESTURE_GAP = 200; // ms without wheel or key input before the next one counts as a new gesture
 export function glideTo(
   y: number,
   duration: number,
@@ -62,24 +65,32 @@ export function glideTo(
     onDone();
     return;
   }
-  let over = false;
+  let over = false,
+    lastInput = performance.now();
   const stopListening = () => {
     window.removeEventListener("wheel", input);
-    window.removeEventListener("touchmove", input);
+    window.removeEventListener("touchmove", block);
+    window.removeEventListener("touchstart", touch);
     window.removeEventListener("keydown", input);
   };
-  const input = (event: Event) => {
-    if (event instanceof KeyboardEvent && !isScrollKey(event)) return;
-    if (!onInterrupt) {
-      event.preventDefault();
-      return;
-    }
+  const interrupt = () => {
+    if (!onInterrupt) return;
     over = true;
     stopListening();
     onInterrupt();
   };
+  const input = (event: Event) => {
+    if (event instanceof KeyboardEvent && !isScrollKey(event)) return;
+    const now = performance.now(),
+      fresh = now - lastInput > NEW_GESTURE_GAP;
+    lastInput = now;
+    if (fresh && onInterrupt) interrupt();
+    else event.preventDefault();
+  };
+  const touch = () => interrupt();
   window.addEventListener("wheel", input, { passive: false });
-  window.addEventListener("touchmove", input, { passive: false });
+  window.addEventListener("touchmove", block, { passive: false });
+  window.addEventListener("touchstart", touch, { passive: true });
   window.addEventListener("keydown", input);
   lenis.resize();
   lenis.scrollTo(y, {
