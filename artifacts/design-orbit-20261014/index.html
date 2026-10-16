@@ -1,0 +1,289 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>디자인 궤도 시안</title>
+<!--
+  디자인 파트 시안 (2026-10-14). 작품 7개(사용자 결정). GROW 원의 모래 고리가 그대로 궤도가 되고 작업물이 행성처럼 돕니다.
+  A: 궤도만(2·2·3), 호버·포커스·탭한 행성이 가운데에 나타남, 손을 떼면 "디자인" 제목으로 돌아감.
+  B: 가운데 대표작 1 + 궤도 6(3·3), 고른 작품이 가운데에 남고 궤도 밖으로 나가면 대표작으로 돌아감.
+  두 안 모두 가운데로 올 때 모래알이 모여 작품이 됨. 클릭·Enter는 크게 보기(Esc로 닫기). 작품은 비율만 다른 자리 표시.
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@600&display=swap">
+<style>
+  @font-face { font-family: Pretendard; src: url("assets/PretendardVariable.woff2") format("woff2"); font-weight: 100 900; }
+  @font-face { font-family: "DM Serif Display"; src: url("assets/DMSerifDisplay-Regular.ttf"); }
+  :root { --bg: #fcfcfb; --ink: #202731; --muted: #58636e; --line: #e6e6e2; --serif: "DM Serif Display", "Noto Serif KR", serif; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--bg); color: var(--ink); font-family: Pretendard, sans-serif; overflow-x: clip; }
+  button { font: inherit; }
+
+  .stage { position: relative; height: max(600px, 100svh); overflow: hidden; }
+  .rings { position: absolute; inset: 0; z-index: 1; width: 100%; height: 100%; pointer-events: none; }
+  .rings ellipse { fill: none; stroke-width: 2.6; stroke-linecap: round; transition: opacity .6s; }
+
+  /* Idle centre of A: the part's title. B keeps it at the top left. */
+  .title { position: absolute; z-index: 4; left: 50%; top: 50%; margin: 0; transform: translate(-50%, -50%); font: 600 clamp(44px, 6vw, 88px)/1 var(--serif); letter-spacing: -.02em; white-space: nowrap; transition: opacity .45s, transform .6s cubic-bezier(.22, 1, .36, 1); }
+  .stage[data-mode="b"] .title { left: 4.2%; top: 96px; transform: none; font-size: clamp(36px, 4vw, 56px); }
+  .stage[data-mode="a"][data-picked] .title { opacity: 0; transform: translate(-50%, -50%) scale(.94); }
+
+  .planet { position: absolute; left: 0; top: 0; z-index: 2; width: var(--size); aspect-ratio: 1; padding: 0; border: 0; border-radius: 16px; overflow: hidden; cursor: pointer; background: none; box-shadow: 0 10px 26px rgb(32 39 49 / .16); transition: box-shadow .3s, outline-color .3s; outline: 3px solid transparent; outline-offset: 4px; will-change: transform; }
+  .planet .art, .frame .art, .big .art { position: absolute; inset: 0; }
+  .planet[data-front] { z-index: 6; }
+  .planet[aria-pressed="true"] { outline-color: #e9a33a; box-shadow: 0 14px 34px rgb(32 39 49 / .26); }
+  .planet:focus-visible { outline-color: #202731; }
+
+  /* Centre: the picked work, fitted to its own ratio. */
+  .center { position: absolute; z-index: 5; left: 50%; top: 50%; display: grid; justify-items: center; gap: 18px; transform: translate(-50%, -50%); pointer-events: none; }
+  .frame { position: relative; border-radius: 10px; overflow: hidden; box-shadow: 0 30px 70px rgb(32 39 49 / .22); opacity: 0; transition: opacity .35s; pointer-events: auto; cursor: zoom-in; border: 0; padding: 0; background: none; }
+  .frame[data-shown] { opacity: 1; }
+  .caption { text-align: center; opacity: 0; transform: translateY(8px); transition: opacity .4s .15s, transform .4s .15s; }
+  .center[data-shown] .caption { opacity: 1; transform: none; }
+  .caption strong { display: block; font-size: 20px; font-weight: 700; }
+  .caption span { display: block; margin-top: 6px; color: var(--muted); font-size: 14px; }
+  .caption .badge { display: inline-block; margin-bottom: 8px; padding: 4px 10px; border-radius: 999px; background: #f3ece1; color: #8a6238; font-size: 12px; font-weight: 700; }
+
+  .grains { position: absolute; inset: 0; z-index: 7; width: 100%; height: 100%; pointer-events: none; }
+
+  /* Placeholder artwork: colour field, number and the example label. */
+  .art { display: grid; place-items: center; background: var(--fill); color: #fff; }
+  .art b { font: 400 clamp(28px, 40%, 120px)/1 var(--serif); }
+  .frame .art b { font-size: clamp(48px, 9vw, 120px); }
+  .art i { position: absolute; left: 10px; bottom: 9px; font: 700 11px/1 Pretendard, sans-serif; font-style: normal; opacity: .85; }
+  .planet .art i { display: none; }
+  .planet .art b { font-size: 24px; }
+
+  .lightbox { position: fixed; inset: 0; z-index: 20; display: grid; place-items: center; padding: 48px 24px; background: rgb(252 252 251 / .96); }
+  .lightbox[hidden] { display: none; }
+  .lightbox .big { position: relative; border-radius: 12px; overflow: hidden; box-shadow: 0 30px 80px rgb(32 39 49 / .25); }
+  .lightbox .close { position: absolute; top: 20px; right: 24px; width: 48px; height: 48px; border: 0; border-radius: 50%; background: #f0f0ed; font-size: 22px; cursor: pointer; }
+
+  /* Mockup controls (not part of the design). */
+  .controls { position: fixed; left: 16px; bottom: 16px; z-index: 30; display: flex; gap: 6px; padding: 6px; border-radius: 999px; background: #202731; box-shadow: 0 8px 24px rgb(0 0 0 / .2); }
+  .controls button { padding: 10px 16px; border: 0; border-radius: 999px; background: none; color: #cfd3d8; font-size: 13px; font-weight: 600; cursor: pointer; }
+  .controls button[aria-pressed="true"] { background: #fcfcfb; color: #202731; }
+  .note { position: fixed; right: 16px; bottom: 16px; z-index: 30; max-width: 300px; padding: 12px 16px; border-radius: 14px; background: #fff; box-shadow: 0 8px 24px rgb(0 0 0 / .1); color: var(--muted); font-size: 13px; line-height: 1.6; }
+  @media (max-width: 700px) {
+    .stage[data-mode="b"] .title { top: 40px; }
+    .caption strong { font-size: 17px; }
+    .note { display: none; }
+  }
+</style>
+</head>
+<body>
+<section class="stage" id="stage" data-mode="a" aria-labelledby="design-title">
+  <svg class="rings" id="rings" aria-hidden="true"></svg>
+  <h2 class="title" id="design-title">디자인</h2>
+  <div class="center" id="center" aria-live="polite">
+    <button type="button" class="frame" id="frame" aria-label="크게 보기"></button>
+    <div class="caption" id="caption"></div>
+  </div>
+  <canvas class="grains" id="grains" aria-hidden="true"></canvas>
+</section>
+
+<div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="작품 크게 보기" hidden>
+  <button type="button" class="close" id="close" aria-label="닫기">×</button>
+  <div class="big" id="big"></div>
+</div>
+
+<div class="controls" role="group" aria-label="시안 바꾸기">
+  <button type="button" data-set="a" aria-pressed="true">A 궤도만</button>
+  <button type="button" data-set="b" aria-pressed="false">B 대표작 + 궤도</button>
+  <button type="button" id="replay">처음부터</button>
+</div>
+<p class="note">작품은 비율만 다른 자리 표시입니다. 행성에 마우스를 올리거나 Tab으로 이동해 보세요. 클릭·Enter는 크게 보기.</p>
+
+<script>
+// Seven placeholder works: only the ratio and colour differ (real files come later).
+const WORKS = [
+  { ratio: 3 / 4, fill: "linear-gradient(150deg, #e96b5a, #c9503f)" },
+  { ratio: 1, fill: "linear-gradient(150deg, #7f9657, #5f7440)" },
+  { ratio: 16 / 9, fill: "linear-gradient(150deg, #e9a33a, #c9832a)" },
+  { ratio: 4 / 5, fill: "linear-gradient(150deg, #3a4a6b, #202a40)" },
+  { ratio: 1, fill: "linear-gradient(150deg, #d9b07e, #b8864c)" },
+  { ratio: 3 / 4, fill: "linear-gradient(150deg, #58636e, #34404b)" },
+  { ratio: 9 / 16, fill: "linear-gradient(150deg, #c9824f, #8a6238)" },
+].map((work, i) => ({ ...work, no: String(i + 1).padStart(2, "0") }));
+const SAND = ["#b8864c", "#8a6238", "#d9b07e"];
+const still = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const $ = id => document.getElementById(id);
+const stage = $("stage"), ringsSvg = $("rings"), center = $("center"), frame = $("frame"), caption = $("caption");
+const canvas = $("grains"), g = canvas.getContext("2d");
+const art = work => `<div class="art" style="--fill:${work.fill}"><b>${work.no}</b><i>작성 예시</i></div>`;
+
+let mode = "a", planets = [], picked = -1, hovering = 0, focusing = false, size = 76, speed = 1, W = 0, H = 0, rings = [], clearTimer = 0, introAt = 0;
+
+// Rings: ellipses around the centre (wide screens get wider orbits); the sand grain look comes from round dots.
+function measure() {
+  W = stage.clientWidth; H = stage.clientHeight;
+  const phone = W <= 700;
+  rings = phone
+    ? [[0.3, 0.25], [0.36, 0.33], [0.41, 0.42]]
+    : [[0.25, 0.3], [0.35, 0.38], [0.45, 0.45]];
+  rings = rings.map(([x, y]) => ({ rx: W * x, ry: H * y }));
+  const dpr = Math.min(devicePixelRatio || 1, 2);
+  canvas.width = W * dpr; canvas.height = H * dpr; g.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ringsSvg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+  ringsSvg.innerHTML = rings.map((r, i) => SAND.map((color, k) =>
+    `<ellipse cx="${W / 2}" cy="${H / 2}" rx="${r.rx}" ry="${r.ry}" stroke="${color}" stroke-dasharray="0.1 ${17 + k * 6}" stroke-dashoffset="${k * 7 + i * 3}" />`).join("")).join("");
+  size = phone ? 54 : 76;
+  stage.style.setProperty("--size", `${size}px`);
+}
+
+// Which works sit on which ring: A 2·2·3 (all seven), B 3·3 on the outer two (the first work is the featured one).
+function build() {
+  planets.forEach(p => p.el.remove());
+  const layout = mode === "a" ? [[0, 1], [2, 3], [4, 5, 6]] : [[], [1, 2, 3], [4, 5, 6]];
+  planets = [];
+  layout.forEach((list, ring) => list.forEach((index, k) => {
+    const el = document.createElement("button");
+    el.type = "button"; el.className = "planet";
+    el.setAttribute("aria-label", `디자인 작업 ${WORKS[index].no} (작성 예시) 가운데에 보기`);
+    el.setAttribute("aria-pressed", "false");
+    el.innerHTML = art(WORKS[index]);
+    stage.appendChild(el);
+    const p = { el, index, ring, angle: (k / list.length) * Math.PI * 2 + ring * 0.9 + 0.4, dir: ring % 2 ? -1 : 1, x: 0, y: 0 };
+    el.addEventListener("pointerenter", e => { if (e.pointerType === "mouse") { hovering++; pick(p); } });
+    el.addEventListener("pointerleave", e => { if (e.pointerType === "mouse") { hovering = Math.max(0, hovering - 1); release(); } });
+    // Keyboard focus only (a mouse click focuses the button too, which must not hold the orbit still).
+    el.addEventListener("focus", () => { if (el.matches(":focus-visible")) { focusing = true; pick(p); } });
+    el.addEventListener("blur", () => { if (focusing) { focusing = false; release(); } });
+    // Touch: the first tap brings it to the centre, a second tap opens it. Mouse/keyboard click opens it.
+    el.addEventListener("click", () => { if (picked === p.index) open(); else pick(p); });
+    planets.push(p);
+  }));
+}
+
+// Places the planets: depth from the angle (the lower half is in front of the centre, the upper half behind it).
+function place(time) {
+  const t = introAt ? Math.min((time - introAt) / 1400, 1) : 1, ease = 1 - Math.pow(1 - t, 3);
+  ringsSvg.style.transform = `scale(${1.8 - 0.8 * ease})`; ringsSvg.style.transformOrigin = "50% 50%";
+  ringsSvg.style.opacity = String(ease);
+  planets.forEach((p, i) => {
+    const r = rings[p.ring];
+    const depth = Math.sin(p.angle), scale = 0.78 + 0.3 * (depth + 1) / 2;
+    const show = Math.min(Math.max((t - 0.45 - i * 0.05) / 0.3, 0), 1);
+    p.x = W / 2 + Math.cos(p.angle) * r.rx; p.y = H / 2 + depth * r.ry;
+    p.el.style.transform = `translate(${p.x - size / 2}px, ${p.y - size / 2}px) scale(${scale * (0.6 + 0.4 * show)})`;
+    p.el.style.opacity = String(show);
+    p.el.toggleAttribute("data-front", depth > 0);
+  });
+}
+
+let last = 0;
+function tick(time) {
+  const dt = last ? Math.min((time - last) / 1000, 0.05) : 0; last = time;
+  const target = hovering || focusing || !$("lightbox").hidden ? 0 : 1;
+  speed += (target - speed) * Math.min(dt * 5, 1);
+  if (!still) planets.forEach(p => { p.angle += dt * speed * p.dir * (0.16 - p.ring * 0.035); });
+  place(time);
+  drawGrains(time);
+  requestAnimationFrame(tick);
+}
+
+// Centre: shows a work sized to its ratio; its grains first flow in from the planet.
+function frameSize(work) {
+  const phone = W <= 700;
+  const maxW = Math.min(W * (phone ? 0.5 : 0.3), 420), maxH = Math.min(H * (phone ? 0.36 : 0.46), 460);
+  let w = maxW, h = w / work.ratio;
+  if (h > maxH) { h = maxH; w = h * work.ratio; }
+  return { w, h };
+}
+function show(index, from) {
+  const work = WORKS[index], { w, h } = frameSize(work);
+  frame.style.width = `${w}px`; frame.style.height = `${h}px`;
+  frame.innerHTML = art(work);
+  frame.removeAttribute("data-shown"); center.removeAttribute("data-shown");
+  caption.innerHTML = `<span class="badge">작성 예시</span><strong>디자인 작업 ${work.no}</strong><span>제목 · 사용 도구 · 한 줄 설명 자리</span>`;
+  const reveal = () => { frame.setAttribute("data-shown", ""); center.setAttribute("data-shown", ""); };
+  if (still || !from) { reveal(); return; }
+  // The frame's place on screen (centre box minus the caption below it).
+  requestAnimationFrame(() => {
+    const box = frame.getBoundingClientRect(), s = stage.getBoundingClientRect();
+    gather(from, { x: box.left - s.left, y: box.top - s.top, w: box.width, h: box.height }, reveal);
+  });
+}
+function pick(p) {
+  clearTimeout(clearTimer);
+  if (picked === p.index && frame.hasAttribute("data-shown")) return;
+  picked = p.index;
+  planets.forEach(q => q.el.setAttribute("aria-pressed", String(q === p)));
+  stage.setAttribute("data-picked", "");
+  show(p.index, { x: p.x, y: p.y });
+}
+// A: back to the title once nothing is hovered or focused. B: back to the featured work.
+function release() {
+  clearTimeout(clearTimer);
+  clearTimer = setTimeout(() => {
+    if (hovering || focusing || !$("lightbox").hidden) return;
+    planets.forEach(q => q.el.setAttribute("aria-pressed", "false"));
+    if (mode === "a") {
+      picked = -1; stage.removeAttribute("data-picked");
+      frame.removeAttribute("data-shown"); center.removeAttribute("data-shown");
+    } else if (picked !== 0) {
+      picked = 0; show(0, null);
+    }
+  }, mode === "a" ? 700 : 1400);
+}
+
+// Sand grains flowing from the planet into the frame, then the work fades in under them.
+let flow = null;
+function gather(from, to, done) {
+  const n = W <= 700 ? 220 : 420, grains = [];
+  for (let i = 0; i < n; i++) grains.push({
+    sx: from.x + (Math.random() - 0.5) * 50, sy: from.y + (Math.random() - 0.5) * 50,
+    tx: to.x + Math.random() * to.w, ty: to.y + Math.random() * to.h,
+    bend: (Math.random() - 0.5) * 160, delay: Math.random() * 0.25, c: SAND[i % 3], r: 1 + Math.random() * 1.6,
+  });
+  flow = { grains, start: performance.now(), done, revealed: false };
+}
+function drawGrains(time) {
+  g.clearRect(0, 0, W, H);
+  if (!flow) return;
+  const t = (time - flow.start) / 1000;
+  if (t > 0.5 && !flow.revealed) { flow.revealed = true; flow.done(); }
+  if (t > 1.05) { flow = null; return; }
+  const fade = 1 - Math.min(Math.max((t - 0.7) / 0.35, 0), 1);
+  for (const q of flow.grains) {
+    const k = Math.min(Math.max((t - q.delay) / 0.55, 0), 1), e = k < 0.5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;
+    const x = q.sx + (q.tx - q.sx) * e + Math.sin(e * Math.PI) * q.bend, y = q.sy + (q.ty - q.sy) * e;
+    g.globalAlpha = fade; g.fillStyle = q.c; g.fillRect(x - q.r, y - q.r, q.r * 2, q.r * 2);
+  }
+  g.globalAlpha = 1;
+}
+
+// Large view.
+let opener = null;
+function open() {
+  if (picked < 0) return;
+  opener = document.activeElement;
+  const work = WORKS[picked], w = Math.min(innerWidth * 0.86, 1000), h = Math.min(innerHeight * 0.8, w / work.ratio);
+  $("big").style.width = `${h * work.ratio}px`; $("big").style.height = `${h}px`; $("big").innerHTML = art(work);
+  $("lightbox").hidden = false; $("close").focus();
+}
+function close() { $("lightbox").hidden = true; opener?.focus?.(); }
+frame.addEventListener("click", open);
+$("close").addEventListener("click", close);
+$("lightbox").addEventListener("click", e => { if (e.target === $("lightbox")) close(); });
+addEventListener("keydown", e => { if (e.key === "Escape" && !$("lightbox").hidden) close(); });
+
+// Mockup controls.
+function start(next) {
+  mode = next; stage.dataset.mode = mode;
+  document.querySelectorAll("[data-set]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.set === mode)));
+  hovering = 0; focusing = false; picked = -1; flow = null; stage.removeAttribute("data-picked");
+  frame.removeAttribute("data-shown"); center.removeAttribute("data-shown");
+  measure(); build();
+  introAt = still ? 0 : performance.now();
+  if (mode === "b") { picked = 0; setTimeout(() => show(0, null), still ? 0 : 900); }
+}
+document.querySelectorAll("[data-set]").forEach(b => b.addEventListener("click", () => start(b.dataset.set)));
+$("replay").addEventListener("click", () => start(mode));
+addEventListener("resize", () => { measure(); if (picked >= 0) show(picked, null); });
+start("a");
+requestAnimationFrame(tick);
+</script>
+</body>
+</html>

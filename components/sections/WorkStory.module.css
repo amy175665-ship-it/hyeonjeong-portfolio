@@ -1,109 +1,538 @@
 /* Same near-white page and type system as AboutStory; the projects themselves are full-screen colour panels. */
-.section { position: relative; z-index: 2; --bg: #fcfcfb; --ink: #202731; --muted: #58636e; --line: #e6e6e2; --night: #121b33; --stage: max(600px, 100svh); color: var(--ink); }
+.section {
+  position: relative;
+  z-index: 2;
+  --bg: #fcfcfb;
+  --ink: #202731;
+  --muted: #58636e;
+  --line: #e6e6e2;
+  --night: #121b33;
+  --stage: max(600px, 100svh);
+  color: var(--ink);
+}
 /* No section background: the GROW circle underneath shows around the last panel as it closes (the window is already
    near-white). */
 
-/* Lead-in page: the section heading and the placeholder note. */
-.intro { padding: 48px 4.2%; }
-.heading { margin: 0; font: 600 clamp(40px, 5vw, 72px)/1.1 var(--font-editorial), var(--font-hangul-serif, serif), Georgia, serif; letter-spacing: -.02em; }
-.note { max-width: 36em; margin: 18px 0 0; color: var(--muted); font-size: 15px; line-height: 1.7; word-break: keep-all; }
+/* Lead-in: the section heading and the placeholder note on the white stage, which the first panel fades in over. */
+.intro {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  padding: calc(var(--chrome, 0px) + 16vh) 4.2% 0;
+  background: var(--bg);
+}
+/* --lift (WorkStory): the words fade and lift away as the first panel opens; the white stays under the opening circle. */
+.intro > * {
+  opacity: calc(1 - var(--lift, 0));
+  translate: 0 calc(var(--lift, 0) * -40px);
+}
+.heading {
+  margin: 0;
+  font:
+    600 clamp(40px, 5vw, 72px) / 1.1 var(--font-editorial),
+    var(--font-hangul-serif, serif),
+    Georgia,
+    serif;
+  letter-spacing: -0.02em;
+}
+.note {
+  max-width: 36em;
+  margin: 18px 0 0;
+  color: var(--muted);
+  font-size: 15px;
+  line-height: 1.7;
+  word-break: keep-all;
+}
 
 /* One pinned stage for the main projects: the track is the stage plus 1.5 stage heights per project (SEGMENT in
    WorkStory); the panels lie on top of each other in the stage, later ones above, and fade in over the previous one.
    --out (0 → 1) fades a panel's words and screens out while the next one fades in. WorkStory sets the scroll-driven
    values; the defaults below are the settled state (no script, reduced motion). */
-.build { position: relative; }
-.track { position: relative; height: calc(var(--stage) * (1 + 1.5 * var(--count, 3))); }
-.pin { position: sticky; top: 0; height: var(--stage); overflow: hidden; background: var(--night); }
-.panel { --zoom: 1; --meta: 1; --band: 1; --band-x: 0px; --desk-y: 0%; --phone-y: 0%; --out: 0; position: absolute; inset: 0; overflow: hidden; background: var(--night); color: #fff; }
-.panel + .panel { opacity: 0; }
-.panelInner { position: absolute; inset: 0; transform-origin: 50% 40%; }
-.shot { position: absolute; inset: 0; transform: scale(var(--zoom)); transform-origin: 60% 40%; background: linear-gradient(115deg, color-mix(in srgb, var(--accent) 62%, #000) 0%, var(--accent) 55%, color-mix(in srgb, var(--accent) 55%, #fff) 100%); }
-.shot::after { content: ""; position: absolute; right: 8%; top: 18%; width: 34%; aspect-ratio: 1; border-radius: 50%; background: radial-gradient(circle at 35% 30%, rgb(255 255 255 / .5), rgb(255 255 255 / .04) 60%); }
-.shotImage { object-fit: cover; object-position: top; }
-.shade { position: absolute; inset: 0; background: linear-gradient(180deg, rgb(10 12 20 / .25) 0%, rgb(10 12 20 / 0) 30%, rgb(10 12 20 / .6) 100%); }
+.build {
+  position: relative;
+}
+.track {
+  position: relative;
+  height: calc(var(--stage) * (1 + var(--intro, 0) + 1.5 * var(--count, 3)));
+}
+.pin {
+  position: sticky;
+  top: 0;
+  height: var(--stage);
+  overflow: hidden;
+  background: var(--night);
+}
+.panel {
+  --zoom: 1;
+  --meta: 1;
+  --band: 1;
+  --band-x: 0px;
+  --desk-y: 0%;
+  --phone-y: 0%;
+  --out: 0;
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: var(--night);
+  color: #fff;
+}
+.panel + .panel {
+  opacity: 0;
+}
+/* At the end of the last project: the night colour of the side list (.dusk) under the last panel's field as sand grains
+   blowing away (.scatter, drawn by WorkStory). */
+.dusk {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: var(--night);
+  opacity: 0;
+  pointer-events: none;
+}
+.scatter {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  visibility: hidden;
+}
+.panelInner {
+  position: absolute;
+  inset: 0;
+  transform-origin: 50% 40%;
+}
+.shot {
+  position: absolute;
+  inset: 0;
+  transform: scale(var(--zoom));
+  transform-origin: 60% 40%;
+  background: linear-gradient(
+    115deg,
+    color-mix(in srgb, var(--accent) 62%, #000) 0%,
+    var(--accent) 55%,
+    color-mix(in srgb, var(--accent) 55%, #fff) 100%
+  );
+}
+.shot::after {
+  content: "";
+  position: absolute;
+  right: 8%;
+  top: 18%;
+  width: 34%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 35% 30%,
+    rgb(255 255 255 / 0.5),
+    rgb(255 255 255 / 0.04) 60%
+  );
+}
+.shotImage {
+  object-fit: cover;
+  object-position: top;
+}
+.shade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgb(10 12 20 / 0.25) 0%,
+    rgb(10 12 20 / 0) 30%,
+    rgb(10 12 20 / 0.6) 100%
+  );
+}
 
 /* The project's features (first category + featureTags) flowing across; decorative, read once as the sr-only list. */
-.ticker { position: absolute; z-index: 2; left: 0; right: 0; top: 30%; overflow: hidden; opacity: calc(var(--band) * clamp(0, 1 - var(--out) * 1.8, 1)); pointer-events: none; }
-.tickerRow { display: flex; width: max-content; font: 400 clamp(44px, 6.2vw, 104px)/1.15 var(--font-editorial), var(--font-hangul-serif, serif), Georgia, serif; color: rgb(255 255 255 / .92); white-space: nowrap; transform: translateX(var(--band-x)); }
-.tickerRow span { padding-right: .3em; }
+.ticker {
+  position: absolute;
+  z-index: 2;
+  left: 0;
+  right: 0;
+  top: 30%;
+  overflow: hidden;
+  opacity: calc(var(--band) * clamp(0, 1 - var(--out) * 1.8, 1));
+  pointer-events: none;
+}
+.tickerRow {
+  display: flex;
+  width: max-content;
+  font:
+    400 clamp(44px, 6.2vw, 104px) / 1.15 var(--font-editorial),
+    var(--font-hangul-serif, serif),
+    Georgia,
+    serif;
+  color: rgb(255 255 255 / 0.92);
+  white-space: nowrap;
+  transform: translateX(var(--band-x));
+}
+.tickerRow span {
+  padding-right: 0.3em;
+}
 
-.meta { position: absolute; z-index: 3; right: 4.2%; top: 112px; display: grid; justify-items: end; gap: 8px; font-size: 14px; text-align: right; opacity: calc(var(--meta) * clamp(0, 1 - var(--out) * 1.8, 1)); }
-.meta strong { font: 400 18px/1.3 var(--font-editorial), Georgia, serif; letter-spacing: .01em; }
-.badge { padding: 4px 10px; border-radius: 999px; background: rgb(255 255 255 / .9); color: var(--muted); font-size: 12px; font-weight: 500; }
+.meta {
+  position: absolute;
+  z-index: 3;
+  right: 4.2%;
+  top: 112px;
+  display: grid;
+  justify-items: end;
+  gap: 8px;
+  font-size: 14px;
+  text-align: right;
+  opacity: calc(var(--meta) * clamp(0, 1 - var(--out) * 1.8, 1));
+}
+.meta strong {
+  font:
+    400 18px/1.3 var(--font-editorial),
+    Georgia,
+    serif;
+  letter-spacing: 0.01em;
+}
+.badge {
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.9);
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 500;
+}
 
-.text { position: absolute; z-index: 3; left: 4.2%; bottom: 6%; max-width: 54%; opacity: clamp(0, 1 - var(--out) * 1.8, 1); }
-.title { margin: 0; font: 900 clamp(64px, 10.5vw, 176px)/.9 var(--font-pretendard), sans-serif; letter-spacing: -.06em; text-shadow: 0 6px 40px rgb(0 0 0 / .25); }
-.title a { color: inherit; text-decoration: none; }
-.title a:focus-visible { outline: 3px solid #fff; outline-offset: 8px; }
-.line { display: block; white-space: nowrap; }
-.char { display: inline-block; }
-.foot { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 28px; margin-top: 22px; opacity: var(--meta); }
-.tagline { margin: 0; font-size: 16px; line-height: 1.6; word-break: keep-all; }
-.detail { display: inline-flex; min-height: 44px; align-items: center; gap: 6px; color: #fff; font-size: 15px; font-weight: 600; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 6px; }
-.detail:focus-visible { outline: 2px solid #fff; outline-offset: 4px; }
+.text {
+  position: absolute;
+  z-index: 3;
+  left: 4.2%;
+  bottom: 6%;
+  max-width: 54%;
+  opacity: clamp(0, 1 - var(--out) * 1.8, 1);
+}
+.title {
+  margin: 0;
+  font:
+    900 clamp(64px, 10.5vw, 176px) / 0.9 var(--font-pretendard),
+    sans-serif;
+  letter-spacing: -0.06em;
+  text-shadow: 0 6px 40px rgb(0 0 0 / 0.25);
+}
+.title a {
+  color: inherit;
+  text-decoration: none;
+}
+.title a:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 8px;
+}
+.line {
+  display: block;
+  white-space: nowrap;
+}
+.char {
+  display: inline-block;
+}
+.foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 28px;
+  margin-top: 22px;
+  opacity: var(--meta);
+}
+.tagline {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.6;
+  word-break: keep-all;
+}
+.detail {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  gap: 6px;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 6px;
+}
+.detail:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 4px;
+}
 
 /* Desktop screen with the phone over its bottom-right corner, rising into place while the panel is pinned. */
-.devices { position: absolute; z-index: 3; right: 6%; bottom: 10%; width: 40%; aspect-ratio: 16 / 10; pointer-events: none; opacity: clamp(0, 1 - var(--out) * 1.8, 1); }
-.desk, .phone { position: absolute; overflow: hidden; background: #fff; box-shadow: 0 30px 60px -24px rgb(0 0 0 / .55); }
-.desk { inset: 0; border-radius: 10px; transform: translateY(var(--desk-y)); }
-.phone { right: -6%; bottom: -12%; width: 26%; aspect-ratio: 9 / 19; border: 5px solid #161a22; border-radius: 18px; transform: translateY(var(--phone-y)); }
-.screen { object-fit: cover; object-position: top; }
+.devices {
+  position: absolute;
+  z-index: 3;
+  right: 6%;
+  bottom: 10%;
+  width: 40%;
+  aspect-ratio: 16 / 10;
+  pointer-events: none;
+  opacity: clamp(0, 1 - var(--out) * 1.8, 1);
+}
+.desk,
+.phone {
+  position: absolute;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 0 30px 60px -24px rgb(0 0 0 / 0.55);
+}
+.desk {
+  inset: 0;
+  border-radius: 10px;
+  transform: translateY(var(--desk-y));
+}
+.phone {
+  right: -6%;
+  bottom: -12%;
+  width: 26%;
+  aspect-ratio: 9 / 19;
+  border: 5px solid #161a22;
+  border-radius: 18px;
+  transform: translateY(var(--phone-y));
+}
+.screen {
+  object-fit: cover;
+  object-position: top;
+}
 
 /* Side projects: a plain dark list that slides up over the last panel (same night colour), one row per project:
    (number) / name / description and tags. A row with a url is a link to the site (new tab). */
-.side { position: relative; padding: 128px 4.2% 96px; background: var(--night); color: #f3efe7; }
-.sideTitle { margin: 0 0 48px; font: 600 clamp(28px, 3vw, 44px)/1.2 var(--font-editorial), var(--font-hangul-serif, serif), Georgia, serif; letter-spacing: -.02em; }
-.sideList { margin: 0; padding: 0; list-style: none; border-top: 1px solid rgb(243 239 231 / .14); }
-.sideList li { border-bottom: 1px solid rgb(243 239 231 / .14); }
-.sideRow { display: grid; grid-template-columns: 120px minmax(0, .9fr) minmax(0, 1.4fr); gap: 40px; align-items: start; padding: 56px 0; color: inherit; text-decoration: none; }
-.sideNumber { padding-top: .35em; font-size: 17px; font-weight: 500; }
-.sideName { display: flex; align-items: baseline; gap: 12px; font: 700 clamp(24px, 2.3vw, 34px)/1.3 var(--font-pretendard), sans-serif; letter-spacing: -.03em; word-break: keep-all; transition: color .25s; }
-.sideArrow { font-size: .7em; transition: transform .3s cubic-bezier(.2, .7, .3, 1); }
-.sideBody { display: grid; justify-items: start; gap: 12px; max-width: 36em; }
-.sideBadge { padding: 4px 10px; border-radius: 999px; background: rgb(243 239 231 / .14); font-size: 12px; font-weight: 500; }
-.sideText { font-size: 17px; line-height: 1.9; word-break: keep-all; }
-.sideTags { display: flex; flex-wrap: wrap; gap: 4px 14px; color: rgb(243 239 231 / .5); font-size: 14px; }
-.sideLink:hover .sideName, .sideLink:focus-visible .sideName { color: #e9a33a; }
-.sideLink:hover .sideArrow, .sideLink:focus-visible .sideArrow { transform: translate(3px, -3px); }
-.sideLink:focus-visible { outline: 2px solid #e9a33a; outline-offset: 4px; }
+/* It starts 0.6 stage heights before the pinned stage lets go, over the last panel scattering into sand, so its top is
+   clear there and its heading rises in through the flying grains while the stage is still pinned (no empty night screen
+   in between). */
+/* Its last 0.6 stage heights lie over the closer (below), which is already pinned and starts closing into the GROW circle
+   there, so that part has no background of its own (the closer is the same night colour) and the rows fade away as they
+   go up (--seam-out): no empty night screen between the list and the circle (2026-10-14). */
+.side {
+  position: relative;
+  z-index: 1;
+  margin-top: calc(var(--stage) * -0.6);
+  padding: 72px 4.2% 96px;
+  background: linear-gradient(
+    transparent,
+    var(--night) calc(var(--stage) * 0.6),
+    var(--night) calc(100% - var(--stage) * 0.6),
+    transparent calc(100% - var(--stage) * 0.6)
+  );
+  color: #f3efe7;
+}
+/* Soft seam (useSeam): the list rises in on the night colour. */
+.side > * {
+  opacity: calc(var(--seam-in, 1) * (1 - var(--seam-out, 0)));
+  translate: 0 calc((1 - var(--seam-in, 1)) * 56px);
+}
+.sideTitle {
+  margin: 0 0 48px;
+  font:
+    600 clamp(28px, 3vw, 44px) / 1.2 var(--font-editorial),
+    var(--font-hangul-serif, serif),
+    Georgia,
+    serif;
+  letter-spacing: -0.02em;
+}
+.sideList {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid rgb(243 239 231 / 0.14);
+}
+.sideList li {
+  border-bottom: 1px solid rgb(243 239 231 / 0.14);
+}
+.sideRow {
+  display: grid;
+  grid-template-columns: 120px minmax(0, 0.9fr) minmax(0, 1.4fr);
+  gap: 40px;
+  align-items: start;
+  padding: 56px 0;
+  color: inherit;
+  text-decoration: none;
+}
+.sideNumber {
+  padding-top: 0.35em;
+  font-size: 17px;
+  font-weight: 500;
+}
+.sideName {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  font:
+    700 clamp(24px, 2.3vw, 34px) / 1.3 var(--font-pretendard),
+    sans-serif;
+  letter-spacing: -0.03em;
+  word-break: keep-all;
+  transition: color 0.25s;
+}
+.sideArrow {
+  font-size: 0.7em;
+  transition: transform 0.3s cubic-bezier(0.2, 0.7, 0.3, 1);
+}
+.sideBody {
+  display: grid;
+  justify-items: start;
+  gap: 12px;
+  max-width: 36em;
+}
+.sideBadge {
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgb(243 239 231 / 0.14);
+  font-size: 12px;
+  font-weight: 500;
+}
+.sideText {
+  font-size: 17px;
+  line-height: 1.9;
+  word-break: keep-all;
+}
+.sideTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+  color: rgb(243 239 231 / 0.5);
+  font-size: 14px;
+}
+.sideLink:hover .sideName,
+.sideLink:focus-visible .sideName {
+  color: #e9a33a;
+}
+.sideLink:hover .sideArrow,
+.sideLink:focus-visible .sideArrow {
+  transform: translate(3px, -3px);
+}
+.sideLink:focus-visible {
+  outline: 2px solid #e9a33a;
+  outline-offset: 4px;
+}
 
 /* The closer: a dark screen after the list, pinned while its spacer passes, shrinking into the GROW circle (the GROW
    section starts two screens before the end of .build, under it). */
-.closer { position: sticky; top: 0; height: var(--stage); background: var(--night); }
-.closerSpacer { height: var(--stage); }
+.closer {
+  position: sticky;
+  top: 0;
+  height: var(--stage);
+  margin-top: calc(var(--stage) * -0.6);
+  background: var(--night);
+}
+.closerSpacer {
+  height: var(--stage);
+}
 
 @media (max-width: 899px) {
-  .intro { padding: 32px 24px; }
-  .side { padding: 104px 24px 64px; }
-  .sideTitle { margin-bottom: 28px; }
-  .sideRow { grid-template-columns: 52px minmax(0, 1fr); gap: 12px 8px; padding: 32px 0; }
-  .sideNumber { padding-top: .2em; font-size: 15px; }
-  .sideBody { grid-column: 2; }
-  .sideText { font-size: 15px; line-height: 1.8; }
-  .sideTags { font-size: 13px; }
+  .intro {
+    padding: calc(var(--chrome, 0px) + 12vh) 24px 0;
+  }
+  .side {
+    padding: 104px 24px 64px;
+  }
+  .sideTitle {
+    margin-bottom: 28px;
+  }
+  .sideRow {
+    grid-template-columns: 52px minmax(0, 1fr);
+    gap: 12px 8px;
+    padding: 32px 0;
+  }
+  .sideNumber {
+    padding-top: 0.2em;
+    font-size: 15px;
+  }
+  .sideBody {
+    grid-column: 2;
+  }
+  .sideText {
+    font-size: 15px;
+    line-height: 1.8;
+  }
+  .sideTags {
+    font-size: 13px;
+  }
 }
 @media (prefers-reduced-motion: reduce) {
-  .closer, .closerSpacer { display: none; }
-  .sideName, .sideArrow { transition: none; }
+  .closer,
+  .closerSpacer {
+    display: none;
+  }
+  .sideName,
+  .sideArrow {
+    transition: none;
+  }
 }
 /* Phones: the screens move up into the middle, the title runs the full width under them. */
 @media (max-width: 700px) {
-  .meta { top: 100px; right: 6%; font-size: 12px; }
-  .meta strong { font-size: 15px; }
-  .ticker { top: 22%; }
-  .tickerRow { font-size: 13vw; }
-  .text { left: 6%; right: 6%; bottom: 7%; max-width: none; }
-  .title { font-size: 16vw; }
-  .tagline { font-size: 14px; }
-  .devices { top: 28%; bottom: auto; width: 64%; }
-  .phone { border-width: 3px; border-radius: 12px; }
+  .meta {
+    top: 100px;
+    right: 6%;
+    font-size: 12px;
+  }
+  .meta strong {
+    font-size: 15px;
+  }
+  .ticker {
+    top: 22%;
+  }
+  .tickerRow {
+    font-size: 13vw;
+  }
+  .text {
+    left: 6%;
+    right: 6%;
+    bottom: 7%;
+    max-width: none;
+  }
+  .title {
+    font-size: 16vw;
+  }
+  .tagline {
+    font-size: 14px;
+  }
+  .devices {
+    top: 28%;
+    bottom: auto;
+    width: 64%;
+  }
+  .phone {
+    border-width: 3px;
+    border-radius: 12px;
+  }
 }
 
-/* Reduced motion: no pinned stage, the panels one after another, each one screen. */
+/* Reduced motion: no pinned stage, the heading then the panels one after another, each one screen. */
 @media (prefers-reduced-motion: reduce) {
-  .track { height: auto; }
-  .pin { position: static; height: auto; overflow: visible; }
-  .panel { position: relative; height: var(--stage); }
-  .panel + .panel { opacity: 1; }
+  .track {
+    height: auto;
+  }
+  .intro {
+    position: relative;
+    inset: auto;
+    min-height: var(--page-h, 600px);
+    justify-content: center;
+    padding-top: 0;
+  }
+  .dusk,
+  .scatter {
+    display: none;
+  }
+  .side {
+    margin-top: 0;
+    background: var(--night);
+  }
+  .pin {
+    position: static;
+    height: auto;
+    overflow: visible;
+  }
+  .panel {
+    position: relative;
+    height: var(--stage);
+  }
+  .panel + .panel {
+    opacity: 1;
+  }
 }

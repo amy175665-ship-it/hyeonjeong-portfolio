@@ -1,34 +1,130 @@
 /* The cover track: three window pages tall; the about page (the stage) stays pinned under the window chrome for two
    of them while the cover turns into it (AboutCover). */
-.cover { position: relative; height: calc(var(--page-h, 600px) * 3); }
+.cover {
+  position: relative;
+  height: calc(var(--page-h, 600px) * 3);
+}
 /* Menu links land at 95% of the cover (the finished page): 1.9 of the 2 pinned pages. */
-.anchor { position: absolute; left: 0; top: calc(var(--page-h, 600px) * 1.9); width: 1px; height: 1px; }
+.anchor {
+  position: absolute;
+  left: 0;
+  top: calc(var(--page-h, 600px) * 1.9);
+  width: 1px;
+  height: 1px;
+}
 /* --word: the size of the big ABSORB.; the sentence sits just above it. */
-.stage { --word: clamp(84px, 19vw, 300px); position: sticky; top: var(--chrome, 0px); height: var(--page-h, 600px); overflow: hidden; }
+.stage {
+  --word: clamp(84px, 19vw, 300px);
+  position: sticky;
+  top: var(--chrome, 0px);
+  height: var(--page-h, 600px);
+  overflow: hidden;
+  opacity: calc(1 - var(--seam-out, 0) * 0.9);
+  translate: 0 calc(var(--seam-out, 0) * -48px);
+}
 /* The page's content sits above the grains. */
-.stage > :not(.grains):not(.word):not(.large):not(:global(.sr-only)) { position: relative; z-index: 1; }
-.grains { position: absolute; inset: 0; z-index: 0; display: block; width: 100%; height: 100%; pointer-events: none; }
+.stage > :not(.grains):not(.word):not(.large):not(:global(.sr-only)) {
+  position: relative;
+  z-index: 1;
+}
+.grains {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
 /* The big word along the bottom left, over the portrait (multiply), its full stop in the ABSORB. coral. */
-.word { position: absolute; z-index: 1; left: calc(4.2% - .06em); bottom: -1.6vw; margin: 0; font: 900 var(--word)/.8 var(--font-pretendard), sans-serif; letter-spacing: -.065em; color: #202731; mix-blend-mode: multiply; pointer-events: none; }
-.word span { color: #e96b5a; mix-blend-mode: normal; }
+.word {
+  position: absolute;
+  z-index: 1;
+  left: calc(4.2% - 0.06em);
+  bottom: -1.6vw;
+  margin: 0;
+  font:
+    900 var(--word) / 0.8 var(--font-pretendard),
+    sans-serif;
+  letter-spacing: -0.065em;
+  color: #202731;
+  mix-blend-mode: multiply;
+  pointer-events: none;
+}
+.word span {
+  color: #e96b5a;
+  mix-blend-mode: normal;
+}
 /* The sentence in its two lines at the top left, level with the portrait's head (so the top half is not empty), on
    the same 4.2% site margin as the header and ABSORB.; sized so the longer line ends before the portrait. Each word soaks from pale
    sand to ink in reading order (--i of --n words, driven by --p from AboutCover), then the marked phrase gets its
    highlighter stroke. */
-.large { --p: 0; position: absolute; z-index: 2; left: 4.2%; top: 16%; margin: 0; font: 700 clamp(28px, 3.2vw, 60px)/1.35 var(--font-pretendard), sans-serif; letter-spacing: -.035em; color: #202731; transform-origin: 0 0; pointer-events: none; }
-.bigLine { display: block; white-space: nowrap; }
-.w { --k: clamp(0, calc((var(--p) * 1.35 - var(--i) / var(--n) * .95) / .16), 1); display: inline-block; color: color-mix(in srgb, #202731 calc(var(--k) * 100%), #eadbc2); }
-.mark { --m: clamp(0, calc((var(--p) - .78) / .2), 1); background: linear-gradient(transparent 58%, #e96b5a40 58%, #e96b5a40 92%, transparent 92%) 0 0 / calc(var(--m) * 100%) 100% no-repeat; }
+.large {
+  --p: 0;
+  position: absolute;
+  z-index: 2;
+  left: 4.2%;
+  top: 16%;
+  margin: 0;
+  font:
+    700 clamp(28px, 3.2vw, 60px) / 1.35 var(--font-pretendard),
+    sans-serif;
+  letter-spacing: -0.035em;
+  color: #202731;
+  transform-origin: 0 0;
+  pointer-events: none;
+}
+.bigLine {
+  display: block;
+  white-space: nowrap;
+}
+.w {
+  --k: clamp(0, calc((var(--p) * 1.35 - var(--i) / var(--n) * 0.95) / 0.16), 1);
+  display: inline-block;
+  color: color-mix(in srgb, #202731 calc(var(--k) * 100%), #eadbc2);
+}
+.mark {
+  --m: clamp(0, calc((var(--p) - 0.78) / 0.2), 1);
+  background: linear-gradient(
+      transparent 58%,
+      #e96b5a40 58%,
+      #e96b5a40 92%,
+      transparent 92%
+    )
+    0 0 / calc(var(--m) * 100%) 100% no-repeat;
+}
 
 @media (max-width: 700px) {
-  .stage { --word: 21vw; }
-  .word { left: calc(24px - .06em); bottom: 1svh; }
+  .stage {
+    --word: 21vw;
+  }
+  .word {
+    left: calc(24px - 0.06em);
+    bottom: 1svh;
+  }
   /* Phones: the portrait takes the bottom, so the sentence stays at the top. */
-  .large { left: 24px; top: 6%; bottom: auto; font-size: 5.2vw; }
+  .large {
+    left: 24px;
+    top: 6%;
+    bottom: auto;
+    font-size: 5.2vw;
+  }
 }
 @media (prefers-reduced-motion: reduce) {
-  .cover { height: auto; }
-  .anchor { top: 0; }
-  .stage { position: relative; top: auto; height: auto; }
-  .grains, .word, .large { display: none; }
+  .cover {
+    height: auto;
+  }
+  .anchor {
+    top: 0;
+  }
+  .stage {
+    position: relative;
+    top: auto;
+    height: auto;
+  }
+  .grains,
+  .word,
+  .large {
+    display: none;
+  }
 }

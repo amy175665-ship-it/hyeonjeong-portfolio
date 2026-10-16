@@ -1,26 +1,118 @@
 /* The section starts two screens early, under the last project panel (WorkStory is stacked above it), so its stage is
-   already pinned while the panel closes into the circle; it stays pinned for the rest. --r (GrowStory) is the circle's radius. */
-.section { --stage: max(600px, 100svh); position: relative; z-index: 1; height: calc(var(--stage) * 5); margin-top: calc(-2 * var(--stage)); background: #fcfcfb; color: #202731; }
-.stage { --r: 270px; position: sticky; top: 0; height: var(--stage); overflow: hidden; }
-.canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+   already pinned while the panel closes into the circle; it stays pinned for the rest. --r (GrowStory) is the circle's radius.
+   After the three screens of shape changes the rings hold with the design works on them (about 0.75 screens), then grow
+   apart and fade (about 0.9 screens) before the contact part comes in. */
+.section {
+  --stage: max(600px, 100svh);
+  position: relative;
+  z-index: 1;
+  height: calc(var(--stage) * 6.3);
+  margin-top: calc(-2 * var(--stage));
+  background: #fcfcfb;
+  color: #202731;
+}
+/* Menu target (#design): where the works are all out and the rings hold (g 0.95, scrolled to under the title bar). */
+.anchor {
+  position: absolute;
+  left: 0;
+  top: calc(var(--stage) * 3.85 + var(--chrome, 0px));
+  width: 1px;
+  height: 1px;
+}
+.stage {
+  --r: 270px;
+  position: sticky;
+  top: 0;
+  height: var(--stage);
+  overflow: hidden;
+}
+.canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
 
 /* The three ways of working, one in each third of the circle (top, lower right, lower left). */
-.labels { margin: 0; padding: 0; list-style: none; opacity: 0; }
-.labels li { position: absolute; display: grid; justify-items: center; gap: 8px; transform: translate(-50%, -50%); font: 800 clamp(18px, 2vw, 30px)/1 var(--font-pretendard), sans-serif; letter-spacing: -.02em; white-space: nowrap; }
-.labels li:nth-child(1) { left: 50%; top: calc(50% - var(--r) * .55); }
-.labels li:nth-child(2) { left: calc(50% + var(--r) * .476); top: calc(50% + var(--r) * .275); }
-.labels li:nth-child(3) { left: calc(50% - var(--r) * .476); top: calc(50% + var(--r) * .275); }
-.labels small { color: #58636e; font: 500 12px/1 var(--font-pretendard), sans-serif; letter-spacing: .14em; }
+.labels {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  opacity: 0;
+}
+.labels li {
+  position: absolute;
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  transform: translate(-50%, -50%);
+  font:
+    800 clamp(18px, 2vw, 30px) / 1 var(--font-pretendard),
+    sans-serif;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+}
+.labels li:nth-child(1) {
+  left: 50%;
+  top: calc(50% - var(--r) * 0.55);
+}
+.labels li:nth-child(2) {
+  left: calc(50% + var(--r) * 0.476);
+  top: calc(50% + var(--r) * 0.275);
+}
+.labels li:nth-child(3) {
+  left: calc(50% - var(--r) * 0.476);
+  top: calc(50% + var(--r) * 0.275);
+}
+.labels small {
+  color: #58636e;
+  font:
+    500 12px/1 var(--font-pretendard),
+    sans-serif;
+  letter-spacing: 0.14em;
+}
 
-.word { position: absolute; left: 50%; bottom: 9%; margin: 0; transform: translateX(-50%); font: 400 clamp(56px, 8vw, 132px)/.9 var(--font-editorial), Georgia, serif; letter-spacing: -.02em; opacity: 0; pointer-events: none; }
-.word b { font-weight: 400; color: #e9a33a; }
+.word {
+  position: absolute;
+  left: 50%;
+  bottom: 9%;
+  margin: 0;
+  transform: translateX(-50%);
+  font:
+    400 clamp(56px, 8vw, 132px) / 0.9 var(--font-editorial),
+    Georgia,
+    serif;
+  letter-spacing: -0.02em;
+  opacity: 0;
+  pointer-events: none;
+}
+.word b {
+  font-weight: 400;
+  color: #e9a33a;
+}
 
 @media (max-width: 700px) {
-  .labels li { font-size: 5vw; }
-  .labels small { font-size: 10px; letter-spacing: .1em; }
-  .word { bottom: 12%; font-size: 17vw; }
+  .labels li {
+    font-size: 5vw;
+  }
+  .labels small {
+    font-size: 10px;
+    letter-spacing: 0.1em;
+  }
+  .word {
+    bottom: 12%;
+    font-size: 17vw;
+  }
 }
-/* Reduced motion: no closing panel above it and no shape changes, so just one screen with the circle. */
+/* Reduced motion: no closing panel above it and no shape changes: one screen with the circle, then one with the rings
+   and the works. */
 @media (prefers-reduced-motion: reduce) {
-  .section { height: var(--stage); margin-top: 0; }
+  .section {
+    height: calc(var(--stage) * 2);
+    margin-top: 0;
+  }
+  .anchor {
+    top: calc(var(--stage) + var(--chrome, 0px));
+  }
 }

@@ -1,63 +1,329 @@
 /* BLOOM.: a pinned night stage. ContactStory sets the scroll-driven values; the defaults are the bloomed state (no
    script, reduced motion): --night circle radius, --open (glow), --face, --text, --bar (closing window bar), --sand. */
-.section { --stage: max(600px, 100svh); --night: 150vmax; --open: 1; --face: 1; --text: 1; --bar: 0; --sand: 0; position: relative; height: calc(var(--stage) * 3.8); background: #fcfcfb; color: #f6f1e4; }
-/* Menu links land a third into the pinned part (b ≈ .33), under the window chrome. */
-.anchor { position: absolute; left: 0; top: calc(var(--stage) * 2.8 * .33 + var(--chrome, 0px)); width: 1px; height: 1px; }
-.stage { position: sticky; top: 0; height: var(--stage); overflow: hidden; }
+/* It starts two screens early, over the end of the GROW section (no background, above it), so its stage is pinned while
+   the GROW rings grow apart: the night opens from the rings' middle right behind them (2026-10-14, user: no cut between
+   design and contact). The first pinned screen is that opening; the bloom runs over the 2.8 screens after it. */
+.section {
+  --stage: max(600px, 100svh);
+  --night: 150vmax;
+  --enter: 1;
+  --open: 1;
+  --face: 1;
+  --text: 1;
+  --bar: 0;
+  --sand: 0;
+  position: relative;
+  z-index: 2;
+  height: calc(var(--stage) * 4.8);
+  margin-top: calc(var(--stage) * -2);
+  color: #f6f1e4;
+}
+/* Menu links land a third into the bloom (b ≈ .33), under the window chrome. */
+.anchor {
+  position: absolute;
+  left: 0;
+  top: calc(var(--stage) + var(--stage) * 2.8 * 0.33 + var(--chrome, 0px));
+  width: 1px;
+  height: 1px;
+}
+.stage {
+  position: sticky;
+  top: 0;
+  height: var(--stage);
+  overflow: hidden;
+}
 
-.night { position: absolute; inset: 0; background: radial-gradient(circle at 66% 55%, #2a3a66 0%, #121b33 60%); clip-path: circle(var(--night) at 50% 50%); }
-.night i { position: absolute; width: 2px; height: 2px; border-radius: 50%; background: #fff7e2; animation: twinkle 3.4s ease-in-out infinite; }
-@keyframes twinkle { 50% { opacity: .25; } }
-.glow { position: absolute; left: 68%; top: 62%; width: 56vmin; aspect-ratio: 1; border-radius: 50%; transform: translate(-50%, -50%); background: radial-gradient(circle, rgb(233 163 58 / .42), transparent 62%); opacity: var(--open); }
+.night {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 66% 55%, #2a3a66 0%, #121b33 60%);
+  clip-path: circle(var(--night) at 50% calc(50% + var(--chrome, 0px) / 2));
+}
+.night i {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  border-radius: 50%;
+  background: #fff7e2;
+  animation: twinkle 3.4s ease-in-out infinite;
+}
+@keyframes twinkle {
+  50% {
+    opacity: 0.25;
+  }
+}
+/* Off screen the stars hold still, so they do not restyle the page every frame elsewhere (ContactStory sets it). */
+.section[data-offscreen] .night i {
+  animation-play-state: paused;
+}
+.glow {
+  position: absolute;
+  left: 68%;
+  top: 62%;
+  width: 56vmin;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(circle, rgb(233 163 58 / 0.42), transparent 62%);
+  opacity: var(--open);
+}
 
 /* The story's 3D cactus, its base on the bottom edge. */
-.cactus { position: absolute; z-index: 1; left: 68%; bottom: -14%; width: clamp(300px, 34vw, 560px); aspect-ratio: 5 / 6; transform: translateX(-50%); opacity: clamp(0, calc(var(--night) / 200px), 1); pointer-events: none; }
+.cactus {
+  position: absolute;
+  z-index: 1;
+  left: 68%;
+  bottom: -14%;
+  width: clamp(300px, 34vw, 560px);
+  aspect-ratio: 5 / 6;
+  transform: translateX(-50%);
+  opacity: clamp(0, calc((var(--enter) - 0.6) * 2.5), 1);
+  pointer-events: none;
+}
+/* (--enter: the night opening, 0 → 1; the cactus comes up only once the night has nearly filled the screen, not over the
+   white GROW scene around the opening circle.) */
 /* The hero's 3D face, back for the goodbye. */
-.face { position: absolute; z-index: 2; left: 6%; top: 10%; width: clamp(220px, 24vw, 380px); aspect-ratio: 1; opacity: var(--face); transform: translateY(calc((1 - var(--face)) * 20px)); pointer-events: none; }
+.face {
+  position: absolute;
+  z-index: 2;
+  left: 6%;
+  top: 10%;
+  width: clamp(220px, 24vw, 380px);
+  aspect-ratio: 1;
+  opacity: var(--face);
+  transform: translateY(calc((1 - var(--face)) * 20px));
+  pointer-events: none;
+}
 
-.text { position: absolute; z-index: 3; left: 8%; right: 8%; bottom: 11%; display: grid; justify-items: start; gap: 18px; opacity: var(--text); }
-.word { margin: 0; font: 400 clamp(56px, 9vw, 150px)/.85 var(--font-editorial), Georgia, serif; letter-spacing: -.02em; }
-.word b { font-weight: 400; color: #e9a33a; }
-.email { display: inline-flex; max-width: 100%; align-items: baseline; gap: 14px; color: inherit; text-decoration: none; transform: translate(var(--mx, 0px), var(--my, 0px)); transition: transform .35s cubic-bezier(.16, 1, .3, 1); }
-.emailText { min-width: 0; font: 400 clamp(26px, 3.4vw, 54px)/1.15 var(--font-editorial), Georgia, serif; letter-spacing: -.01em; background: linear-gradient(#e9a33a, #e9a33a) 0 96% / var(--ul, 0%) 2px no-repeat; transition: background-size .5s cubic-bezier(.16, 1, .3, 1); }
-.email:hover .emailText, .email:focus-visible .emailText { --ul: 100%; }
-.email:focus-visible { outline: 2px solid #e9a33a; outline-offset: 6px; }
-.arrow { flex: none; font-size: clamp(20px, 2.4vw, 30px); transition: transform .3s cubic-bezier(.2, .7, .3, 1); }
-.email:hover .arrow, .email:focus-visible .arrow { transform: translate(3px, -3px); }
-.channels { display: flex; flex-wrap: wrap; gap: 10px; margin: 0; padding: 0; list-style: none; }
-.channel { display: inline-flex; min-height: 44px; align-items: center; gap: 8px; padding: 0 16px; border: 1px solid rgb(246 241 228 / .35); border-radius: 999px; color: inherit; font-size: 14px; font-weight: 500; text-decoration: none; }
-.channel:hover { background: rgb(246 241 228 / .1); }
-.channel svg { width: 18px; height: 18px; }
+.text {
+  position: absolute;
+  z-index: 3;
+  left: 8%;
+  right: 8%;
+  bottom: 11%;
+  display: grid;
+  justify-items: start;
+  gap: 18px;
+  opacity: var(--text);
+}
+.word {
+  margin: 0;
+  font:
+    400 clamp(56px, 9vw, 150px) / 0.85 var(--font-editorial),
+    Georgia,
+    serif;
+  letter-spacing: -0.02em;
+}
+.word b {
+  font-weight: 400;
+  color: #e9a33a;
+}
+.email {
+  display: inline-flex;
+  max-width: 100%;
+  align-items: baseline;
+  gap: 14px;
+  color: inherit;
+  text-decoration: none;
+  transform: translate(var(--mx, 0px), var(--my, 0px));
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.emailText {
+  min-width: 0;
+  font:
+    400 clamp(26px, 3.4vw, 54px) / 1.15 var(--font-editorial),
+    Georgia,
+    serif;
+  letter-spacing: -0.01em;
+  background: linear-gradient(#e9a33a, #e9a33a) 0 96% / var(--ul, 0%) 2px
+    no-repeat;
+  transition: background-size 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.email:hover .emailText,
+.email:focus-visible .emailText {
+  --ul: 100%;
+}
+.email:focus-visible {
+  outline: 2px solid #e9a33a;
+  outline-offset: 6px;
+}
+.arrow {
+  flex: none;
+  font-size: clamp(20px, 2.4vw, 30px);
+  transition: transform 0.3s cubic-bezier(0.2, 0.7, 0.3, 1);
+}
+.email:hover .arrow,
+.email:focus-visible .arrow {
+  transform: translate(3px, -3px);
+}
+.channels {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.channel {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  gap: 8px;
+  padding: 0 16px;
+  border: 1px solid rgb(246 241 228 / 0.35);
+  border-radius: 999px;
+  color: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+}
+.channel:hover {
+  background: rgb(246 241 228 / 0.1);
+}
+.channel svg {
+  width: 18px;
+  height: 18px;
+}
 /* Keyboard focus inside the night (the email, the channels) shows the words even before the scroll brings them in. */
-.section:focus-within .text, .section:focus-within .copyright { opacity: 1; }
-.copyright { position: absolute; z-index: 3; right: 4.2%; bottom: 24px; margin: 0; color: rgb(246 241 228 / .6); font-size: 13px; opacity: var(--text); }
+.section:focus-within .text,
+.section:focus-within .copyright {
+  opacity: 1;
+}
+.copyright {
+  position: absolute;
+  z-index: 3;
+  right: 4.2%;
+  bottom: 24px;
+  margin: 0;
+  color: rgb(246 241 228 / 0.6);
+  font-size: 13px;
+  opacity: var(--text);
+}
 
-.closeBar { position: absolute; z-index: 8; left: 0; right: 0; top: 0; height: 88px; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; padding: 0 4.2%; background: #f0f0ed; transform: translateY(calc((var(--bar) - 1) * 100%)); }
-.dots { display: flex; gap: 8px; }
-.dots i { width: 13px; height: 13px; border-radius: 50%; background: #e96b5a; }
-.dots i:nth-child(2) { background: #e9a33a; }
-.dots i:nth-child(3) { background: #7f9657; }
-.barLogo { width: 34px; height: auto; }
-.sandEnd { position: absolute; z-index: 9; left: -4%; right: -4%; top: 100%; height: 160%; transform: translateY(calc(var(--sand) * var(--stage) * -1.08)); pointer-events: none; }
-.sandEnd svg { display: block; width: 100%; height: 100%; }
-.home { position: absolute; left: 50%; top: calc(var(--stage) * .42); width: 76px; transform: translateX(-50%); opacity: clamp(0, calc((var(--sand) - .85) * 6.7), 1); pointer-events: auto; }
-.home img { display: block; width: 100%; height: auto; }
+.closeBar {
+  position: absolute;
+  z-index: 8;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 88px;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  padding: 0 4.2%;
+  background: #f0f0ed;
+  transform: translateY(calc((var(--bar) - 1) * 100%));
+}
+.dots {
+  display: flex;
+  gap: 8px;
+}
+.dots i {
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: #e96b5a;
+}
+.dots i:nth-child(2) {
+  background: #e9a33a;
+}
+.dots i:nth-child(3) {
+  background: #7f9657;
+}
+.barLogo {
+  width: 34px;
+  height: auto;
+}
+.sandEnd {
+  position: absolute;
+  z-index: 9;
+  left: -4%;
+  right: -4%;
+  top: 100%;
+  height: 160%;
+  transform: translateY(calc(var(--sand) * var(--stage) * -1.08));
+  pointer-events: none;
+}
+.sandEnd svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.home {
+  position: absolute;
+  left: 50%;
+  top: calc(var(--stage) * 0.42);
+  width: 76px;
+  transform: translateX(-50%);
+  opacity: clamp(0, calc((var(--sand) - 0.85) * 6.7), 1);
+  pointer-events: auto;
+}
+.home img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
 
 @media (max-width: 700px) {
   /* Phones: face at the top, the words in the middle, the cactus below them on the right. */
-  .cactus { left: 72%; bottom: -6%; width: 58vw; }
-  .glow { left: 72%; top: 80%; width: 80vw; }
-  .face { left: 4%; top: 10%; width: 50vw; }
-  .text { left: 7%; right: 7%; top: 44%; bottom: auto; gap: 14px; }
-  .word { font-size: 20vw; }
-  .emailText { font-size: 7.4vw; }
-  .copyright { left: 7%; right: auto; bottom: 14px; font-size: 12px; }
-  .closeBar { height: 64px; padding: 0 16px; }
+  .cactus {
+    left: 72%;
+    bottom: -6%;
+    width: 58vw;
+  }
+  .glow {
+    left: 72%;
+    top: 80%;
+    width: 80vw;
+  }
+  .face {
+    left: 4%;
+    top: 10%;
+    width: 50vw;
+  }
+  .text {
+    left: 7%;
+    right: 7%;
+    top: 44%;
+    bottom: auto;
+    gap: 14px;
+  }
+  .word {
+    font-size: 20vw;
+  }
+  .emailText {
+    font-size: 7.4vw;
+  }
+  .copyright {
+    left: 7%;
+    right: auto;
+    bottom: 14px;
+    font-size: 12px;
+  }
+  .closeBar {
+    height: 64px;
+    padding: 0 16px;
+  }
 }
 @media (prefers-reduced-motion: reduce) {
-  .section { height: var(--stage); }
-  .anchor { top: var(--chrome, 0px); }
-  .night i { animation: none; }
-  .closeBar, .sandEnd { display: none; }
-  .email, .emailText, .arrow { transition: none; }
+  .section {
+    height: var(--stage);
+    margin-top: 0;
+    background: #fcfcfb;
+  }
+  .anchor {
+    top: var(--chrome, 0px);
+  }
+  .night i {
+    animation: none;
+  }
+  .closeBar,
+  .sandEnd {
+    display: none;
+  }
+  .email,
+  .emailText,
+  .arrow {
+    transition: none;
+  }
 }

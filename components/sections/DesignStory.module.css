@@ -1,23 +1,265 @@
-/* Same near-white page and type system as WorkStory (BUILD. green dot). */
-.section { --ink: #202731; --muted: #58636e; --line: #e6e6e2; --green: #7f9657; padding: 56px 40px; background: #fcfcfb; color: var(--ink); }
-.inner { width: 100%; max-width: 1120px; margin: 0 auto; }
-.kicker { display: flex; align-items: center; gap: 10px; margin: 0 0 14px; color: var(--muted); font: 400 16px/1 var(--font-editorial), Georgia, serif; letter-spacing: .04em; }
-.dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); }
-.title { margin: 0; font: 600 36px/1.2 var(--font-editorial), var(--font-hangul-serif, serif), Georgia, serif; letter-spacing: -.02em; }
-/* Nothing to show yet: a quiet dashed slot rather than an empty grid. */
-.empty { display: flex; min-height: 200px; align-items: center; justify-content: center; margin: 40px 0 0; border: 1px dashed #d6d6d0; border-radius: 6px; background: #f3f3f1; color: var(--muted); font-size: 14px; }
-.grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 32px 24px; margin: 40px 0 0; padding: 0; list-style: none; }
-.item { margin: 0; }
-.media { position: relative; aspect-ratio: 4 / 3; overflow: hidden; border-radius: 6px; background: #f0f0ec; box-shadow: 0 1px 0 var(--line), 0 18px 40px -28px #5a3d1a55; }
-.image { object-fit: contain; padding: 12px; }
-.caption { margin: 14px 0 0; font: 600 20px/1.35 var(--font-editorial), var(--font-hangul-serif, serif), Georgia, serif; letter-spacing: -.02em; word-break: keep-all; }
-
-@media (max-width: 899px) {
-  .section { padding: 40px 24px; }
-  .title { font-size: 28px; }
-  .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); margin-top: 28px; }
-  .empty { margin-top: 28px; min-height: 160px; }
+/* Design works on the GROW circle's held sand rings (DesignStory over GrowStory's pinned stage). --presence (DesignStory):
+   how far the works are in, 0 → 1. The middle is the middle of the screen under the title bar (--chrome), where
+   GrowStory centres the rings. */
+.layer {
+  --ink: #202731;
+  --muted: #58636e;
+  --presence: 0;
+  --middle: calc(var(--chrome, 0px) + (100% - var(--chrome, 0px)) / 2);
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  color: var(--ink);
 }
-@media (max-width: 599px) {
-  .grid { grid-template-columns: 1fr; }
+.layer[data-out] {
+  pointer-events: none;
+}
+
+/* The part's title holds the middle until a work is picked. */
+.title {
+  position: absolute;
+  z-index: 4;
+  left: 50%;
+  top: var(--middle);
+  margin: 0;
+  transform: translate(-50%, -50%);
+  font:
+    600 clamp(40px, 4.6vw, 72px) / 1 var(--font-editorial),
+    var(--font-hangul-serif, serif),
+    Georgia,
+    serif;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+  opacity: var(--presence);
+  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.layer[data-picked] .title {
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.94);
+  transition:
+    opacity 0.45s,
+    transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.empty {
+  position: absolute;
+  left: 50%;
+  top: calc(var(--middle) + 64px);
+  margin: 0;
+  transform: translateX(-50%);
+  color: var(--muted);
+  font-size: 14px;
+  opacity: var(--presence);
+}
+
+/* Planets: placed and turned by DesignStory (transform, opacity); still focusable before they are out (focusing one
+   scrolls to the held rings), but not under the pointer. */
+.orbit {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.planet {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 2;
+  width: 68px;
+  aspect-ratio: 1;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  border-radius: 14px;
+  background: #f0f0ec;
+  box-shadow: 0 6px 16px rgb(32 39 49 / 0.1);
+  outline: 3px solid transparent;
+  outline-offset: 4px;
+  cursor: pointer;
+  opacity: 0;
+  transition:
+    box-shadow 0.3s,
+    outline-color 0.3s,
+    filter 0.4s;
+  will-change: transform;
+}
+/* With a work picked the others step back (filter, as the loop owns the inline opacity). */
+.layer[data-picked] .planet:not([aria-pressed="true"]) {
+  filter: opacity(0.4);
+}
+.planet[data-front] {
+  z-index: 6;
+}
+.planet[aria-pressed="true"] {
+  outline-color: #e9a33a;
+  box-shadow: 0 10px 24px rgb(32 39 49 / 0.18);
+}
+.planet:focus-visible {
+  outline-color: var(--ink);
+}
+
+/* The picked work, sized to its ratio (inline), with its caption below; in front of every planet so none covers it. */
+.center {
+  position: absolute;
+  z-index: 7;
+  left: 50%;
+  top: var(--middle);
+  display: grid;
+  justify-items: center;
+  gap: 14px;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+.frame {
+  position: relative;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  border-radius: 10px;
+  background: #f0f0ec;
+  box-shadow: 0 24px 56px rgb(32 39 49 / 0.18);
+  cursor: zoom-in;
+  opacity: 0;
+  pointer-events: auto;
+  transition: opacity 0.35s;
+}
+.center[data-shown] .frame {
+  opacity: 1;
+}
+.caption {
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+  padding: 6px 14px;
+  border-radius: 12px;
+  background: rgb(252 252 251 / 0.85);
+  text-align: center;
+  opacity: 0;
+  transform: translateY(8px);
+  transition:
+    opacity 0.4s 0.15s,
+    transform 0.4s 0.15s;
+}
+.center[data-shown] .caption {
+  opacity: 1;
+  transform: none;
+}
+.caption strong {
+  font-size: 17px;
+  font-weight: 700;
+}
+.meta {
+  color: var(--muted);
+  font-size: 13px;
+  word-break: keep-all;
+}
+.badge {
+  margin-bottom: 2px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: #f3ece1;
+  color: #8a6238;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.grains {
+  position: absolute;
+  inset: 0;
+  z-index: 8;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* A work's picture, or a placeholder's colour field and number. */
+.image {
+  object-fit: cover;
+}
+.field {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(
+    150deg,
+    var(--fill),
+    color-mix(in srgb, var(--fill), #000 18%)
+  );
+  color: #fff;
+}
+.field b {
+  font:
+    400 21px/1 var(--font-editorial),
+    Georgia,
+    serif;
+}
+.frame .field b {
+  font-size: clamp(40px, 6vw, 88px);
+}
+.big .field b {
+  font-size: clamp(48px, 9vw, 120px);
+}
+
+/* Large view (a modal dialog: Esc, the button or a click outside closes it). */
+.dialog {
+  width: 100vw;
+  max-width: none;
+  height: 100svh;
+  max-height: none;
+  margin: 0;
+  padding: 48px 24px;
+  border: 0;
+  background: rgb(252 252 251 / 0.96);
+  color: var(--ink);
+}
+.dialog[open] {
+  display: grid;
+  place-items: center;
+}
+.dialog::backdrop {
+  background: transparent;
+}
+.big {
+  position: relative;
+  width: min(86vw, 1000px, calc(80svh * var(--ratio)));
+  aspect-ratio: var(--ratio);
+  overflow: hidden;
+  border-radius: 12px;
+  box-shadow: 0 30px 80px rgb(32 39 49 / 0.25);
+}
+.big .image {
+  object-fit: contain;
+}
+.close {
+  position: absolute;
+  top: 20px;
+  right: 24px;
+  width: 48px;
+  height: 48px;
+  border: 0;
+  border-radius: 50%;
+  background: #f0f0ec;
+  color: var(--ink);
+  font-size: 22px;
+  cursor: pointer;
+}
+
+@media (max-width: 700px) {
+  .planet {
+    width: 50px;
+    border-radius: 11px;
+  }
+  .field b {
+    font-size: 16px;
+  }
+  .caption strong {
+    font-size: 15px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .title,
+  .frame,
+  .caption,
+  .planet {
+    transition: none;
+  }
 }

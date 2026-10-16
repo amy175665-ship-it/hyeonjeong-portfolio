@@ -21,11 +21,31 @@ const listVariants = {
 // Double "ring-ring" bell motion: tilt → tilt → tilt → tilt → settle.
 const logoRingKeyframes: Keyframe[] = [
   { transform: "translateX(0) rotate(0deg) scale(1)", easing: "ease-in-out" },
-  { transform: "translateX(-1.5px) rotate(-8deg) scale(1.04)", offset: 0.14, easing: "ease-in-out" },
-  { transform: "translateX(1.5px) rotate(8deg) scale(1.04)", offset: 0.3, easing: "ease-in-out" },
-  { transform: "translateX(-1px) rotate(-7deg) scale(1.03)", offset: 0.48, easing: "ease-in-out" },
-  { transform: "translateX(1px) rotate(6deg) scale(1.02)", offset: 0.64, easing: "ease-in-out" },
-  { transform: "translateX(0) rotate(-1.5deg) scale(1)", offset: 0.82, easing: "ease-in-out" },
+  {
+    transform: "translateX(-1.5px) rotate(-8deg) scale(1.04)",
+    offset: 0.14,
+    easing: "ease-in-out",
+  },
+  {
+    transform: "translateX(1.5px) rotate(8deg) scale(1.04)",
+    offset: 0.3,
+    easing: "ease-in-out",
+  },
+  {
+    transform: "translateX(-1px) rotate(-7deg) scale(1.03)",
+    offset: 0.48,
+    easing: "ease-in-out",
+  },
+  {
+    transform: "translateX(1px) rotate(6deg) scale(1.02)",
+    offset: 0.64,
+    easing: "ease-in-out",
+  },
+  {
+    transform: "translateX(0) rotate(-1.5deg) scale(1)",
+    offset: 0.82,
+    easing: "ease-in-out",
+  },
   { transform: "translateX(0) rotate(0deg) scale(1)", easing: "ease-in-out" },
 ];
 const itemVariants = {
@@ -36,7 +56,11 @@ const itemVariants = {
 export default function SiteNav() {
   const [menuOpen, setMenuOpen] = useState(false);
   // Sand falling from the logo to the hovered menu word: x of the logo's centre, from its bottom to the word's bottom.
-  const [sand, setSand] = useState<{ x: number; from: number; to: number } | null>(null);
+  const [sand, setSand] = useState<{
+    x: number;
+    from: number;
+    to: number;
+  } | null>(null);
   const pourTo = (link: HTMLElement) => {
     const logo = logoRef.current?.getBoundingClientRect();
     if (!logo || prefersReducedMotion) return;
@@ -44,7 +68,8 @@ export default function SiteNav() {
     range.selectNodeContents(link);
     const text = range.getBoundingClientRect();
     // The line box reaches below the letters by the font's descent; stop at the letters' foot instead.
-    const foot = text.bottom - parseFloat(getComputedStyle(link).fontSize) * 0.24;
+    const foot =
+      text.bottom - parseFloat(getComputedStyle(link).fontSize) * 0.24;
     setSand({ x: logo.left + logo.width / 2, from: logo.bottom - 8, to: foot });
   };
   const headerRef = useRef<HTMLElement>(null);
@@ -55,27 +80,43 @@ export default function SiteNav() {
   const links = [...navLinks, navCta];
   // Once the window has dissolved into the full-screen layout the header floats over the page: it shows the current
   // stage word next to the menu button and steps out of the way while the page scrolls down (back on the way up).
-  const { stage, floating, immersive } = useWindowState();
+  const { stage, floating } = useWindowState();
   const direction = useScrollDirection();
-  // Tucked away on the way down, and while a part shows something full screen (an opened hobby).
-  const tucked = floating && (direction === "down" || immersive) && !menuOpen;
-  const stageWord = stages.find(item => item.id === stage)?.word ?? stages[0].word;
+  // Tucked away on the way down.
+  const tucked = floating && direction === "down" && !menuOpen;
+  const stageWord =
+    stages.find((item) => item.id === stage)?.word ?? stages[0].word;
   // The part each menu link leads to, with its stage colour; the current part (once inside the window) is marked.
-  const linkStage = (href: string) => stages.find(item => href.endsWith("#" + item.part));
-  const currentPart = floating ? stages.find(item => item.id === stage)?.part : undefined;
+  const linkStage = (href: string) =>
+    stages.find((item) => href.endsWith("#" + item.part));
+  const currentPart = floating
+    ? stages.find((item) => item.id === stage)?.part
+    : undefined;
   // Ignore hovers while a ring is still playing so repeated events never stack.
   const ringLogo = () => {
     const logo = logoRef.current;
-    if (!logo || prefersReducedMotion || logoRing.current?.playState === "running") return;
+    if (
+      !logo ||
+      prefersReducedMotion ||
+      logoRing.current?.playState === "running"
+    )
+      return;
     logoRing.current = logo.animate(logoRingKeyframes, { duration: 620 });
   };
   useEffect(() => {
-    if (!menuOpen) { setSand(null); return; }
+    if (!menuOpen) {
+      setSand(null);
+      return;
+    }
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") { setMenuOpen(false); toggleRef.current?.focus(); }
+      if (event.key === "Escape") {
+        setMenuOpen(false);
+        toggleRef.current?.focus();
+      }
     };
     const onPointerDown = (event: PointerEvent) => {
-      if (!headerRef.current?.contains(event.target as Node)) setMenuOpen(false);
+      if (!headerRef.current?.contains(event.target as Node))
+        setMenuOpen(false);
     };
     document.addEventListener("keydown", onKeyDown);
     document.addEventListener("pointerdown", onPointerDown);
@@ -85,22 +126,76 @@ export default function SiteNav() {
     };
   }, [menuOpen]);
   return (
-    <header ref={headerRef} className={[styles.header, floating && styles.floating, tucked && styles.tucked].filter(Boolean).join(" ")} onBlur={(event) => {
-      if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setMenuOpen(false);
-    }}>
-      <nav aria-label="주 메뉴" className={styles.nav}>
-        <Link href={navProfile.href} aria-label={`${navProfile.name} 홈`} onClick={() => setMenuOpen(false)} onPointerEnter={(event) => { if (event.pointerType !== "touch") ringLogo(); }} className={styles.logo}>
-          <Image ref={logoRef} src={logoImage} alt="" className={styles.logoImage} sizes="76px" priority />
+    <header
+      ref={headerRef}
+      className={[
+        styles.header,
+        floating && styles.floating,
+        tucked && styles.tucked,
+      ]
+        .filter(Boolean)
+        .join(" ")}
+      onBlur={(event) => {
+        if (!event.currentTarget.contains(event.relatedTarget as Node | null))
+          setMenuOpen(false);
+      }}
+    >
+      <nav
+        aria-label="주 메뉴"
+        className={styles.nav}
+      >
+        <Link
+          href={navProfile.href}
+          aria-label={`${navProfile.name} 홈`}
+          onClick={() => setMenuOpen(false)}
+          onPointerEnter={(event) => {
+            if (event.pointerType !== "touch") ringLogo();
+          }}
+          className={styles.logo}
+        >
+          <Image
+            ref={logoRef}
+            src={logoImage}
+            alt=""
+            className={styles.logoImage}
+            sizes="76px"
+            priority
+          />
         </Link>
-        <button ref={toggleRef} type="button" aria-label={menuOpen ? "메뉴 닫기" : "메뉴 열기"} aria-expanded={menuOpen} aria-controls="site-navigation" onClick={() => setMenuOpen(!menuOpen)} className={styles.toggle}>
-          <span aria-hidden="true" className={`${styles.bar} ${menuOpen ? styles.barTopOpen : ""}`} />
+        <button
+          ref={toggleRef}
+          type="button"
+          aria-label={menuOpen ? "메뉴 닫기" : "메뉴 열기"}
+          aria-expanded={menuOpen}
+          aria-controls="site-navigation"
+          onClick={() => setMenuOpen(!menuOpen)}
+          className={styles.toggle}
+        >
+          <span
+            aria-hidden="true"
+            className={`${styles.bar} ${menuOpen ? styles.barTopOpen : ""}`}
+          />
           {/* Middle bar: phones and tablets only (three bars read as a menu at small sizes; two looked like "="). */}
-          <span aria-hidden="true" className={`${styles.bar} ${styles.barMiddle} ${menuOpen ? styles.barMiddleOpen : ""}`} />
-          <span aria-hidden="true" className={`${styles.bar} ${menuOpen ? styles.barBottomOpen : ""}`} />
+          <span
+            aria-hidden="true"
+            className={`${styles.bar} ${styles.barMiddle} ${menuOpen ? styles.barMiddleOpen : ""}`}
+          />
+          <span
+            aria-hidden="true"
+            className={`${styles.bar} ${menuOpen ? styles.barBottomOpen : ""}`}
+          />
         </button>
         {/* Current stage of the story (decorative: the menu and the sections carry the same information). */}
-        <span className={styles.stageWord} aria-hidden="true"><RollingWord word={stageWord} /></span>
-        <span className={styles.spacer} aria-hidden="true" />
+        <span
+          className={styles.stageWord}
+          aria-hidden="true"
+        >
+          <RollingWord word={stageWord} />
+        </span>
+        <span
+          className={styles.spacer}
+          aria-hidden="true"
+        />
       </nav>
       <AnimatePresence>
         {menuOpen && (
@@ -108,7 +203,9 @@ export default function SiteNav() {
             id="site-navigation"
             aria-label="전체 메뉴"
             className={styles.mobile}
-            onClick={(event) => { if (event.target === event.currentTarget) setMenuOpen(false); }}
+            onClick={(event) => {
+              if (event.target === event.currentTarget) setMenuOpen(false);
+            }}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -126,28 +223,68 @@ export default function SiteNav() {
                 const linkPart = linkStage(link.href);
                 const current = !!linkPart && linkPart.part === currentPart;
                 return (
-                <motion.a
-                  key={link.href}
-                  href={link.href}
-                  aria-current={current ? "location" : undefined}
-                  style={{ "--accent": linkPart?.accent ?? "#7f9657" } as CSSProperties}
-                  onClick={() => setMenuOpen(false)}
-                  onPointerEnter={event => { if (event.pointerType === "mouse") pourTo(event.currentTarget); }}
-                  onPointerLeave={() => setSand(null)}
-                  className={styles.menuLink}
-                  variants={itemVariants}
-                  transition={{ duration: prefersReducedMotion ? 0 : 0.35, ease: [0.2, 0.65, 0.3, 1] }}
-                >
-                  <span lang="en">{link.label}</span>
-                  {/* The current part ends in its stage colour's full stop, like ABSORB. / BUILD. (decorative). */}
-                  {current && <span className={styles.menuDot} aria-hidden="true">.</span>}
-                  {/* Sand mound piled at the foot of the hovered word, where the falling sand lands (decorative). */}
-                  <Image src="/images/effects/sand-mound.webp" alt="" aria-hidden="true" width={900} height={163} className={styles.mound} unoptimized />
-                </motion.a>
+                  <motion.a
+                    key={link.href}
+                    href={link.href}
+                    aria-current={current ? "location" : undefined}
+                    style={
+                      {
+                        "--accent": linkPart?.accent ?? "#7f9657",
+                      } as CSSProperties
+                    }
+                    onClick={() => setMenuOpen(false)}
+                    onPointerEnter={(event) => {
+                      if (event.pointerType === "mouse")
+                        pourTo(event.currentTarget);
+                    }}
+                    onPointerLeave={() => setSand(null)}
+                    className={styles.menuLink}
+                    variants={itemVariants}
+                    transition={{
+                      duration: prefersReducedMotion ? 0 : 0.35,
+                      ease: [0.2, 0.65, 0.3, 1],
+                    }}
+                  >
+                    <span lang="en">{link.label}</span>
+                    {/* The current part ends in its stage colour's full stop, like ABSORB. / BUILD. (decorative). */}
+                    {current && (
+                      <span
+                        className={styles.menuDot}
+                        aria-hidden="true"
+                      >
+                        .
+                      </span>
+                    )}
+                    {/* Sand mound piled at the foot of the hovered word, where the falling sand lands (decorative). */}
+                    <Image
+                      src="/images/effects/sand-mound.webp"
+                      alt=""
+                      aria-hidden="true"
+                      width={900}
+                      height={163}
+                      className={styles.mound}
+                      unoptimized
+                    />
+                  </motion.a>
                 );
               })}
             </motion.div>
-            {contact.email && <motion.a href={`mailto:${contact.email}`} className={styles.menuMail} variants={itemVariants} initial="hidden" animate="visible" exit="hidden" transition={{ duration: prefersReducedMotion ? 0 : 0.35, delay: prefersReducedMotion ? 0 : 0.35 }}>{contact.email}</motion.a>}
+            {contact.email && (
+              <motion.a
+                href={`mailto:${contact.email}`}
+                className={styles.menuMail}
+                variants={itemVariants}
+                initial="hidden"
+                animate="visible"
+                exit="hidden"
+                transition={{
+                  duration: prefersReducedMotion ? 0 : 0.35,
+                  delay: prefersReducedMotion ? 0 : 0.35,
+                }}
+              >
+                {contact.email}
+              </motion.a>
+            )}
           </motion.nav>
         )}
       </AnimatePresence>

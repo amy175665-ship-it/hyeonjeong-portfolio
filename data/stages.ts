@@ -12,4 +12,5 @@ export const stages: Stage[] = [
   { id: "bloom", word: "BLOOM.", accent: "#e9a33a", part: "contact" },
 ];
 
-export const stageOfPart = (part: string) => stages.find(stage => stage.part === part) ?? stages[0];
+export const stageOfPart = (part: string) =>
+  stages.find((stage) => stage.part === part) ?? stages[0];

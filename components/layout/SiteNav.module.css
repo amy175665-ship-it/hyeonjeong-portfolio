@@ -1,52 +1,185 @@
-.header { position: fixed; top: 24px; left: 4.2%; right: 4.2%; z-index: 50; pointer-events: none; transition: transform .45s cubic-bezier(.16, 1, .3, 1); }
+.header {
+  position: fixed;
+  top: 24px;
+  left: 4.2%;
+  right: 4.2%;
+  z-index: 50;
+  pointer-events: none;
+  transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+}
 /* Floating over the full-screen layout: tucked away above the screen while the page scrolls down. */
-.tucked { transform: translateY(calc(-100% - 40px)); }
+.tucked {
+  transform: translateY(calc(-100% - 40px));
+}
 /* Keyboard focus inside a tucked header brings it back at once, so the focused link is never off screen. */
-.tucked:focus-within { transform: none; transition: none; }
+.tucked:focus-within {
+  transform: none;
+  transition: none;
+}
 /* Stage word (ABSORB. → BUILD. → …) left of the menu button, only once the header floats. */
-.stageWord { grid-column: 3; grid-row: 1; justify-self: end; align-self: center; margin-right: 96px; color: #202731; font: 700 13px/1.25 var(--font-pretendard), sans-serif; letter-spacing: .16em; opacity: 0; transition: opacity .3s ease; }
-.floating .stageWord { opacity: 1; }
+.stageWord {
+  grid-column: 3;
+  grid-row: 1;
+  justify-self: end;
+  align-self: center;
+  margin-right: 96px;
+  color: #202731;
+  font:
+    700 13px/1.25 var(--font-pretendard),
+    sans-serif;
+  letter-spacing: 0.16em;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+.floating .stageWord {
+  opacity: 1;
+}
 /* The header row spans the page width over the desert window's title bar: only the logo and the menu button take the
    pointer, so the window buttons and tabs underneath stay clickable. */
-.nav { position: relative; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; min-height: 60px; }
-.logo, .toggle, .mobile { pointer-events: auto; }
-.logo { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); display: grid; place-items: center; width: 76px; height: 76px; z-index: 51; }
-.logoImage { display: block; transform-origin: 50% 20%; width: 100%; height: 100%; object-fit: contain; }
+.nav {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  min-height: 60px;
+}
+.logo,
+.toggle,
+.mobile {
+  pointer-events: auto;
+}
+.logo {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  display: grid;
+  place-items: center;
+  width: 76px;
+  height: 76px;
+  z-index: 51;
+}
+.logoImage {
+  display: block;
+  transform-origin: 50% 20%;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
 /* Bar size and gap are variables so the open × follows the icon size: the outer bars move to the middle, which is
    half a step (gap + bar height) away with two bars and a whole step with three. */
-.toggle { grid-row: 1; --bar-w: 44px; --bar-h: 4px; --bar-gap: 18px; --bar-shift: calc((var(--bar-gap) + var(--bar-h)) / 2); grid-column: 3; justify-self: end; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--bar-gap); width: 76px; height: 76px; background: transparent; position: relative; z-index: 51; }
-.bar { display: block; width: var(--bar-w); height: var(--bar-h); border-radius: calc(var(--bar-h) / 2); background: #202731; transition: transform .3s cubic-bezier(.4, 0, .2, 1); }
-.barTopOpen { transform: translateY(var(--bar-shift)) rotate(45deg); }
-.barBottomOpen { transform: translateY(calc(var(--bar-shift) * -1)) rotate(-45deg); }
-.barMiddle { display: none; transition: opacity .2s ease; }
+.toggle {
+  grid-row: 1;
+  --bar-w: 44px;
+  --bar-h: 4px;
+  --bar-gap: 18px;
+  --bar-shift: calc((var(--bar-gap) + var(--bar-h)) / 2);
+  grid-column: 3;
+  justify-self: end;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--bar-gap);
+  width: 76px;
+  height: 76px;
+  background: transparent;
+  position: relative;
+  z-index: 51;
+}
+.bar {
+  display: block;
+  width: var(--bar-w);
+  height: var(--bar-h);
+  border-radius: calc(var(--bar-h) / 2);
+  background: #202731;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.barTopOpen {
+  transform: translateY(var(--bar-shift)) rotate(45deg);
+}
+.barBottomOpen {
+  transform: translateY(calc(var(--bar-shift) * -1)) rotate(-45deg);
+}
+.barMiddle {
+  display: none;
+  transition: opacity 0.2s ease;
+}
 /* Desktop: while the desert window is up its toolbar holds the menu (tabs) and the logo, so the menu button and logo
    step aside (WindowFrame sets html[data-window-up]). */
 @media (min-width: 1024px) {
-  .toggle { transition: opacity .25s ease, visibility .25s; }
-  :global(html[data-window-up]) .toggle { opacity: 0; visibility: hidden; pointer-events: none; }
+  .toggle {
+    transition:
+      opacity 0.25s ease,
+      visibility 0.25s;
+  }
+  :global(html[data-window-up]) .toggle {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
   /* The window's floating toolbar holds the logo while the window is up. */
-  .logo { transition: opacity .25s ease, visibility .25s; }
-  :global(html[data-window-up]) .logo { opacity: 0; visibility: hidden; pointer-events: none; }
+  .logo {
+    transition:
+      opacity 0.25s ease,
+      visibility 0.25s;
+  }
+  :global(html[data-window-up]) .logo {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
   /* Once the window has dissolved, its floating toolbar stays on as the header (WindowFrame), so this header (logo,
      stage word, menu button) is not shown on desktops at all. */
-  .floating { visibility: hidden; }
-  .floating .logo, .floating .toggle, .floating .stageWord { pointer-events: none; }
+  .floating {
+    visibility: hidden;
+  }
+  .floating .logo,
+  .floating .toggle,
+  .floating .stageWord {
+    pointer-events: none;
+  }
 }
-.barMiddleOpen { opacity: 0; }
+.barMiddleOpen {
+  opacity: 0;
+}
 /* Phones and tablets: a slightly smaller logo (64px) and a light three-bar icon, so the two do not compete and the
    icon reads as a menu (two short bars looked like "="). 44px touch target, bars' right edge on the 24px margin. */
 @media (max-width: 1023px) {
-  .logo { width: 64px; height: 64px; }
-  .toggle { --bar-w: 22px; --bar-h: 2px; --bar-gap: 6px; --bar-shift: calc(var(--bar-gap) + var(--bar-h)); width: 44px; height: 44px; margin-right: -11px; }
-  .barMiddle { display: block; }
+  .logo {
+    width: 64px;
+    height: 64px;
+  }
+  .toggle {
+    --bar-w: 22px;
+    --bar-h: 2px;
+    --bar-gap: 6px;
+    --bar-shift: calc(var(--bar-gap) + var(--bar-h));
+    width: 44px;
+    height: 44px;
+    margin-right: -11px;
+  }
+  .barMiddle {
+    display: block;
+  }
   /* Warm dark brown instead of the ink, so the icon sits in the sand palette next to the green logo. */
-  .bar { background: #5b3f2a; }
+  .bar {
+    background: #5b3f2a;
+  }
   /* Over a dark full-screen project panel (WorkStory sets html[data-on-dark]) or the BLOOM night (ContactStory, data-bloom-dark) the floating stage word and closed menu
      icon turn white. */
-  :global(html:is([data-on-dark], [data-bloom-dark])) .floating .stageWord { color: #fff; }
-  :global(html:is([data-on-dark], [data-bloom-dark])) .floating .bar:not(.barTopOpen):not(.barBottomOpen):not(.barMiddleOpen) { background: #fff; }
+  :global(html:is([data-on-dark], [data-bloom-dark])) .floating .stageWord {
+    color: #fff;
+  }
+  :global(html:is([data-on-dark], [data-bloom-dark]))
+    .floating
+    .bar:not(.barTopOpen):not(.barBottomOpen):not(.barMiddleOpen) {
+    background: #fff;
+  }
 }
-.spacer { display: none; }
+.spacer {
+  display: none;
+}
 .mobile {
   position: fixed;
   inset: 0;
@@ -61,21 +194,95 @@
   background: linear-gradient(180deg, #fcfcfb 0%, #fcfcfb 62%, #f6ead8 100%);
   overflow-y: auto;
 }
-.menuList { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; gap: clamp(8px, 2vw, 16px); }
+.menuList {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(8px, 2vw, 16px);
+}
 /* Menu words in the site's display serif, like the hero's ABSORB. / BUILD. / GROW. */
-.menuLink { position: relative; isolation: isolate; padding: 4px 12px; color: #202731; font: 400 clamp(40px, 6vw, 76px)/1.05 var(--font-editorial), Georgia, serif; letter-spacing: -.01em; text-align: center; text-decoration: none; }
-.menuDot { color: var(--accent); }
+.menuLink {
+  position: relative;
+  isolation: isolate;
+  padding: 4px 12px;
+  color: #202731;
+  font:
+    400 clamp(40px, 6vw, 76px) / 1.05 var(--font-editorial),
+    Georgia,
+    serif;
+  letter-spacing: -0.01em;
+  text-align: center;
+  text-decoration: none;
+}
+.menuDot {
+  color: var(--accent);
+}
 /* The email under the words, for a quick hello. */
-.menuMail { position: relative; z-index: 1; color: #58636e; font-size: 15px; font-weight: 500; text-decoration: underline; text-decoration-color: #e3bf91; text-decoration-thickness: 2px; text-underline-offset: 6px; }
-.menuMail:hover { color: #202731; }
+.menuMail {
+  position: relative;
+  z-index: 1;
+  color: #58636e;
+  font-size: 15px;
+  font-weight: 500;
+  text-decoration: underline;
+  text-decoration-color: #e3bf91;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 6px;
+}
+.menuMail:hover {
+  color: #202731;
+}
 /* Sand mound piled at the foot of the word on hover or keyboard focus: the same size under every word (in em, so it
    follows the menu type size), behind the letters and reaching a little up behind their lower part, growing upward. */
-.mound { position: absolute; left: 50%; top: calc(100% - 4px - .62em); z-index: -1; width: min(5em, 330px); max-width: none; height: auto; opacity: 0; pointer-events: none; transform: translateX(-50%) scale(.6, 0); transform-origin: 50% 75%; transition: transform .45s cubic-bezier(.2, .8, .3, 1), opacity .25s ease; }
-.menuLink:hover .mound, .menuLink:focus-visible .mound { opacity: 1; transform: translateX(-50%) scale(1); }
-@media (min-width: 1024px) {
-  .toggle { grid-column: 3; justify-self: end; }
-  .spacer { display: none; }
+.mound {
+  position: absolute;
+  left: 50%;
+  top: calc(100% - 4px - 0.62em);
+  z-index: -1;
+  width: min(5em, 330px);
+  max-width: none;
+  height: auto;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(-50%) scale(0.6, 0);
+  transform-origin: 50% 75%;
+  transition:
+    transform 0.45s cubic-bezier(0.2, 0.8, 0.3, 1),
+    opacity 0.25s ease;
 }
-@media (max-width: 1023px) { .header { top: 18px; left: 24px; right: 24px; } }
-@media (max-width: 1023px) { .stageWord { margin-right: 60px; font-size: 11px; letter-spacing: .12em; } }
-@media (prefers-reduced-motion: reduce) { .header, .stageWord { transition: none; } }
+.menuLink:hover .mound,
+.menuLink:focus-visible .mound {
+  opacity: 1;
+  transform: translateX(-50%) scale(1);
+}
+@media (min-width: 1024px) {
+  .toggle {
+    grid-column: 3;
+    justify-self: end;
+  }
+  .spacer {
+    display: none;
+  }
+}
+@media (max-width: 1023px) {
+  .header {
+    top: 18px;
+    left: 24px;
+    right: 24px;
+  }
+}
+@media (max-width: 1023px) {
+  .stageWord {
+    margin-right: 60px;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .header,
+  .stageWord {
+    transition: none;
+  }
+}
