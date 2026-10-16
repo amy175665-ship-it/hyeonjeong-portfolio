@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import { useMotionValue } from "framer-motion";
 import { iconPaths } from "@/components/layout/SiteFooter";
 import { onScrollFrame } from "@/components/motion/scrollFrame";
+import { styleWriter } from "@/components/motion/styleWriter";
 import { useWindowState } from "@/components/stage/windowState";
 import { contact } from "@/data/contact";
 import { navProfile } from "@/data/navigation";
@@ -134,6 +135,7 @@ export default function ContactStory() {
       W = box.offsetWidth;
       total = root.offsetHeight;
     };
+    const put = styleWriter(); // writes only changed values (see styleWriter)
     const paint = () => {
       // The 3D views mount once the part comes near; the face renders only while the part is on screen.
       const close = rect.top < H * 1.5 && rect.bottom > -H * 0.5;
@@ -155,16 +157,17 @@ export default function ContactStory() {
         sand = easeInOut(ramp(b, 0.8, 1));
       story.set(CLOSED + (OPEN - CLOSED) * open);
       // The circle starts once the design title and works above have mostly faded (not as a dot on the title).
-      root.style.setProperty(
+      put(
+        root,
         "--night",
         `${(easeInOut(ramp(enter, 0.25, 1)) * (Math.hypot(W, H) / 2 + 80)).toFixed(1)}px`,
       );
-      root.style.setProperty("--enter", enter.toFixed(3));
-      root.style.setProperty("--open", open.toFixed(3));
-      root.style.setProperty("--face", ramp(b, 0.08, 0.24).toFixed(3));
-      root.style.setProperty("--text", ramp(b, 0.14, 0.3).toFixed(3));
-      root.style.setProperty("--bar", easeInOut(ramp(b, 0.7, 0.82)).toFixed(3));
-      root.style.setProperty("--sand", sand.toFixed(4));
+      put(root, "--enter", enter.toFixed(3));
+      put(root, "--open", open.toFixed(3));
+      put(root, "--face", ramp(b, 0.08, 0.24).toFixed(3));
+      put(root, "--text", ramp(b, 0.14, 0.3).toFixed(3));
+      put(root, "--bar", easeInOut(ramp(b, 0.7, 0.82)).toFixed(3));
+      put(root, "--sand", sand.toFixed(4));
       // The floating header (phones) turns light over the night.
       document.documentElement.toggleAttribute(
         "data-bloom-dark",

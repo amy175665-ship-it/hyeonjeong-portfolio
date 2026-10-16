@@ -6,6 +6,7 @@ import Link from "next/link";
 import ProjectLinks from "@/components/ui/ProjectLinks";
 import { scrollToY } from "@/components/layout/scrollLock";
 import { onScrollFrame } from "@/components/motion/scrollFrame";
+import { styleWriter } from "@/components/motion/styleWriter";
 import useSeam from "@/components/motion/useSeam";
 import {
   mainProjects,
@@ -414,6 +415,7 @@ export default function WorkStory() {
       return go;
     });
 
+    const put = styleWriter(); // writes only changed values (see styleWriter)
     const paint = () => {
       if (still) return;
       const { height, width, top } = view,
@@ -431,12 +433,12 @@ export default function WorkStory() {
       const wordsOut = easeInOut(ramp(u(last), 0.5, 0.64)),
         blown = ramp(u(last), 0.64, 1);
       const lift = easeInOut(ramp(p, INTRO * 0.1, INTRO * 0.8));
-      intro.style.setProperty("--lift", lift.toFixed(3));
+      put(intro, "--lift", lift.toFixed(3));
       if (!grains || grains.w !== view.stageWidth || grains.h !== height) {
         grains = buildGrains(view.stageWidth, height);
         drawnAt = -1;
       }
-      dusk.style.opacity = blown > 0 ? "1" : "0";
+      put(dusk, "opacity", blown > 0 ? "1" : "0");
       drawScatter(blown);
       panels.forEach((panel, index) => {
         const a = fade(index);
@@ -450,39 +452,42 @@ export default function WorkStory() {
             a < 1
               ? `radial-gradient(circle at 50% 55%, #000 ${Math.max(radius - 200, 0).toFixed(0)}px, transparent ${radius.toFixed(0)}px)`
               : "";
-          panel.style.maskImage = mask;
-          panel.style.webkitMaskImage = mask;
+          put(panel, "mask-image", mask);
+          put(panel, "-webkit-mask-image", mask);
         } else
-          panel.style.opacity =
-            index === last && blown > 0 ? "0" : a.toFixed(3);
-        panel.style.pointerEvents = a < 0.5 || out > 0.5 ? "none" : "";
-        panel.style.setProperty("--out", out.toFixed(3));
-        panel.style.setProperty(
-          "--zoom",
-          (1.22 - easeOut(a) * 0.22 + d * 0.05).toFixed(4),
-        );
+          put(
+            panel,
+            "opacity",
+            index === last && blown > 0 ? "0" : a.toFixed(3),
+          );
+        put(panel, "pointer-events", a < 0.5 || out > 0.5 ? "none" : "");
+        put(panel, "--out", out.toFixed(3));
+        put(panel, "--zoom", (1.22 - easeOut(a) * 0.22 + d * 0.05).toFixed(4));
+        // The title letters: only those still moving are rewritten (put skips unchanged values).
         chars[index].forEach((char, order) => {
           const k = easeOut(ramp(a, 0.35 + order * 0.03, 0.75 + order * 0.03));
-          char.style.opacity = k.toFixed(3);
-          char.style.filter =
-            k < 1 ? `blur(${((1 - k) * 14).toFixed(1)}px)` : "";
-          char.style.transform =
-            k < 1 ? `translateY(${((1 - k) * 30).toFixed(1)}px)` : "";
+          put(char, "opacity", k.toFixed(3));
+          put(char, "filter", k < 1 ? `blur(${((1 - k) * 14).toFixed(1)}px)` : "");
+          put(
+            char,
+            "transform",
+            k < 1 ? `translateY(${((1 - k) * 30).toFixed(1)}px)` : "",
+          );
         });
-        panel.style.setProperty("--meta", ramp(a, 0.7, 1).toFixed(3));
-        panel.style.setProperty(
+        put(panel, "--meta", ramp(a, 0.7, 1).toFixed(3));
+        put(
+          panel,
           "--band",
           (ramp(d, 0.05, 0.25) * (1 - ramp(d, 0.85, 1))).toFixed(3),
         );
-        panel.style.setProperty(
-          "--band-x",
-          `${(-d * (phone ? 900 : 1500)).toFixed(1)}px`,
-        );
-        panel.style.setProperty(
+        put(panel, "--band-x", `${(-d * (phone ? 900 : 1500)).toFixed(1)}px`);
+        put(
+          panel,
           "--desk-y",
           `${((1 - easeOut(ramp(d, 0.2, 0.55))) * 130).toFixed(1)}%`,
         );
-        panel.style.setProperty(
+        put(
+          panel,
           "--phone-y",
           `${((1 - easeOut(ramp(d, 0.32, 0.65))) * 170).toFixed(1)}%`,
         );
@@ -492,11 +497,14 @@ export default function WorkStory() {
         close = easeInOut(ramp(c, 0.02, 0.6));
       const radius = Math.min(width, height) * (phone ? 0.4 : 0.3),
         full = Math.hypot(width, height) / 2 + 20;
-      closer.style.clipPath =
+      put(
+        closer,
+        "clip-path",
         close > 0
           ? `circle(${(full + (radius - full) * close).toFixed(1)}px at 50% 50%)`
-          : "";
-      closer.style.opacity = c > 0.6 ? (1 - ramp(c, 0.6, 0.7)).toFixed(3) : "";
+          : "",
+      );
+      put(closer, "opacity", c > 0.6 ? (1 - ramp(c, 0.6, 0.7)).toFixed(3) : "");
     };
 
     // Repaints on scroll and resize, only while the panels are within a screen of the viewport.

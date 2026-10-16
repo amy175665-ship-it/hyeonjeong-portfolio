@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import DesignStory, { createOrbit } from "@/components/sections/DesignStory";
 import { onScrollFrame } from "@/components/motion/scrollFrame";
+import { styleWriter } from "@/components/motion/styleWriter";
 import type { DesignItem } from "@/data/design";
 import { workPrinciples } from "@/data/workStyle";
 import styles from "./GrowStory.module.css";
@@ -22,6 +23,8 @@ const ORBIT_RINGS = [0, 1, 2];
 // Leaving (user, 2026-10-14): scrolling on after the hold, each ring grows (the outer ones faster, so the gaps open up)
 // and the grains and works fade, before the contact part comes in.
 const growth = (k: number, exit: number) => 1 + exit * (0.9 + 0.45 * k);
+// g where the rings have grown apart and faded out (the end of the pinned stage); past it nothing is left to draw.
+const END = 1.43;
 const clamp = (value: number) => Math.min(Math.max(value, 0), 1);
 const ramp = (value: number, from: number, to: number) =>
   clamp((value - from) / (to - from));
@@ -194,22 +197,24 @@ export default function GrowStory({
       ];
     };
     let fade = "";
+    const put = styleWriter(); // writes only changed values (see styleWriter)
 
     // top: the section's top on screen. Until one screen in, the circle sits under the closing project panel; the
     // shape changes run over the next three screens (g 0 → 1), the rings hold with the works on them (g 0.85 → 1.1) and
-    // then grow apart and fade (g 1.1 → 1.43, the end of the pinned stage).
+    // then grow apart and fade (g 1.1 → END, the end of the pinned stage).
     const paint = (top: number, time: number) => {
       const g = Math.max((-top - H) / (3 * H), 0);
       const into = ramp(-top, H * 0.7, H),
         off = ramp(g, 0.12, 0.24);
-      list.style.opacity = (into * (1 - off)).toFixed(3);
-      list.style.filter = off > 0 ? `blur(${(off * 10).toFixed(1)}px)` : "";
-      grow.style.opacity = (
-        ramp(g, 0.46, 0.54) *
-        (1 - ramp(g, 0.6, 0.66))
-      ).toFixed(3);
+      put(list, "opacity", (into * (1 - off)).toFixed(3));
+      put(list, "filter", off > 0 ? `blur(${(off * 10).toFixed(1)}px)` : "");
+      put(
+        grow,
+        "opacity",
+        (ramp(g, 0.46, 0.54) * (1 - ramp(g, 0.6, 0.66))).toFixed(3),
+      );
       const hold = easeInOut(ramp(g, 0.64, 0.78)),
-        exit = easeInOut(ramp(g, 1.1, 1.43)),
+        exit = easeInOut(ramp(g, 1.1, END)),
         t = time / 1000;
       orbit.presence = ramp(g, 0.76, 0.85) * (1 - ramp(exit, 0, 0.55));
       orbit.active = true;
@@ -223,23 +228,31 @@ export default function GrowStory({
       }
       for (let i = 0; i < N; i++) {
         const lag = delay[i] * 0.5;
-        const scatter = easeInOut(
-          clamp((ramp(g, 0.18, 0.36) - lag * 0.4) / 0.6),
-        );
-        // The gathering starts as the scattering ends (2026-10-14, user: shorter drift of loose grains).
-        const gather = easeInOut(
-          clamp((ramp(g, 0.34, 0.52) - lag * 0.4) / 0.6),
-        );
         const rings = easeInOut(clamp((ramp(g, 0.58, 0.68) - lag * 0.3) / 0.7));
-        const bx = B[i * 2] + Math.sin(t * 0.6 + i) * 10,
-          by = B[i * 2 + 1] + Math.cos(t * 0.5 + i * 1.3) * 8;
-        let tx = lerp(A[i * 2], bx, scatter),
+        let tx = 0,
+          ty = 0;
+        // Once a grain is on its ring (rings 1) the loose and gathered places no longer count, so they are skipped;
+        // before the rings form (rings 0) its ring place is skipped.
+        if (rings < 1) {
+          const scatter = easeInOut(
+            clamp((ramp(g, 0.18, 0.36) - lag * 0.4) / 0.6),
+          );
+          // The gathering starts as the scattering ends (2026-10-14, user: shorter drift of loose grains).
+          const gather = easeInOut(
+            clamp((ramp(g, 0.34, 0.52) - lag * 0.4) / 0.6),
+          );
+          const bx = B[i * 2] + Math.sin(t * 0.6 + i) * 10,
+            by = B[i * 2 + 1] + Math.cos(t * 0.5 + i * 1.3) * 8;
+          tx = lerp(A[i * 2], bx, scatter);
           ty = lerp(A[i * 2 + 1], by, scatter);
-        tx = lerp(tx, C[i * 2], gather);
-        ty = lerp(ty, C[i * 2 + 1], gather);
-        const [rx, ry] = onRing(i, hold, t, exit);
-        tx = lerp(tx, rx, rings);
-        ty = lerp(ty, ry, rings);
+          tx = lerp(tx, C[i * 2], gather);
+          ty = lerp(ty, C[i * 2 + 1], gather);
+        }
+        if (rings > 0) {
+          const [rx, ry] = onRing(i, hold, t, exit);
+          tx = lerp(tx, rx, rings);
+          ty = lerp(ty, ry, rings);
+        }
         const dx = tx - pointer.x,
           dy = ty - pointer.y,
           d = Math.hypot(dx, dy);
@@ -299,7 +312,8 @@ export default function GrowStory({
     // loop itself only draws and never makes the browser lay the page out mid-frame.
     let frame = 0,
       top = 0,
-      height = 0;
+      height = 0,
+      faded = false;
     // Far from the screen the works' layer stops too.
     const rest = () => {
       orbit.active = false;
@@ -319,6 +333,18 @@ export default function GrowStory({
         rest();
         return;
       }
+      // Past the end (the contact part overlaps this section) the rings have faded out: one last paint leaves them
+      // invisible, then the loop rests until the page scrolls back up.
+      if (-top - H >= 3 * H * END) {
+        if (!faded) {
+          paint(top, time);
+          rest();
+          faded = true;
+        }
+        frame = 0;
+        return;
+      }
+      faded = false;
       paint(top, time);
       frame = requestAnimationFrame(loop);
     };

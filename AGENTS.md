@@ -37,7 +37,7 @@ README는 프로젝트 소개와 개발 안내, 이 문서는 에이전트의 �
 
 - 파일 탐색에는 `rg --files`, 참조 검색에는 `rg -n`을 사용하고, 우선 `app/`, `components/`, `data/` 안에서 범위를 좁힙니다. `.next/`, `node_modules/`와 시안 전체를 처음부터 읽지 않습니다.
 - 스타일 문제는 해당 CSS Module, 인라인 스타일·CSS 변수, 전역 스타일 순서로 영향을 확인합니다. 임의의 `!important`나 전역 덮어쓰기로 원인을 숨기지 않습니다.
-- 스크롤에 묶인 처리는 `window`에 scroll 리스너를 따로 달지 않고 `components/motion/scrollFrame.ts`의 `onScrollFrame({ read, write })`에 등록합니다. 레이아웃 읽기(getBoundingClientRect, offsetHeight, scrollY, getComputedStyle)는 read에, 스타일·속성 쓰기는 write에만 둡니다(write 안의 읽기 하나가 다른 파트가 쓴 스타일을 그 자리에서 다시 계산시킴). Lenis가 페이지를 움직인 같은 프레임에 실행되므로 transform으로 붙잡는 요소가 한 프레임씩 밀려 튀지 않습니다. 화면 밖에서 계속 도는 CSS 애니메이션(특히 var()를 쓰는 키프레임처럼 메인 스레드에서 도는 것)은 `animation-play-state: paused`로 멈춥니다(히어로 단어는 `[data-paused]`, 기술 띠는 AboutCover의 `data-offscreen`, 연락처 별은 ContactStory의 `data-offscreen`).
+- 스크롤에 묶인 처리는 `window`에 scroll 리스너를 따로 달지 않고 `components/motion/scrollFrame.ts`의 `onScrollFrame({ read, write })`에 등록합니다. 레이아웃 읽기(getBoundingClientRect, offsetHeight, scrollY, getComputedStyle)는 read에, 스타일·속성 쓰기는 write에만 둡니다(write 안의 읽기 하나가 다른 파트가 쓴 스타일을 그 자리에서 다시 계산시킴). 매 프레임 쓰는 스타일은 `components/motion/styleWriter.ts`의 `styleWriter()`로 값이 바뀔 때만 씁니다(같은 값도 다시 쓰면 스타일 재계산이 일어남). Lenis가 페이지를 움직인 같은 프레임에 실행되므로 transform으로 붙잡는 요소가 한 프레임씩 밀려 튀지 않습니다. 화면 밖에서 계속 도는 CSS 애니메이션(특히 var()를 쓰는 키프레임처럼 메인 스레드에서 도는 것)은 `animation-play-state: paused`로 멈춥니다(히어로 단어는 `[data-paused]`, 기술 띠는 AboutCover의 `data-offscreen`, 연락처 별은 ContactStory의 `data-offscreen`).
 - 상태·이벤트를 수정할 때는 값을 쓰는 곳과 읽는 곳, 이벤트를 보내는 곳과 받는 곳을 모두 찾습니다. 특히 창 전환은 `ConceptScenes`·`WindowFrame`·`SiteNav`·`scrollLock`·`windowState`의 연결을 확인합니다.
 
 ## 2. 컨셉
@@ -74,7 +74,7 @@ README는 프로젝트 소개와 개발 안내, 이 문서는 에이전트의 �
 app/                       page, layout(폰트·CustomCursor), globals.css, work/[slug] 상세 페이지
 components/
 ├─ layout/                 SiteNav(헤더·전체 메뉴), SiteFooter(상세 페이지 푸터), MenuSand, SkipLink(본문 바로가기), SmoothScroll(Lenis), scrollLock(스크롤 고정·glideTo)
-├─ motion/                 SplitText(글자·단어 쪼개기), RollingWord(글자가 굴러 바뀌는 단어), useScrollDirection, scrollFrame(스크롤 연동 읽기→쓰기 묶음), useSeam(파트 경계의 들어옴·나감 값)
+├─ motion/                 SplitText(글자·단어 쪼개기), RollingWord(글자가 굴러 바뀌는 단어), useScrollDirection, scrollFrame(스크롤 연동 읽기→쓰기 묶음), useSeam(파트 경계의 들어옴·나감 값), styleWriter(바뀐 스타일 값만 쓰기)
 ├─ stage/                  windowState(지금 단계와 창이 풀렸는지를 헤더 등에 알림)
 ├─ sections/
 │  ├─ AboutStory, AboutCover, HobbyFlow, WorkStory, GrowStory, DesignStory, ContactStory   창 안의 소개(ABSORB 표지), 취미, 대표 프로젝트, GROW 원, 디자인, 연락처
@@ -400,6 +400,8 @@ artifacts/                 사용자에게 보여 줄 시안·승인된 시안(�
    - 연락처: 스크롤마다 footer에 CSS 변수 6~7개를 써서 안쪽 요소 전체 스타일 재계산 + 화면에 있을 때 별 80개 반짝임이 메인 스레드에서 돎. 변수를 실제로 쓰는 요소에만 쓰기, 별은 묶음 몇 개로 나눠 반짝이기(모양이 조금 바뀌므로 확인받기).
    - GROW 원 캔버스 루프는 근처에 있으면 스크롤이 없어도 매 프레임 1000개를 그림(시간에 따른 흔들림). 필요하면 멈춰 있을 때 갱신 빈도를 낮춤.
    - 확인: 위 측정 방법으로 전후 비교(특히 디자인·연락처 구간의 CPU 4배 기준 100ms 안팎 작업).
+   - 진행(2026-10-16, 1차, 화면 변화 없음): 프로파일 결과 가만히 있을 때의 주범은 GROW 원 루프(`paint`)였고, 다 사라진 뒤(g 1.43, `END`)에도 연락처 화면에서 계속 돌았습니다. 지금은 END 이후 한 번 그리고 멈추며(다시 올라오면 재개), 고리에 자리 잡은 모래알은 흩어짐·모임 계산을 건너뜁니다. WorkStory·GrowStory·ContactStory의 매 프레임 스타일은 `styleWriter`로 바뀐 값만 씁니다. 측정(실제 GPU, 프로덕션 빌드, 1440×900): 가만히 있을 때 이 PC 디자인 고리 206→119ms/s, 연락처 248→190ms/s. 스크롤은 이 PC에서 원래 부드러움. CPU 4배에서 프로젝트 긴 작업 5개 376ms→4개 260ms, 연락처 56개 3469ms→52개 3085ms(가만히 있을 때 4배 수치는 측정마다 흔들려 비교 근거로 쓰지 않음). 캡처로 프로젝트 제목·디자인 고리·연락처가 이전과 같음을 확인했습니다.
+   - 남은 것: 연락처 스크롤(4배)이 여전히 무겁습니다. 남은 비용은 JS가 아니라 렌더링입니다(스크롤마다 footer 변수 → 별 80개 포함 하위 전체 재계산, 3D 선인장 다시 그리기, 3D 얼굴, 별 반짝임). 변수를 쓰는 요소로 옮기기(화면 변화 없음, 구조 변경)와 별 묶어 반짝이기(모양 조금 바뀜, 확인 필요)가 다음 후보입니다. 디자인 고리는 모래알 1000개 `arc`가 가장 큽니다(사각형으로 바꾸면 빨라지나 모양이 바뀜).
 6. **빌드 확인과 커밋**
    - 완료(2026-10-16): 10-14·10-16 작업을 영역별 커밋 4개(Styles·Opening·Window parts·Docs)로 나눴습니다. 같은 파일에 여러 날의 작업이 섞여 있어 작업 단위로는 나누지 않았습니다. push는 하지 않았습니다.
    - `npm.cmd run build`는 2026-10-16 Tailwind 제거 뒤 성공했습니다(경고는 sharp 없음뿐, `metadataBase`는 같은 날 설정). 이후 변경이 있으면 커밋 전에 다시 빌드합니다. 사용자 개발 서버가 3000번에서 켜져 있으면 `.next/`가 충돌하므로 서버를 잠시 끄거나 별도 작업 복사본에서 빌드합니다(위 "개발 서버와 빌드").

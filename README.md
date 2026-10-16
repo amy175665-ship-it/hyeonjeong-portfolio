@@ -107,7 +107,7 @@ app/
 └─ work/[slug]/page.tsx       대표 프로젝트 상세 페이지
 components/
 ├─ layout/                    SiteNav(헤더·전체 메뉴), SiteFooter(상세 페이지 푸터), MenuSand, SmoothScroll, scrollLock
-├─ motion/                    SplitText·RollingWord(글자 단위 모션), useScrollDirection, scrollFrame(스크롤 연동 읽기→쓰기 묶음), useSeam(파트 경계의 들어옴·나감 값)
+├─ motion/                    SplitText·RollingWord(글자 단위 모션), useScrollDirection, scrollFrame(스크롤 연동 읽기→쓰기 묶음), useSeam(파트 경계의 들어옴·나감 값), styleWriter(바뀐 스타일 값만 쓰기)
 ├─ stage/                     windowState(지금 단계·창이 풀렸는지)
 ├─ sections/
 │  ├─ AboutStory, AboutCover, HobbyFlow, WorkStory, GrowStory, DesignStory, ContactStory   브라우저 창 안의 소개·취미, 대표 프로젝트, 디자인, 연락처
