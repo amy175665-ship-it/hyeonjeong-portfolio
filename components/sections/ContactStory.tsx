@@ -136,6 +136,20 @@ export default function ContactStory() {
       total = root.offsetHeight;
     };
     const put = styleWriter(); // writes only changed values (see styleWriter)
+    // Each scroll-driven value goes on the element that uses it (see the CSS), not on the whole footer: a custom property
+    // on the footer made everything inside it, the 80 stars too, restyle on every scroll frame.
+    const find = (name: string) =>
+      root.querySelector<HTMLElement>(`.${styles[name]}`);
+    const night = find("night"),
+      glow = find("glow"),
+      cactus = find("cactus"),
+      text = find("text"),
+      copyright = find("copyright"),
+      closeBar = find("closeBar"),
+      sandEnd = find("sandEnd");
+    const set = (element: HTMLElement | null, name: string, value: string) => {
+      if (element) put(element, name, value);
+    };
     const paint = () => {
       // The 3D views mount once the part comes near; the face renders only while the part is on screen.
       const close = rect.top < H * 1.5 && rect.bottom > -H * 0.5;
@@ -157,17 +171,24 @@ export default function ContactStory() {
         sand = easeInOut(ramp(b, 0.8, 1));
       story.set(CLOSED + (OPEN - CLOSED) * open);
       // The circle starts once the design title and works above have mostly faded (not as a dot on the title).
-      put(
-        root,
-        "--night",
-        `${(easeInOut(ramp(enter, 0.25, 1)) * (Math.hypot(W, H) / 2 + 80)).toFixed(1)}px`,
+      // The night circle is written as its clip-path (the same circle as the CSS) rather than as --night, so the stars
+      // inside it are not restyled with it.
+      const radius = (
+        easeInOut(ramp(enter, 0.25, 1)) *
+        (Math.hypot(W, H) / 2 + 80)
+      ).toFixed(1);
+      set(
+        night,
+        "clip-path",
+        `circle(${radius}px at 50% calc(50% + var(--chrome, 0px) / 2))`,
       );
-      put(root, "--enter", enter.toFixed(3));
-      put(root, "--open", open.toFixed(3));
-      put(root, "--face", ramp(b, 0.08, 0.24).toFixed(3));
-      put(root, "--text", ramp(b, 0.14, 0.3).toFixed(3));
-      put(root, "--bar", easeInOut(ramp(b, 0.7, 0.82)).toFixed(3));
-      put(root, "--sand", sand.toFixed(4));
+      set(glow, "--open", open.toFixed(3));
+      set(cactus, "--enter", enter.toFixed(3));
+      set(face.current, "--face", ramp(b, 0.08, 0.24).toFixed(3));
+      set(text, "--text", ramp(b, 0.14, 0.3).toFixed(3));
+      set(copyright, "--text", ramp(b, 0.14, 0.3).toFixed(3));
+      set(closeBar, "--bar", easeInOut(ramp(b, 0.7, 0.82)).toFixed(3));
+      set(sandEnd, "--sand", sand.toFixed(4));
       // The floating header (phones) turns light over the night.
       document.documentElement.toggleAttribute(
         "data-bloom-dark",

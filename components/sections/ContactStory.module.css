@@ -1,5 +1,7 @@
-/* BLOOM.: a pinned night stage. ContactStory sets the scroll-driven values; the defaults are the bloomed state (no
-   script, reduced motion): --night circle radius, --open (glow), --face, --text, --bar (closing window bar), --sand. */
+/* BLOOM.: a pinned night stage. ContactStory sets the scroll-driven values on the elements that use them (.night's
+   clip-path, --open on .glow, --enter on .cactus, --face on .face, --text on .text and .copyright, --bar on .closeBar,
+   --sand on .sandEnd); the defaults here are the bloomed state (no script, reduced motion): --night circle radius,
+   --open (glow), --face, --text, --bar (closing window bar), --sand. */
 /* It starts two screens early, over the end of the GROW section (no background, above it), so its stage is pinned while
    the GROW rings grow apart: the night opens from the rings' middle right behind them (2026-10-14, user: no cut between
    design and contact). The first pinned screen is that opening; the bloom runs over the 2.8 screens after it. */
