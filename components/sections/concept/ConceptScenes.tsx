@@ -30,7 +30,7 @@ import {
 import WindGust from "./WindGust";
 import PollenGrow from "./PollenGrow";
 import WindowFrame from "./WindowFrame";
-import SandHandoff, { HANDOFF, HANDOFF_SECONDS } from "./SandHandoff";
+import SandHandoff, { HANDOFF } from "./SandHandoff";
 import {
   COVER,
   COVER_SCROLL,
@@ -78,8 +78,10 @@ const RETURN_SECONDS = 3;
 // Hand-off from the story to the browser window (teacher's feedback): the last scene scatters into sand and the sand
 // gathers into the window's first page (SandHandoff, phases in HANDOFF on the window's `raise` value 0..1; lowering
 // the window plays it backwards).
-const RAISE_SECONDS = HANDOFF_SECONDS; // with the scroll (window button, one wheel step)
+// The hand-off is laid out over HANDOFF_SECONDS (3.2) and plays faster here (3.2 until 2026-10-16).
+const RAISE_SECONDS = 2.2; // with the scroll (window button, one wheel step)
 const JUMP_SECONDS = 1.2; // the logo's way home: quicker, the page glides on anyway
+const FINISH_SECONDS = 0.35; // a wheel step or touch during the glide: the rest of the hand-off, quickly
 const ramp = (value: number, [from, to]: readonly [number, number]) =>
   Math.min(Math.max((value - from) / (to - from), 0), 1);
 const smooth = (t: number) => t * t * (3 - 2 * t);
@@ -433,9 +435,23 @@ export default function ConceptScenes({
     animate(raise, up ? 1 : 0, { duration, ease: "linear" });
     if (!glide) return;
     gliding.current = true;
-    glideTo(up ? travelStart() : coverEnd(), duration, () => {
-      gliding.current = false;
-    });
+    const end = up ? travelStart() : coverEnd();
+    glideTo(
+      end,
+      duration,
+      () => {
+        gliding.current = false;
+      },
+      undefined,
+      // A wheel step, touch or scroll key on the way does not wait for the glide: the page is put at its end (the
+      // window is held at the top all the way, so nothing jumps), the hand-off finishes quickly, and the input scrolls
+      // on from there. A new animation on `raise` replaces the running one.
+      () => {
+        gliding.current = false;
+        scrollToY(end);
+        animate(raise, up ? 1 : 0, { duration: FINISH_SECONDS, ease: "linear" });
+      },
+    );
   };
   useMotionValueEvent(scrollYProgress, "change", (value) => {
     // After the story: a small step down from the cover end raises the window, a small step up from its top lowers it.

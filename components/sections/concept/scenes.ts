@@ -15,7 +15,7 @@ export const COVER = { risen: 0.45, swap: 0.5, sink: 0.55 };
 // "cover" uses the first 2 screens; at its end the page is held while the other scenes play over PLAY_SECONDS,
 // then the last 0.8 screen lets the dunes melt into the next section.
 export const COVER_SCROLL = 2 / 2.8;
-export const PLAY_SECONDS = 11;
+export const PLAY_SECONDS = 7; // 11 until 2026-10-16 (shortened so the opening holds the page less long)
 
 // After the hand-off the window stays held for this many more screens of scroll while its frame (title bar, phone card
 // margins) dissolves into the full-screen layout; the pinned track is this much longer than the story (3.8 screens).

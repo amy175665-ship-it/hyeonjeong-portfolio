@@ -15,13 +15,16 @@ const SCROLL_KEYS = new Set([
   "End",
 ]);
 const block = (event: Event) => event.preventDefault();
-const blockKeys = (event: KeyboardEvent) => {
+// A key that scrolls the page (not one typed into a field or pressed on a control).
+const isScrollKey = (event: KeyboardEvent) => {
   const target = event.target as HTMLElement | null;
-  if (
+  return (
     SCROLL_KEYS.has(event.key) &&
     !target?.closest("input, textarea, select, button, a, [contenteditable]")
-  )
-    event.preventDefault();
+  );
+};
+const blockKeys = (event: KeyboardEvent) => {
+  if (isScrollKey(event)) event.preventDefault();
 };
 const hold = () => {
   if (lockedY !== null && Math.abs(window.scrollY - lockedY) > 1)
@@ -44,21 +47,40 @@ export function scrollToY(y: number) {
   else window.scrollTo(0, y);
 }
 
-// Glides to a scroll position over `duration` seconds, ignoring wheel, touch and scroll keys on the way.
+// Glides to a scroll position over `duration` seconds. Wheel, touch and scroll keys on the way are ignored, or, with
+// `onInterrupt`, end the glide there: `onInterrupt` runs instead of `onDone` and should settle the page (a jump with
+// scrollToY also stops the glide), after which the input scrolls the page as usual.
 export function glideTo(
   y: number,
   duration: number,
   onDone: () => void,
   easing = (t: number) => 1 - Math.pow(1 - t, 3),
+  onInterrupt?: () => void,
 ) {
   if (!lenis || duration <= 0) {
     window.scrollTo(0, y);
     onDone();
     return;
   }
-  window.addEventListener("wheel", block, { passive: false });
-  window.addEventListener("touchmove", block, { passive: false });
-  window.addEventListener("keydown", blockKeys);
+  let over = false;
+  const stopListening = () => {
+    window.removeEventListener("wheel", input);
+    window.removeEventListener("touchmove", input);
+    window.removeEventListener("keydown", input);
+  };
+  const input = (event: Event) => {
+    if (event instanceof KeyboardEvent && !isScrollKey(event)) return;
+    if (!onInterrupt) {
+      event.preventDefault();
+      return;
+    }
+    over = true;
+    stopListening();
+    onInterrupt();
+  };
+  window.addEventListener("wheel", input, { passive: false });
+  window.addEventListener("touchmove", input, { passive: false });
+  window.addEventListener("keydown", input);
   lenis.resize();
   lenis.scrollTo(y, {
     duration,
@@ -66,9 +88,9 @@ export function glideTo(
     lock: true,
     easing,
     onComplete: () => {
-      window.removeEventListener("wheel", block);
-      window.removeEventListener("touchmove", block);
-      window.removeEventListener("keydown", blockKeys);
+      if (over) return;
+      over = true;
+      stopListening();
       onDone();
     },
   });
