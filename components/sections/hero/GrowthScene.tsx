@@ -3,33 +3,106 @@
 import { useEffect, useRef, useState } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import * as THREE from "three";
+import { onScrollFrame } from "@/components/motion/scrollFrame";
 import styles from "./GrowthScene.module.css";
 
 // Keep the cactus scene available for reuse; the avatar occupies its slot for now.
 const SHOW_CACTUS = false;
 
-function Cactus({ near, reduced }: { near: React.MutableRefObject<boolean>; reduced: boolean }) {
+function Cactus({
+  near,
+  reduced,
+}: {
+  near: React.MutableRefObject<boolean>;
+  reduced: boolean;
+}) {
   const plant = useRef<THREE.Group>(null);
   useFrame((_, delta) => {
     if (!plant.current) return;
-    const blend = reduced ? 1 : 1 - Math.exp(-4 * Math.min(delta, .05));
-    plant.current.rotation.z = THREE.MathUtils.lerp(plant.current.rotation.z, near.current && !reduced ? -.1 : 0, blend);
+    const blend = reduced ? 1 : 1 - Math.exp(-4 * Math.min(delta, 0.05));
+    plant.current.rotation.z = THREE.MathUtils.lerp(
+      plant.current.rotation.z,
+      near.current && !reduced ? -0.1 : 0,
+      blend,
+    );
     const size = near.current && !reduced ? 1.045 : 1;
     plant.current.scale.lerp(new THREE.Vector3(size, size, size), blend);
   });
-  return <group rotation={[0, -.3, 0]} position={[0, -.7, 0]}>
-    <mesh position={[0, -.38, 0]}><cylinderGeometry args={[.48, .31, .65, 7]} /><meshStandardMaterial color="#b36e52" flatShading roughness={.95} /></mesh>
-    <mesh position={[0, -.05, 0]}><cylinderGeometry args={[.52, .49, .16, 7]} /><meshStandardMaterial color="#c88665" flatShading roughness={.9} /></mesh>
-    <mesh position={[0, .04, 0]}><cylinderGeometry args={[.43, .43, .03, 7]} /><meshStandardMaterial color="#514138" roughness={1} /></mesh>
-    <group ref={plant} name="growth-cactus">
-      <group rotation={[0, 0, -.14]}>
-        <mesh position={[0, 1.12, 0]}><cylinderGeometry args={[.13, .23, 2.2, 6]} /><meshStandardMaterial color="#818d80" flatShading roughness={.9} /></mesh>
-        <mesh position={[0, 2.23, 0]} scale={[.14, .2, .14]}><icosahedronGeometry args={[1, 0]} /><meshStandardMaterial color="#9caa92" flatShading /></mesh>
-        <mesh position={[-.19, 1.32, 0]} rotation={[0, 0, .9]}><cylinderGeometry args={[.08, .12, .42, 5]} /><meshStandardMaterial color="#9caa92" flatShading /></mesh>
-        {[.4, .8, 1.2, 1.6, 2].map((y, i) => <mesh key={y} position={[i % 2 ? -.16 : .16, y, .1]} rotation={[0, 0, i % 2 ? .9 : -.9]}><coneGeometry args={[.016, .11, 3]} /><meshStandardMaterial color="#e2d8be" /></mesh>)}
+  return (
+    <group
+      rotation={[0, -0.3, 0]}
+      position={[0, -0.7, 0]}
+    >
+      <mesh position={[0, -0.38, 0]}>
+        <cylinderGeometry args={[0.48, 0.31, 0.65, 7]} />
+        <meshStandardMaterial
+          color="#b36e52"
+          flatShading
+          roughness={0.95}
+        />
+      </mesh>
+      <mesh position={[0, -0.05, 0]}>
+        <cylinderGeometry args={[0.52, 0.49, 0.16, 7]} />
+        <meshStandardMaterial
+          color="#c88665"
+          flatShading
+          roughness={0.9}
+        />
+      </mesh>
+      <mesh position={[0, 0.04, 0]}>
+        <cylinderGeometry args={[0.43, 0.43, 0.03, 7]} />
+        <meshStandardMaterial
+          color="#514138"
+          roughness={1}
+        />
+      </mesh>
+      <group
+        ref={plant}
+        name="growth-cactus"
+      >
+        <group rotation={[0, 0, -0.14]}>
+          <mesh position={[0, 1.12, 0]}>
+            <cylinderGeometry args={[0.13, 0.23, 2.2, 6]} />
+            <meshStandardMaterial
+              color="#818d80"
+              flatShading
+              roughness={0.9}
+            />
+          </mesh>
+          <mesh
+            position={[0, 2.23, 0]}
+            scale={[0.14, 0.2, 0.14]}
+          >
+            <icosahedronGeometry args={[1, 0]} />
+            <meshStandardMaterial
+              color="#9caa92"
+              flatShading
+            />
+          </mesh>
+          <mesh
+            position={[-0.19, 1.32, 0]}
+            rotation={[0, 0, 0.9]}
+          >
+            <cylinderGeometry args={[0.08, 0.12, 0.42, 5]} />
+            <meshStandardMaterial
+              color="#9caa92"
+              flatShading
+            />
+          </mesh>
+          {[0.4, 0.8, 1.2, 1.6, 2].map((y, i) => (
+            <mesh
+              key={y}
+              position={[i % 2 ? -0.16 : 0.16, y, 0.1]}
+              rotation={[0, 0, i % 2 ? 0.9 : -0.9]}
+            >
+              <coneGeometry args={[0.016, 0.11, 3]} />
+              <meshStandardMaterial color="#e2d8be" />
+            </mesh>
+          ))}
+        </group>
       </group>
     </group>
-  </group>;
+  );
 }
 
 // Split a word so every character, including the period, reacts to hover on its own.
@@ -52,12 +125,28 @@ function HoverLetters({ text }: { text: string }) {
       const natural = chars.map(left);
       const size = parseFloat(getComputedStyle(box).fontSize);
       box.classList.add(styles.loose);
-      chars.forEach((char, index) => { char.style.marginLeft = `${(natural[index] - left(char)) / size}em`; });
+      chars.forEach((char, index) => {
+        char.style.marginLeft = `${(natural[index] - left(char)) / size}em`;
+      });
       holder.style.transform = "";
     });
-    return () => { active = false; };
+    return () => {
+      active = false;
+    };
   }, []);
-  return <span ref={word}>{text.split("").map((char, index) => <span key={index} className={styles.char} data-sand-letter=""><span className={styles.glyph}>{char}</span></span>)}</span>;
+  return (
+    <span ref={word}>
+      {text.split("").map((char, index) => (
+        <span
+          key={index}
+          className={styles.char}
+          data-sand-letter=""
+        >
+          <span className={styles.glyph}>{char}</span>
+        </span>
+      ))}
+    </span>
+  );
 }
 
 export default function GrowthScene() {
@@ -71,8 +160,14 @@ export default function GrowthScene() {
     const motion = matchMedia("(prefers-reduced-motion: reduce)");
     const updateMotion = () => setReduced(motion.matches);
     const update = () => setDesktop(media.matches);
-    update(); updateMotion(); media.addEventListener("change", update); motion.addEventListener("change", updateMotion);
-    return () => { media.removeEventListener("change", update); motion.removeEventListener("change", updateMotion); };
+    update();
+    updateMotion();
+    media.addEventListener("change", update);
+    motion.addEventListener("change", updateMotion);
+    return () => {
+      media.removeEventListener("change", update);
+      motion.removeEventListener("change", updateMotion);
+    };
   }, []);
   useEffect(() => {
     if (!desktop) return;
@@ -81,33 +176,113 @@ export default function GrowthScene() {
     const move = (event: PointerEvent) => {
       if (event.pointerType === "touch") return;
       const rect = cover.getBoundingClientRect();
-      const inside = event.clientY >= rect.top && event.clientY <= rect.bottom && !document.querySelector('button[aria-controls="site-navigation"][aria-expanded="true"]');
+      const inside =
+        event.clientY >= rect.top &&
+        event.clientY <= rect.bottom &&
+        !document.querySelector(
+          'button[aria-controls="site-navigation"][aria-expanded="true"]',
+        );
       const plantRect = pot.current?.getBoundingClientRect();
-      near.current = !!(inside && plantRect && event.clientX > plantRect.left && event.clientX < plantRect.right && event.clientY > plantRect.top && event.clientY < plantRect.bottom);
+      near.current = !!(
+        inside &&
+        plantRect &&
+        event.clientX > plantRect.left &&
+        event.clientX < plantRect.right &&
+        event.clientY > plantRect.top &&
+        event.clientY < plantRect.bottom
+      );
     };
     // The water-drop pointer and click drop that lived here moved to the site-wide CustomCursor.
-    const leave = () => { near.current = false; };
-    const scroll = () => root.current?.style.setProperty("--drift", `${reduced ? 0 : Math.min(scrollY, innerHeight) * .08}px`);
+    const leave = () => {
+      near.current = false;
+    };
+    let drift = "",
+      next = "";
+    const read = () => {
+      next = `${reduced ? 0 : Math.min(scrollY, innerHeight) * 0.08}px`;
+    };
+    const write = () => {
+      if (next !== drift) {
+        drift = next;
+        root.current?.style.setProperty("--drift", drift);
+      }
+    };
     if (reduced) leave();
     window.addEventListener("pointermove", move, { passive: true });
     cover.addEventListener("pointerleave", leave);
-    window.addEventListener("scroll", scroll, { passive: true });
-    scroll();
-    return () => { window.removeEventListener("pointermove", move); cover.removeEventListener("pointerleave", leave); window.removeEventListener("scroll", scroll); };
+    const offScroll = onScrollFrame({ read, write });
+    read();
+    write();
+    return () => {
+      window.removeEventListener("pointermove", move);
+      cover.removeEventListener("pointerleave", leave);
+      offScroll();
+    };
   }, [desktop, reduced]);
   if (!desktop) return null;
-  return <div ref={root} className={styles.scene}>
-    <div className={styles.sunlight} aria-hidden="true" />
-    <div className={styles.shadow} aria-hidden="true"><i /><i /><i /></div>
-    <div className={styles.absorb} aria-hidden="true"><HoverLetters text="ABSORB." /></div>
-    <div className={styles.build} aria-hidden="true"><HoverLetters text="BUILD." /></div>
-    <div className={styles.grow} aria-hidden="true"><HoverLetters text="GROW." /></div>
-    {SHOW_CACTUS && <div className={styles.plant} ref={pot} role="img" aria-label="테라코타 화분에서 비스듬히 자라는 로우폴리 선인장">
-      <Canvas dpr={[1, 1.5]} camera={{ position: [0, 1, 6], fov: 35 }} gl={{ alpha: true, antialias: true }}>
-        <hemisphereLight intensity={1.4} args={["#fff7df", "#778a99", 1.4]} />
-        <directionalLight position={[4, 5, 3]} intensity={3} color="#fff0cc" />
-        <Cactus near={near} reduced={reduced} />
-      </Canvas>
-    </div>}
-  </div>;
+  return (
+    <div
+      ref={root}
+      className={styles.scene}
+    >
+      <div
+        className={styles.sunlight}
+        aria-hidden="true"
+      />
+      <div
+        className={styles.shadow}
+        aria-hidden="true"
+      >
+        <i />
+        <i />
+        <i />
+      </div>
+      <div
+        className={styles.absorb}
+        aria-hidden="true"
+      >
+        <HoverLetters text="ABSORB." />
+      </div>
+      <div
+        className={styles.build}
+        aria-hidden="true"
+      >
+        <HoverLetters text="BUILD." />
+      </div>
+      <div
+        className={styles.grow}
+        aria-hidden="true"
+      >
+        <HoverLetters text="GROW." />
+      </div>
+      {SHOW_CACTUS && (
+        <div
+          className={styles.plant}
+          ref={pot}
+          role="img"
+          aria-label="테라코타 화분에서 비스듬히 자라는 로우폴리 선인장"
+        >
+          <Canvas
+            dpr={[1, 1.5]}
+            camera={{ position: [0, 1, 6], fov: 35 }}
+            gl={{ alpha: true, antialias: true }}
+          >
+            <hemisphereLight
+              intensity={1.4}
+              args={["#fff7df", "#778a99", 1.4]}
+            />
+            <directionalLight
+              position={[4, 5, 3]}
+              intensity={3}
+              color="#fff0cc"
+            />
+            <Cactus
+              near={near}
+              reduced={reduced}
+            />
+          </Canvas>
+        </div>
+      )}
+    </div>
+  );
 }

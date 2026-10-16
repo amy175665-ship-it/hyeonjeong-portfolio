@@ -24,7 +24,8 @@ export const DISSOLVE_SCREENS = 0.9;
 export type SceneName = keyof typeof SCENES;
 
 const clamp = (value: number) => Math.min(Math.max(value, 0), 1);
-const ramp = (value: number, from: number, to: number) => clamp((value - from) / (to - from));
+const ramp = (value: number, from: number, to: number) =>
+  clamp((value - from) / (to - from));
 
 // 0..1 progress inside one scene.
 export function sceneProgress(progress: number, scene: SceneName) {

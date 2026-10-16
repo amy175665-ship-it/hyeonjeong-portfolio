@@ -5,14 +5,27 @@ import type Lenis from "lenis";
 let lenis: Lenis | null = null;
 let lockedY: number | null = null;
 
-const SCROLL_KEYS = new Set([" ", "PageUp", "PageDown", "ArrowUp", "ArrowDown", "Home", "End"]);
+const SCROLL_KEYS = new Set([
+  " ",
+  "PageUp",
+  "PageDown",
+  "ArrowUp",
+  "ArrowDown",
+  "Home",
+  "End",
+]);
 const block = (event: Event) => event.preventDefault();
 const blockKeys = (event: KeyboardEvent) => {
   const target = event.target as HTMLElement | null;
-  if (SCROLL_KEYS.has(event.key) && !target?.closest("input, textarea, select, button, a, [contenteditable]")) event.preventDefault();
+  if (
+    SCROLL_KEYS.has(event.key) &&
+    !target?.closest("input, textarea, select, button, a, [contenteditable]")
+  )
+    event.preventDefault();
 };
 const hold = () => {
-  if (lockedY !== null && Math.abs(window.scrollY - lockedY) > 1) window.scrollTo(0, lockedY);
+  if (lockedY !== null && Math.abs(window.scrollY - lockedY) > 1)
+    window.scrollTo(0, lockedY);
 };
 const releaseOnLink = (event: MouseEvent) => {
   if ((event.target as HTMLElement | null)?.closest("a[href]")) unlockScroll();
@@ -32,7 +45,12 @@ export function scrollToY(y: number) {
 }
 
 // Glides to a scroll position over `duration` seconds, ignoring wheel, touch and scroll keys on the way.
-export function glideTo(y: number, duration: number, onDone: () => void, easing = (t: number) => 1 - Math.pow(1 - t, 3)) {
+export function glideTo(
+  y: number,
+  duration: number,
+  onDone: () => void,
+  easing = (t: number) => 1 - Math.pow(1 - t, 3),
+) {
   if (!lenis || duration <= 0) {
     window.scrollTo(0, y);
     onDone();
@@ -43,7 +61,10 @@ export function glideTo(y: number, duration: number, onDone: () => void, easing 
   window.addEventListener("keydown", blockKeys);
   lenis.resize();
   lenis.scrollTo(y, {
-    duration, force: true, lock: true, easing,
+    duration,
+    force: true,
+    lock: true,
+    easing,
     onComplete: () => {
       window.removeEventListener("wheel", block);
       window.removeEventListener("touchmove", block);

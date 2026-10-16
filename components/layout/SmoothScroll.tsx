@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, type ReactNode } from "react";
 import Lenis from "lenis";
+import { flushScrollFrame } from "@/components/motion/scrollFrame";
 import { registerLenis } from "./scrollLock";
 
 export default function SmoothScroll({ children }: { children: ReactNode }) {
@@ -9,7 +10,7 @@ export default function SmoothScroll({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const prefersReducedMotion = window.matchMedia(
-      "(prefers-reduced-motion: reduce)"
+      "(prefers-reduced-motion: reduce)",
     ).matches;
 
     // People who've asked their OS for less motion get native scroll, full stop.
@@ -22,6 +23,8 @@ export default function SmoothScroll({ children }: { children: ReactNode }) {
     });
     lenisRef.current = lenis;
     registerLenis(lenis);
+    // Scroll-tied parts read and paint right after Lenis has moved the page, in the same frame.
+    const offScroll = lenis.on("scroll", flushScrollFrame);
 
     let rafId: number;
     function raf(time: number) {
@@ -32,6 +35,7 @@ export default function SmoothScroll({ children }: { children: ReactNode }) {
 
     return () => {
       cancelAnimationFrame(rafId);
+      offScroll();
       registerLenis(null);
       lenis.destroy();
     };

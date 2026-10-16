@@ -9,32 +9,72 @@ function Letters({ text }: { text: string }) {
   return (
     <>
       {text.split("").map((char, index) => (
-        <span key={index} className={styles.letter}>{char === " " ? "\u00a0" : char}</span>
+        <span
+          key={index}
+          className={styles.letter}
+        >
+          {char === " " ? "\u00a0" : char}
+        </span>
       ))}
     </>
   );
 }
 
-export default function Hero({ showTitle = true, desert = false }: { showTitle?: boolean; desert?: boolean }) {
+export default function Hero({
+  showTitle = true,
+  desert = false,
+}: {
+  showTitle?: boolean;
+  desert?: boolean;
+}) {
   return (
     <>
-    <section className={`${styles.hero} ${!showTitle ? styles.editorial : ""} ${desert ? styles.desert : ""}`} aria-labelledby="hero-title">
-      <div className={styles.composition}>
-        <div className={styles.atmosphere} aria-hidden="true" />
-        <HeroAvatar />
-        <div className={styles.intro}>
-          <h1 id="hero-title" className={`${styles.title} ${showTitle ? "" : styles.titleHidden}`} lang="en" aria-label="ABSORB. BUILD. GROW.">
-            <span aria-hidden="true"><Letters text="ABSORB." /></span>
-            <span aria-hidden="true"><Letters text="BUILD." /></span>
-            <span aria-hidden="true"><em><Letters text="GROW." /></em></span>
-          </h1>
-          <p className={styles.coverSubtitle}>배운 것을 흡수하고, 직접 구현하며 성장하는<br className={styles.subtitleBreak} /> 웹퍼블리셔 백현정입니다.</p>
+      <section
+        className={`${styles.hero} ${!showTitle ? styles.editorial : ""} ${desert ? styles.desert : ""}`}
+        aria-labelledby="hero-title"
+      >
+        <div className={styles.composition}>
+          <div
+            className={styles.atmosphere}
+            aria-hidden="true"
+          />
+          <HeroAvatar />
+          <div className={styles.intro}>
+            <h1
+              id="hero-title"
+              className={`${styles.title} ${showTitle ? "" : styles.titleHidden}`}
+              lang="en"
+              aria-label="ABSORB. BUILD. GROW."
+            >
+              <span aria-hidden="true">
+                <Letters text="ABSORB." />
+              </span>
+              <span aria-hidden="true">
+                <Letters text="BUILD." />
+              </span>
+              <span aria-hidden="true">
+                <em>
+                  <Letters text="GROW." />
+                </em>
+              </span>
+            </h1>
+            <p className={styles.coverSubtitle}>
+              배운 것을 흡수하고, 직접 구현하며 성장하는
+              <br className={styles.subtitleBreak} /> 웹퍼블리셔 백현정입니다.
+            </p>
+          </div>
+          {!showTitle && <GrowthScene />}
+          <SandStream />
+          <Image
+            src={sandImage}
+            alt=""
+            aria-hidden="true"
+            className={styles.sand}
+            priority
+            unoptimized
+          />
         </div>
-        {!showTitle && <GrowthScene />}
-        <SandStream />
-        <Image src={sandImage} alt="" aria-hidden="true" className={styles.sand} priority unoptimized />
-      </div>
-    </section>
+      </section>
     </>
   );
 }

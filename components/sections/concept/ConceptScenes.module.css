@@ -3,76 +3,383 @@
    the track is --dissolve screens longer, where the window is held while its frame dissolves.
    Layers: the stage is in front of the window until the hand-off is over (the sand uncovers the window behind it), then
    the window comes in front (data-up, set by ConceptScenes). */
-.scenes { --cover-h: max(600px, 100svh); position: relative; isolation: isolate; }
-.track { position: relative; z-index: 2; height: calc(var(--cover-h) * (3.8 + var(--dissolve, 0))); }
-.scenes[data-up] > .track { z-index: 0; }
-.storyTrack { position: absolute; top: 0; left: 0; width: 1px; height: calc(var(--cover-h) * 3.8); visibility: hidden; pointer-events: none; }
-.stage { position: sticky; top: 0; height: var(--cover-h); overflow: hidden; overflow: clip; isolation: isolate; }
+.scenes {
+  --cover-h: max(600px, 100svh);
+  position: relative;
+  isolation: isolate;
+}
+.track {
+  position: relative;
+  z-index: 2;
+  height: calc(var(--cover-h) * (3.8 + var(--dissolve, 0)));
+}
+.scenes[data-up] > .track {
+  z-index: 0;
+}
+.storyTrack {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1px;
+  height: calc(var(--cover-h) * 3.8);
+  visibility: hidden;
+  pointer-events: none;
+}
+.stage {
+  position: sticky;
+  top: 0;
+  height: var(--cover-h);
+  overflow: hidden;
+  overflow: clip;
+  isolation: isolate;
+}
 /* Once the hand-off has turned the screen white, the whole stage steps aside so the window held behind it shows under
    the gathering grains. */
-.stage[data-handoff] > * { visibility: hidden; }
+.stage[data-handoff] > * {
+  visibility: hidden;
+}
 /* Layers: sky (+ time-of-day layers) < hero (until the swap) < sand < tint < cactus < gust < pollen < text. */
-.hero { position: absolute; inset: 0; z-index: 1; }
-.sky { position: absolute; inset: 0; z-index: 0; background: #f7fbfe url('/images/hero/hero-sunlight-bg.webp') center / cover no-repeat; }
+.hero {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+.sky {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: #f7fbfe url("/images/hero/hero-sunlight-bg.webp") center / cover
+    no-repeat;
+}
 /* Same size and centering as Hero's .sand (hidden in desert mode); its vertical position is set from scroll. */
-.sand { position: absolute; top: 0; left: 50%; z-index: 2; width: max(100vw, 1100px); max-width: none; height: auto; transform: translate(-50%, 0); pointer-events: none; user-select: none; will-change: transform; }
+.sand {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  z-index: 2;
+  width: max(100vw, 1100px);
+  max-width: none;
+  height: auto;
+  transform: translate(-50%, 0);
+  pointer-events: none;
+  user-select: none;
+  will-change: transform;
+}
 /* Cactus stands on the dunes, in front of the sand. The wrapper hides it while the hand-off's grains stand in for it. */
-.cactusWrap { position: absolute; inset: 0; z-index: 4; pointer-events: none; }
+.cactusWrap {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+}
 /* Hand-off (SandHandoff): while the scene scatters into sand, the desert behind it fades to the window's white. The
    grains are drawn on a screen-fixed canvas in front of the stage and the window. */
-.handoffWhite { position: absolute; inset: 0; z-index: 11; pointer-events: none; opacity: 0; background: #fcfcfb; }
-.sandHandoff { position: fixed; inset: 0; z-index: 3; width: 100vw; height: 100vh; pointer-events: none; }
+.handoffWhite {
+  position: absolute;
+  inset: 0;
+  z-index: 11;
+  pointer-events: none;
+  opacity: 0;
+  background: #fcfcfb;
+}
+.sandHandoff {
+  position: fixed;
+  inset: 0;
+  z-index: 3;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+}
 /* Time-of-day layers fade over the daylight sky; nothing flashes, each only crossfades with scroll. */
-.skyLayer { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
-.sunset { background: linear-gradient(180deg, #e98a6e 0%, #f3b07a 45%, #f8d3a0 70%); }
-.night { background: linear-gradient(180deg, #121b33 0%, #24314f 50%, #44506d 75%); }
-.night i { position: absolute; border-radius: 50%; background: #fff7e2; }
-.dawn { background: linear-gradient(180deg, #b9d4ec 0%, #f2d6c4 55%, #f8e3c8 75%); }
-.tint { position: absolute; inset: 0; z-index: 3; pointer-events: none; mix-blend-mode: multiply; }
-.tintSunset { background: #f08a5d; }
-.tintNight { background: #1d2742; }
+.skyLayer {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+.sunset {
+  background: linear-gradient(180deg, #e98a6e 0%, #f3b07a 45%, #f8d3a0 70%);
+}
+.night {
+  background: linear-gradient(180deg, #121b33 0%, #24314f 50%, #44506d 75%);
+}
+.night i {
+  position: absolute;
+  border-radius: 50%;
+  background: #fff7e2;
+}
+.dawn {
+  background: linear-gradient(180deg, #b9d4ec 0%, #f2d6c4 55%, #f8e3c8 75%);
+}
+.tint {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  mix-blend-mode: multiply;
+}
+.tintSunset {
+  background: #f08a5d;
+}
+.tintNight {
+  background: #1d2742;
+}
 /* The canvas is much wider than the cactus so its long low-sun shadows are not cut off; the 3D camera keeps a vertical
    field of view, so the width does not change the cactus size (it is set by the height). */
-.cactus { position: absolute; left: 50%; bottom: 3%; z-index: 4; width: min(140vw, 1600px); height: min(66svh, 620px); transform: translateX(-50%); transform-origin: 50% 100%; pointer-events: none; }
-.gust { position: absolute; inset: 0; z-index: 5; display: block; width: 100%; height: 100%; pointer-events: none; }
+.cactus {
+  position: absolute;
+  left: 50%;
+  bottom: 3%;
+  z-index: 4;
+  width: min(140vw, 1600px);
+  height: min(66svh, 620px);
+  transform: translateX(-50%);
+  transform-origin: 50% 100%;
+  pointer-events: none;
+}
+.gust {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: block;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
 /* Scene phrases sit in the open sky (left, about a third down), large enough to read against any time of day. */
-.phrase { position: absolute; left: 15vw; top: 26%; z-index: 7; max-width: 64%; margin: 0; pointer-events: none; color: #202731; font: 600 clamp(36px, 4.4vw, 76px)/1.2 var(--font-editorial), var(--font-hangul-serif, serif), Georgia, serif; letter-spacing: -.035em; word-break: keep-all; }
-.pollen { position: absolute; inset: 0; z-index: 6; display: block; width: 100%; height: 100%; pointer-events: none; }
+.phrase {
+  position: absolute;
+  left: 15vw;
+  top: 26%;
+  z-index: 7;
+  max-width: 64%;
+  margin: 0;
+  pointer-events: none;
+  color: #202731;
+  font:
+    600 clamp(36px, 4.4vw, 76px) / 1.2 var(--font-editorial),
+    var(--font-hangul-serif, serif),
+    Georgia,
+    serif;
+  letter-spacing: -0.035em;
+  word-break: keep-all;
+}
+.pollen {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  display: block;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
 /* Lets the pollen fade out with the cactus when the story rewinds. */
-.pollenLayer { position: absolute; inset: 0; z-index: 6; pointer-events: none; }
+.pollenLayer {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  pointer-events: none;
+}
 /* Desktop: the cactus stands on the right for the whole story (text left, empty desert center, cactus right). */
 @media (min-width: 1024px) {
   /* Cactus on the right, slightly past 70% and low on the dunes, at 1.392x (the canvas is sized from its untransformed
      box, so this scale applies once). */
-  .cactus { left: calc(70% + min(46vw, 520px) * .106); transform: translate(-50%, calc(4svh + min(66svh, 620px) * .212)) scale(1.392); }
+  .cactus {
+    left: calc(70% + min(46vw, 520px) * 0.106);
+    transform: translate(-50%, calc(4svh + min(66svh, 620px) * 0.212))
+      scale(1.392);
+  }
 }
 /* SCENE 3 statement: left side, a little below the middle, two tones; the cactus stands lower on the right. */
-.statement { position: absolute; left: 15vw; top: 26%; z-index: 7; display: flex; flex-direction: column; gap: .12em; max-width: 58vw; margin: 0; pointer-events: none; font: 600 clamp(36px, 4.4vw, 76px)/1.25 var(--font-editorial), var(--font-hangul-serif, serif), Georgia, serif; letter-spacing: -.035em; word-break: keep-all; }
-.statementLight { color: #fbf1df; text-shadow: 0 1px 18px #7a3c1e26; }
+.statement {
+  position: absolute;
+  left: 15vw;
+  top: 26%;
+  z-index: 7;
+  display: flex;
+  flex-direction: column;
+  gap: 0.12em;
+  max-width: 58vw;
+  margin: 0;
+  pointer-events: none;
+  font:
+    600 clamp(36px, 4.4vw, 76px) / 1.25 var(--font-editorial),
+    var(--font-hangul-serif, serif),
+    Georgia,
+    serif;
+  letter-spacing: -0.035em;
+  word-break: keep-all;
+}
+.statementLight {
+  color: #fbf1df;
+  text-shadow: 0 1px 18px #7a3c1e26;
+}
 /* Closing under the pollen "GROW.": one large line, then a quiet note in the body typeface. */
-.closing { position: absolute; left: 50%; top: calc(33% + 40px); z-index: 7; width: min(92vw, 760px); text-align: center; pointer-events: none; }
-.closingLead { margin: 0; color: #202731; font: 600 clamp(28px, 3vw, 48px)/1.2 var(--font-editorial), var(--font-hangul-serif, serif), Georgia, serif; letter-spacing: -.03em; word-break: keep-all; }
-.closingNote { margin: 10px 0 0; color: #58636e; font: 400 clamp(14px, 1.15vw, 18px)/1.7 var(--font-pretendard), sans-serif; word-break: keep-all; }
+.closing {
+  position: absolute;
+  left: 50%;
+  top: calc(33% + 40px);
+  z-index: 7;
+  width: min(92vw, 760px);
+  text-align: center;
+  pointer-events: none;
+}
+.closingLead {
+  margin: 0;
+  color: #202731;
+  font:
+    600 clamp(28px, 3vw, 48px) / 1.2 var(--font-editorial),
+    var(--font-hangul-serif, serif),
+    Georgia,
+    serif;
+  letter-spacing: -0.03em;
+  word-break: keep-all;
+}
+.closingNote {
+  margin: 10px 0 0;
+  color: #58636e;
+  font:
+    400 clamp(14px, 1.15vw, 18px) / 1.7 var(--font-pretendard),
+    sans-serif;
+  word-break: keep-all;
+}
 /* End of the story: the bottom of the dunes melts into flat sand (#e3bf91, sampled from the dune image) as the window rises. */
-.groundFade { position: absolute; left: 0; right: 0; bottom: 0; height: 22%; z-index: 3; pointer-events: none; background: linear-gradient(180deg, #e3bf9100, #e3bf91); }
+.groundFade {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 22%;
+  z-index: 3;
+  pointer-events: none;
+  background: linear-gradient(180deg, #e3bf9100, #e3bf91);
+}
 @media (max-width: 1023px) {
-  .cactus { width: 240vw; height: 58svh; bottom: 8%; }
-  .statement { left: 24px; top: 18%; max-width: calc(100% - 48px); font-size: clamp(30px, 8.4vw, 44px); }
-  .phrase { left: 24px; top: 20%; max-width: calc(100% - 48px); font-size: clamp(30px, 8.6vw, 44px); }
-  .closing { top: calc(30% + 28px); }
+  .cactus {
+    width: 240vw;
+    height: 58svh;
+    bottom: 8%;
+  }
+  .statement {
+    left: 24px;
+    top: 18%;
+    max-width: calc(100% - 48px);
+    font-size: clamp(30px, 8.4vw, 44px);
+  }
+  .phrase {
+    left: 24px;
+    top: 20%;
+    max-width: calc(100% - 48px);
+    font-size: clamp(30px, 8.6vw, 44px);
+  }
+  .closing {
+    top: calc(30% + 28px);
+  }
 }
 /* End of the story: a thin line at the bottom with one grain falling down it, inviting the next scroll. */
-.scrollCue { position: absolute; left: 50%; bottom: 28px; z-index: 7; width: 2px; height: 56px; transform: translateX(-50%); pointer-events: none; overflow: hidden; border-radius: 2px; background: linear-gradient(180deg, #20273100, #20273170); }
-.scrollCue i { position: absolute; left: -1px; top: 0; width: 4px; height: 14px; border-radius: 2px; background: #7a5128; animation: cueFall 1.8s cubic-bezier(.45, 0, .55, 1) infinite; }
-@keyframes cueFall { 0% { transform: translateY(-14px); opacity: 0; } 25% { opacity: 1; } 80% { opacity: 1; } 100% { transform: translateY(56px); opacity: 0; } }
+.scrollCue {
+  position: absolute;
+  left: 50%;
+  bottom: 28px;
+  z-index: 7;
+  width: 2px;
+  height: 56px;
+  transform: translateX(-50%);
+  pointer-events: none;
+  overflow: hidden;
+  border-radius: 2px;
+  background: linear-gradient(180deg, #20273100, #20273170);
+}
+.scrollCue i {
+  position: absolute;
+  left: -1px;
+  top: 0;
+  width: 4px;
+  height: 14px;
+  border-radius: 2px;
+  background: #7a5128;
+  animation: cueFall 1.8s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+}
+@keyframes cueFall {
+  0% {
+    transform: translateY(-14px);
+    opacity: 0;
+  }
+  25% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(56px);
+    opacity: 0;
+  }
+}
 @media (max-width: 1023px) {
-  .scrollCue { bottom: 20px; height: 44px; }
+  .scrollCue {
+    bottom: 20px;
+    height: 44px;
+  }
 }
 /* TEMP: skip button while the portfolio is being edited (remove with SHOW_SKIP in ConceptScenes.tsx). */
-.skip { position: absolute; right: 32px; bottom: 28px; z-index: 8; min-height: 40px; padding: 0 18px; border: 1px solid #20273133; border-radius: 999px; background: #fffaf2cc; color: #202731; font: 600 13px/1 var(--font-pretendard), sans-serif; letter-spacing: .08em; cursor: pointer; backdrop-filter: blur(6px); }
-.skip:hover { background: #fffaf2; }
+.skip {
+  position: absolute;
+  right: 32px;
+  bottom: 28px;
+  z-index: 8;
+  min-height: 40px;
+  padding: 0 18px;
+  border: 1px solid #20273133;
+  border-radius: 999px;
+  background: #fffaf2cc;
+  color: #202731;
+  font:
+    600 13px/1 var(--font-pretendard),
+    sans-serif;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  backdrop-filter: blur(6px);
+}
+.skip:hover {
+  background: #fffaf2;
+}
 /* Shortcut to the projects on the opening screen (same pill as SKIP, bottom left); --fade from ConceptScenes. */
-.jump { position: absolute; left: 32px; bottom: 28px; z-index: 8; display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 20px; border: 1px solid #20273133; border-radius: 999px; background: #fffaf2cc; color: #202731; font: 600 14px/1 var(--font-pretendard), sans-serif; text-decoration: none; backdrop-filter: blur(6px); opacity: var(--fade, 1); transition: background-color .2s; }
-.jump:hover { background: #fffaf2; }
-.jump:focus-visible { opacity: 1; }
-@media (max-width: 1023px) { .skip { right: 20px; bottom: 20px; } .jump { left: 20px; bottom: 20px; } }
+.jump {
+  position: absolute;
+  left: 32px;
+  bottom: 28px;
+  z-index: 8;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 20px;
+  border: 1px solid #20273133;
+  border-radius: 999px;
+  background: #fffaf2cc;
+  color: #202731;
+  font:
+    600 14px/1 var(--font-pretendard),
+    sans-serif;
+  text-decoration: none;
+  backdrop-filter: blur(6px);
+  opacity: var(--fade, 1);
+  transition: background-color 0.2s;
+}
+.jump:hover {
+  background: #fffaf2;
+}
+.jump:focus-visible {
+  opacity: 1;
+}
+@media (max-width: 1023px) {
+  .skip {
+    right: 20px;
+    bottom: 20px;
+  }
+  .jump {
+    left: 20px;
+    bottom: 20px;
+  }
+}
