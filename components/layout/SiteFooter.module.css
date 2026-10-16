@@ -1,0 +1,175 @@
+.footer {
+  border-top: 1px solid #dbe5ed;
+  background-color: #f7fbfe;
+  padding-right: 1.5rem;
+  padding-left: 1.5rem;
+  color: #202731;
+}
+
+.container {
+  max-width: 1120px;
+  margin-right: auto;
+  margin-left: auto;
+  padding-top: 4rem;
+  padding-bottom: 2rem;
+}
+
+.card {
+  border: 1px solid rgb(185 219 246 / 60%);
+  border-radius: 1.5rem;
+  background-color: rgb(185 219 246 / 30%);
+  padding: 2rem 1.25rem;
+}
+
+.title {
+  margin-bottom: 1.75rem;
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.channels {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.item,
+.emailItem {
+  min-width: 0;
+}
+
+.emailItem {
+  width: 100%;
+}
+
+.link,
+.emailLink {
+  display: inline-flex;
+  min-height: 2.75rem;
+  max-width: 100%;
+  align-items: center;
+  gap: 0.75rem;
+  border-radius: 0.75rem;
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+  transition-duration: 150ms;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.link {
+  background-color: rgb(247 251 254 / 70%);
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.25rem;
+}
+
+.emailLink {
+  padding: 0.75rem 0.5rem 0.75rem 0;
+  font-size: 1.125rem;
+  font-weight: 600;
+  line-height: 1.75rem;
+}
+
+.link:hover,
+.emailLink:hover {
+  background-color: rgb(247 251 254 / 70%);
+}
+
+.link:focus-visible,
+.emailLink:focus-visible {
+  outline-color: #202731;
+  outline-offset: 4px;
+}
+
+.icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  flex-shrink: 0;
+}
+
+.text,
+.emailText {
+  min-width: 0;
+  overflow-wrap: break-word;
+}
+
+.arrow {
+  flex-shrink: 0;
+}
+
+.copyright {
+  margin-top: 2rem;
+  border-top: 1px solid #dbe5ed;
+  padding-top: 1.5rem;
+  color: #58636e;
+  font-size: 0.875rem;
+  line-height: 1.7;
+}
+
+@media (max-width: 389px) {
+  .emailLink {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    row-gap: 0.5rem;
+  }
+
+  .emailText {
+    grid-column: span 2 / span 2;
+    grid-row-start: 2;
+  }
+}
+
+@media (min-width: 390px) {
+  .emailLink {
+    font-size: 1.25rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .footer {
+    padding-right: 2.5rem;
+    padding-left: 2.5rem;
+  }
+
+  .container {
+    padding-top: 6rem;
+    padding-bottom: 2.5rem;
+  }
+
+  .card {
+    padding: 3rem 2.5rem;
+  }
+
+  .title {
+    margin-bottom: 2.5rem;
+    font-size: 2.25rem;
+    line-height: 2.5rem;
+  }
+
+  .channels {
+    gap: 1.5rem;
+  }
+
+  .emailLink {
+    gap: 1.25rem;
+    font-size: 1.875rem;
+    line-height: 2.25rem;
+  }
+
+  .icon {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+
+  .copyright {
+    margin-top: 3rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .link,
+  .emailLink {
+    transition-property: none;
+  }
+}

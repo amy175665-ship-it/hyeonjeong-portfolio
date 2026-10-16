@@ -20,12 +20,34 @@ export default function OpengraphImage() {
           position: "relative",
         }}
       >
-        <div style={{ fontSize: 28, letterSpacing: 8, color: "#58636E" }}>PORTFOLIO</div>
-        <div style={{ fontSize: 104, fontWeight: 700, color: "#202731", marginTop: 20 }}>BAEK HYUNJUNG</div>
-        <div style={{ fontSize: 36, color: "#202731", marginTop: 16 }}>Web Publisher</div>
-        <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: 20, backgroundColor: "#B9DBF6" }} />
+        <div style={{ fontSize: 28, letterSpacing: 8, color: "#58636E" }}>
+          PORTFOLIO
+        </div>
+        <div
+          style={{
+            fontSize: 104,
+            fontWeight: 700,
+            color: "#202731",
+            marginTop: 20,
+          }}
+        >
+          BAEK HYUNJUNG
+        </div>
+        <div style={{ fontSize: 36, color: "#202731", marginTop: 16 }}>
+          Web Publisher
+        </div>
+        <div
+          style={{
+            position: "absolute",
+            bottom: 0,
+            left: 0,
+            right: 0,
+            height: 20,
+            backgroundColor: "#B9DBF6",
+          }}
+        />
       </div>
     ),
-    { ...size }
+    { ...size },
   );
 }

@@ -1,0 +1,279 @@
+.page {
+  background-color: #f7fbfe;
+  padding-right: 1.5rem;
+  padding-left: 1.5rem;
+  color: #202731;
+}
+
+.header,
+.sections,
+.nextProject {
+  max-width: 1120px;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+.header {
+  padding-top: 8rem;
+  padding-bottom: 4rem;
+}
+
+.backLink {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  border: 1px solid #dbe5ed;
+  border-radius: 9999px;
+  padding-right: 1rem;
+  padding-left: 1rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+
+.backLink:hover {
+  background-color: rgb(185 219 246 / 40%);
+}
+
+.backLink:focus-visible,
+.nextLink:focus-visible {
+  outline-color: #202731;
+}
+
+.badge {
+  display: inline-flex;
+  margin-bottom: 1rem;
+  border-radius: 9999px;
+  background-color: rgb(185 219 246 / 40%);
+  padding: 0.375rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  line-height: 1rem;
+}
+
+.title {
+  margin-bottom: 1.5rem;
+  overflow-wrap: anywhere;
+  word-break: keep-all;
+  font-size: 1.875rem;
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -0.025em;
+}
+
+.placeholderNotice {
+  margin-bottom: 1.5rem;
+  color: #58636e;
+  line-height: 1.7;
+}
+
+.stack,
+.caption,
+.featureNotice,
+.nextLabel {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+
+.section {
+  display: grid;
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+  gap: 1rem;
+  border-top: 1px solid #dbe5ed;
+  padding-top: 4rem;
+  padding-bottom: 4rem;
+}
+
+.sectionNumber {
+  display: flex;
+  width: 2.75rem;
+  height: 2.75rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  background-color: rgb(185 219 246 / 40%);
+  color: #202731;
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1.25rem;
+}
+
+.sectionBody,
+.desktopFigure {
+  min-width: 0;
+}
+
+.sectionTitle {
+  margin-bottom: 1.75rem;
+  word-break: keep-all;
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.sectionContent {
+  overflow-wrap: anywhere;
+  word-break: keep-all;
+  color: #58636e;
+  font-size: 1rem;
+  line-height: 1.7;
+}
+
+.overview,
+.challenge {
+  border: 1px solid #dbe5ed;
+  border-radius: 1rem;
+  background-color: #eef5fa;
+  padding: 1.25rem;
+}
+
+.overview {
+  display: grid;
+  column-gap: 2rem;
+  row-gap: 0.75rem;
+}
+
+.term,
+.challengeHeading {
+  font-weight: 500;
+}
+
+.challengeHeading {
+  color: #202731;
+}
+
+.screens {
+  display: grid;
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+  align-items: start;
+  gap: 1rem;
+}
+
+.mobileFigure {
+  width: 100%;
+  min-width: 0;
+  max-width: 240px;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+.screenImage {
+  width: 100%;
+  height: auto;
+  border: 1px solid #dbe5ed;
+  border-radius: 0.75rem;
+  background-color: #eef5fa;
+  padding: 0.75rem;
+}
+
+.caption {
+  margin-top: 0.75rem;
+}
+
+.featureNotice {
+  margin-bottom: 1rem;
+}
+
+.featureList {
+  list-style-type: disc;
+  padding-left: 1.25rem;
+}
+
+.featureList > :not([hidden]) ~ :not([hidden]),
+.challenge > :not([hidden]) ~ :not([hidden]) {
+  margin-top: 0.75rem;
+  margin-bottom: 0;
+}
+
+.challenges > :not([hidden]) ~ :not([hidden]) {
+  margin-top: 2rem;
+  margin-bottom: 0;
+}
+
+.nextProject {
+  border-top: 1px solid #dbe5ed;
+  padding-top: 4rem;
+  padding-bottom: 4rem;
+}
+
+.nextLabel {
+  margin-bottom: 0.75rem;
+  color: #58636e;
+}
+
+.nextLink {
+  display: inline-block;
+  min-height: 2.75rem;
+  border-radius: 0.5rem;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  overflow-wrap: anywhere;
+  word-break: keep-all;
+  font-size: 1.25rem;
+  font-weight: 600;
+  line-height: 1.375;
+  text-decoration-line: underline;
+  text-decoration-color: #b9dbf6;
+  text-underline-offset: 4px;
+}
+
+.nextLink:hover {
+  text-decoration-color: #202731;
+}
+
+@media (min-width: 768px) {
+  .page {
+    padding-right: 2.5rem;
+    padding-left: 2.5rem;
+  }
+
+  .header {
+    padding-top: 10rem;
+    padding-bottom: 6rem;
+  }
+
+  .title {
+    font-size: 3rem;
+    line-height: 1;
+  }
+
+  .section {
+    grid-template-columns: 80px minmax(0, 1fr);
+    gap: 1.5rem;
+  }
+
+  .section,
+  .nextProject {
+    padding-top: 6rem;
+    padding-bottom: 6rem;
+  }
+
+  .sectionTitle {
+    margin-bottom: 2.5rem;
+    font-size: 2.25rem;
+    line-height: 2.5rem;
+  }
+
+  .overview,
+  .challenge {
+    padding: 2rem;
+  }
+
+  .overview {
+    grid-template-columns: 120px minmax(0, 1fr);
+  }
+
+  .screens {
+    grid-template-columns: 2fr 1fr;
+    gap: 1.5rem;
+  }
+
+  .mobileFigure {
+    max-width: 280px;
+  }
+
+  .nextLink {
+    font-size: 1.875rem;
+    line-height: 2.25rem;
+  }
+}

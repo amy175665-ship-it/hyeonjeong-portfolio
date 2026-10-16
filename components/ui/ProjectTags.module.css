@@ -1,0 +1,38 @@
+.tags {
+  margin-top: 1rem;
+  font-size: 0.75rem;
+  line-height: 1rem;
+}
+
+.tags > :not([hidden]) ~ :not([hidden]) {
+  margin-top: 0.5rem;
+  margin-bottom: 0;
+}
+
+.categories {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.category {
+  border: 1px solid #dbe5ed;
+  border-radius: 9999px;
+  padding: 0.25rem 0.75rem;
+}
+
+.features,
+.skyFeatures {
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: 0.75rem;
+  row-gap: 0.5rem;
+}
+
+.features {
+  color: #223b30;
+}
+
+.skyFeatures {
+  color: #58636e;
+}

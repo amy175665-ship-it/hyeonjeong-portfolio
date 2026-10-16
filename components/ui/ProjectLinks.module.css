@@ -1,0 +1,36 @@
+.links {
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: 1.5rem;
+  row-gap: 0.75rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+
+.link,
+.skyLink {
+  text-decoration-line: underline;
+  text-underline-offset: 4px;
+}
+
+.link:hover {
+  color: #223b30;
+}
+
+.skyLink {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  gap: 0.5rem;
+  border-radius: 0.5rem;
+  padding-right: 0.75rem;
+  padding-left: 0.75rem;
+}
+
+.skyLink:hover {
+  background-color: rgb(185 219 246 / 40%);
+}
+
+.skyLink:focus-visible {
+  outline-color: #202731;
+}
