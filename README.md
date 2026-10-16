@@ -39,8 +39,8 @@
 | 2 | 모래 전환 | 모래가 올라와 첫 화면을 덮었다가 내려가며 사막 장면이 드러납니다. 로고·메뉴도 모래 능선 뒤로 가려졌다가 다시 나타납니다. |
 | 3 | 컨셉 장면 | 새싹이 선인장으로 자라며 모래바람을 버티고("직접 만들고"), 하늘이 노을·밤·새벽으로 바뀌는 동안 계속 자란 뒤("표면을 설계하고, 경험을 짓다."), 꽃이 피고 모래가 내려앉아 GROW.가 됩니다("웬만해선 시들지 않습니다."). 모래가 내려간 뒤부터는 스크롤하지 않아도 약 11초 동안 저절로 재생되며, 재생하는 동안에는 화면이 고정됩니다. |
 | 4 | 소개·기술 (ABSORB.) | 이야기가 끝나고 휠을 한 번 내리면 선인장·GROW.·문구가 모래알로 부서져 바람에 흩어지고, 사막이 흰색으로 바뀐 뒤 모래알이 다시 모여 브라우저 창의 소개 페이지가 됩니다(약 3.2초, 위로 스크롤하면 거꾸로). 이후 창 안에서 이어집니다. 창 안은 섹션마다 한 화면 높이이고 스크롤은 자유롭게 움직이며, 메뉴로 이동하면 섹션 하나가 화면에 딱 맞게 보입니다. 소개는 왼쪽 사진·이름·연락처, 오른쪽 소개 문장과 교육 목록(연도 / 항목 / 보조정보), 아래쪽에 끝없이 흐르는 기술 아이콘 띠. 소개는 ABSORB 표지로 시작합니다(선인장 모래알이 모래알 초상화와 큰 ABSORB.로 모이고, 왼쪽 위에 소개 문장이 크게 차오른 뒤, 모래알이 사진 칸으로 모여 실제 사진이 되며 문장이 제자리로 줄어들고 소개 페이지가 완성됨). 다음 페이지는 취미 타일 그리드(전시·카페·음악·여행·봉사 / 보드게임 / 러닝)로, 항목에 호버하거나 키보드·터치로 선택하면 왼쪽 큰 박스에 그룹 단어(ABSORB. / BUILD. / GROW.)와 뜻이 표시됩니다. 사진 슬라이드는 박스 안에서 재생되며 전체 화면으로 확대되지 않습니다. 그다음 브이로그 영상 자리 |
-| 5 | 대표 프로젝트 (BUILD.) | 창 위쪽 탭(ABOUT·PROJECTS·DESIGN·CONTACT)으로 넘어갑니다. 제목 페이지 뒤로 예시 프로젝트 3개가 화면 전체 패널로 차례로 겹치며, 큰 제목·기능 띠·PC와 모바일 화면이 스크롤에 맞춰 나타나고 상세 페이지로 연결 |
-| 6 | 디자인 (BUILD.) | 같은 창 안에서 이어집니다. 디자인 작업물 자리(현재 "준비 중입니다") |
+| 5 | 대표 프로젝트 (BUILD.) | 창 위쪽 탭(ABOUT·PROJECTS·DESIGN·CONTACT)으로 넘어갑니다. 흰 무대의 제목 위로 첫 프로젝트가 가운데서 번지듯 열리고, 예시 프로젝트 3개가 화면 전체 패널로 배경색이 바뀌며 이어지고(끝에서 밤색으로 어두워져 사이드 목록으로), 큰 제목·기능 띠·PC와 모바일 화면이 스크롤에 맞춰 나타나고 상세 페이지로 연결 |
+| 6 | 디자인 (GROW.) | GROW 원의 끝에서 모래 고리가 화면에 머물고, 그 고리 위에 작업물 7개가 행성처럼 돕니다. 호버·포커스·탭하면 가운데에 나타나고 클릭하면 크게 봅니다(현재 "작성 예시" 자리 표시) |
 | 7 | 연락처 (BLOOM.) | 창의 마지막 장면. 가운데서 밤이 퍼지고 3D 선인장에 꽃이 피며 3D 얼굴이 돌아오고, BLOOM.·큰 이메일 링크·저작권 표기가 나타납니다. 끝에서 창 막대가 내려오고 모래가 올라와 화면을 덮습니다 |
 
 - 헤더는 가운데 선인장 로고(호버 시 종처럼 흔들림)와 햄버거 메뉴로 구성됩니다. 헤더 메뉴(ABOUT·PROJECTS·DESIGN·CONTACT)는 모두 브라우저 창 안의 해당 위치로 이동합니다.
@@ -55,7 +55,7 @@
 - 리디자인("A Living Digital Desert", 방향 B)을 단계별로 진행 중입니다. 승인된 동작 시안은 `artifacts/mockup-living-desert-20261008/index.html`을 브라우저로 열어 볼 수 있습니다.
 - 1단계(완료): 모래 전환으로 드러난 창이 스크롤하면 전면 화면으로 풀리고(창틀 값 `--frame` 1→0), 창 안은 일반 스크롤로 소개 → 취미 → 프로젝트 → 디자인 → 연락처가 이어집니다. 전면이 되면 헤더가 화면 위에 떠서 지금 단계 단어(ABSORB. 등)를 보이고, 아래로 스크롤하면 숨었다가 위로 스크롤하면 돌아옵니다.
 - 이전 구성(스크롤로 날아오는 브라우저 데모, 프로젝트 캐러셀 등)과 음성 소개 코드는 지웠습니다. 필요하면 git 기록에서 찾습니다.
-- 브이로그는 영상이 생길 때까지 숨깁니다. 디자인 작업은 비어 있어 "준비 중"이 보입니다.
+- 브이로그는 영상이 생길 때까지 숨깁니다. 디자인 작업은 7개 자리 표시("작성 예시")로 궤도에 올라가 있습니다.
 
 ## 개발 환경
 
@@ -63,7 +63,7 @@
 | --- | --- |
 | 프레임워크 | Next.js 14 App Router, React 18 |
 | 언어 | TypeScript |
-| 스타일 | CSS Module, Tailwind CSS 3 |
+| 스타일 | CSS Module (Tailwind는 2026-10-16에 제거) |
 | 모션·스크롤 | Framer Motion, Lenis |
 | 3D·그래픽 | three.js, React Three Fiber, drei, Canvas 2D |
 | 글꼴 | Pretendard(본문), DM Serif Display(영문 제목), Noto Serif KR(한글 제목) |
@@ -107,7 +107,7 @@ app/
 └─ work/[slug]/page.tsx       대표 프로젝트 상세 페이지
 components/
 ├─ layout/                    SiteNav(헤더·전체 메뉴), SiteFooter(상세 페이지 푸터), MenuSand, SmoothScroll, scrollLock
-├─ motion/                    SplitText·RollingWord(글자 단위 모션), useScrollDirection
+├─ motion/                    SplitText·RollingWord(글자 단위 모션), useScrollDirection, scrollFrame(스크롤 연동 읽기→쓰기 묶음), useSeam(파트 경계의 들어옴·나감 값)
 ├─ stage/                     windowState(지금 단계·창이 풀렸는지)
 ├─ sections/
 │  ├─ AboutStory, AboutCover, HobbyFlow, WorkStory, GrowStory, DesignStory, ContactStory   브라우저 창 안의 소개·취미, 대표 프로젝트, 디자인, 연락처
@@ -123,6 +123,8 @@ artifacts/                    시안과 승인된 시안(사진·영상은 git �
 - 여러 섹션에서 쓰는 요소는 `ui/`, 첫 화면 전용 요소는 `sections/hero/`, 사막 이후 컨셉 장면은 `sections/concept/`에서 관리합니다.
 - 원본 이미지는 `assets/`, 화면용 변환본은 `public/`에 둡니다. 원본을 바꾸면 WebP 변환본도 다시 만들어야 합니다.
 - `.next/`와 `node_modules/`는 생성물이며 Git 관리 대상에서 제외되어 있습니다.
+
+상세 페이지 푸터의 스타일은 `components/layout/SiteFooter.module.css`, 프로젝트 링크의 스타일은 `components/ui/ProjectLinks.module.css`, 프로젝트 태그의 스타일은 `components/ui/ProjectTags.module.css`에서 관리합니다. 프로젝트 상세 페이지의 스타일은 `app/work/[slug]/page.module.css`에서 관리합니다. 메뉴 모래 캔버스의 고정 스타일은 `components/layout/MenuSand.module.css`에서 관리합니다. 기본 본문 폰트·굵기와 `.sr-only`는 `app/globals.css`에서 직접 정의합니다. `.sr-only` 이름은 모래 전환과 소개 표지의 참조를 위해 유지합니다. Tailwind는 모든 컴포넌트를 CSS Modules로 전환한 뒤 설정(`tailwind.config.ts`, `postcss.config.mjs`)과 의존성(`tailwindcss`, `autoprefixer`, `postcss`)까지 제거했습니다. 브라우저 접두어는 Next.js 기본 PostCSS 설정이 붙입니다.
 
 ## 디자인 기준
 
@@ -140,7 +142,7 @@ artifacts/                    시안과 승인된 시안(사진·영상은 git �
 - 강조색은 세 가지만, 점·밑줄·태그·강조 글자 같은 작은 표시에 씁니다.
 - 제목은 DM Serif Display + Noto Serif KR, 본문은 Pretendard(줄 간격 1.7)를 씁니다.
 - 본문 최대 너비 1120px, 섹션 상하 여백 PC 96px·모바일 64px를 기준으로 합니다.
-- 새 섹션과 장면은 CSS Module로 작성합니다. `tailwind.config.ts`의 `portfolio` 색상(하늘색 계열)은 이전 구성과 상세 페이지에서 쓰고 있어 그대로 둡니다.
+- 새 섹션과 장면은 CSS Module로 작성합니다. 상세 페이지는 이전 하늘색 계열 값(`globals.css`의 `--paper` 등)을 그대로 씁니다.
 
 상세 수치와 동작 기준은 [AGENTS.md](./AGENTS.md)에 정리되어 있습니다.
 
@@ -158,7 +160,7 @@ artifacts/                    시안과 승인된 시안(사진·영상은 git �
 | 소개 큰 문장·직무 문구 | `components/sections/AboutStory.tsx` |
 | 기술명·선택적 설명 | `data/skills.ts` |
 | 프로젝트 목록·상세 내용 | `data/projects.ts` |
-| 디자인 이미지·제목 | `data/design.ts` |
+| 디자인 작업(이미지·비율·제목·도구·설명) | `data/design.ts` |
 | 연락처·이력서 링크 | `data/contact.ts` |
 | 이야기 단계 단어·색 | `data/stages.ts` |
 | 커서 이미지 | 원본 `assets/cursor/`, 화면용 `public/images/cursor/*.webp` |
