@@ -1,4 +1,4 @@
-﻿export type ProjectLinksData = {
+export type ProjectLinksData = {
   website?: string;
   github?: string;
   figma?: string;
@@ -19,7 +19,9 @@ export type Project = {
   size: "large" | "small";
   image: string;
   desktopImage: string;
+  desktopDevice?: "monitor";
   mobileImage: string;
+  mobileDevice?: "gold-phone";
   duration: string;
   scope: string;
   responsive: string;
@@ -28,6 +30,9 @@ export type Project = {
   accent?: string;
   // Big title on the full-screen panel, one entry per line (the title is used as one line without it).
   headline?: string[];
+  // Published Notion page with the project write-up. With it, the panel's title and "상세 보기" open it in a new tab
+  // instead of the site's detail page (/work/[slug]).
+  notion?: string;
 };
 
 // Main projects: real project names and stacks; screens, links and the detail-page write-up are still to come, so
@@ -70,18 +75,21 @@ export const projects: Project[] = [
     slug: "jajak",
     headline: ["JAJAK"],
     accent: "#e96b5a",
+    notion: "https://app.notion.com/p/JAJAK-AI-3e9ac548c61480ecb47be45f93a44e81",
     featured: true,
     placeholder: true,
     categoryTags: ["팀", "Git 협업"],
     featureTags: ["역할 분담", "담당 페이지", "Git 협업", "GSAP"],
     title: "JAJAK",
-    tagline: "전통주 큐레이션 쇼핑몰 — React 팀 프로젝트",
+    tagline: "AI 기반 전통주 큐레이션 쇼핑몰",
     type: "Team",
     stack: ["React", "Git", "GSAP"],
     size: "large",
-    image: "/images/project-desktop-placeholder.svg",
-    desktopImage: "/images/project-desktop-placeholder.svg",
-    mobileImage: "/images/project-mobile-placeholder.svg",
+    image: "/images/projects/jajak/desktop.webp",
+    desktopDevice: "monitor",
+    desktopImage: "/images/projects/jajak/desktop.webp",
+    mobileImage: "/images/projects/jajak/mobile.webp",
+    mobileDevice: "gold-phone",
     links: {},
     duration: "실제 제작 기간 입력 예정",
     scope:
@@ -139,6 +147,8 @@ export type SideProject = {
   description: string;
   tags: string[];
   url?: string;
+  // Published Notion page with the write-up; the row opens it (before url) in a new tab.
+  notion?: string;
   placeholder: boolean;
 };
 
@@ -152,14 +162,14 @@ export const sideProjects: SideProject[] = [
   },
   {
     title: "NODE",
-    description:
-      "상품 사이트 — 상품 JSON 구조를 정리하고 필터·정렬 로직을 공통화한 팀 프로젝트",
+    description: "소리의 연결점으로 완성되는 프리미엄 오디오 플랫폼",
     tags: ["JavaScript", "JSON", "필터·정렬", "팀"],
+    notion: "https://app.notion.com/p/NODE-3e9ac548c6148089a8d8da8a7e8a2bc6",
     placeholder: true,
   },
   {
     title: "CHAMVERSE",
-    description: "Vanilla JavaScript로 서비스 화면을 구현한 팀 프로젝트",
+    description: "애니메이션 OTT 플랫폼",
     tags: ["Vanilla JS", "DOM", "Event", "팀"],
     placeholder: true,
   },
