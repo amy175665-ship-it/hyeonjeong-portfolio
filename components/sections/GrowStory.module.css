@@ -55,15 +55,15 @@
 }
 .labels li:nth-child(1) {
   left: 50%;
-  top: calc(50% - var(--r) * 0.55);
+  top: calc(50% - var(--label-top-offset, 148.5px));
 }
 .labels li:nth-child(2) {
-  left: calc(50% + var(--r) * 0.476);
-  top: calc(50% + var(--r) * 0.275);
+  left: calc(50% + var(--label-side-x, 128.5px));
+  top: calc(50% + var(--label-side-y, 74.25px));
 }
 .labels li:nth-child(3) {
-  left: calc(50% - var(--r) * 0.476);
-  top: calc(50% + var(--r) * 0.275);
+  left: calc(50% - var(--label-side-x, 128.5px));
+  top: calc(50% + var(--label-side-y, 74.25px));
 }
 .labels small {
   color: #58636e;

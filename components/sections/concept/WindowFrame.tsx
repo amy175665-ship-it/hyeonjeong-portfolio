@@ -279,6 +279,7 @@ export default function WindowFrame({
       <div
         ref={anchor}
         className={styles.anchor}
+        data-window-anchor
         aria-hidden="true"
       >
         <div

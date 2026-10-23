@@ -129,6 +129,9 @@ export default function GrowStory({
       orbit.rx = ORBIT_RINGS.map((k) => RX[k]);
       orbit.ry = ORBIT_RINGS.map((k) => RY[k]);
       box.style.setProperty("--r", `${R.toFixed(1)}px`);
+      box.style.setProperty("--label-top-offset", `${(R * 0.55).toFixed(1)}px`);
+      box.style.setProperty("--label-side-x", `${(R * 0.476).toFixed(1)}px`);
+      box.style.setProperty("--label-side-y", `${(R * 0.275).toFixed(1)}px`);
       let seed = 11;
       const random = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
       A = new Float32Array(N * 2);
@@ -386,6 +389,7 @@ export default function GrowStory({
       ref={section}
       aria-labelledby="grow-title"
       className={styles.section}
+      data-scroll-grow
     >
       {/* Menu target (#design): the held rings with the works on them. */}
       <span
@@ -396,6 +400,7 @@ export default function GrowStory({
       <div
         ref={stage}
         className={styles.stage}
+        data-scroll-grow-stage
       >
         <h2
           id="grow-title"
