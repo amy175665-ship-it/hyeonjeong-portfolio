@@ -68,7 +68,14 @@ type Grain = {
   rate: number;
   gather: number;
 };
-type Pixel = [x: number, y: number, r: number, g: number, b: number, a: number];
+export type Pixel = [
+  x: number,
+  y: number,
+  r: number,
+  g: number,
+  b: number,
+  a: number,
+];
 // The page side laid out ahead for one screen size: its pixels and the grains landing on them.
 type Plan = {
   width: number;
@@ -283,8 +290,8 @@ const easeInOut = (t: number) =>
 const mix = (a: number, b: number, k: number) => a + (b - a) * k;
 
 // Draws onto a scratch canvas the size of the screen and returns its visible pixels on the grain grid. `page`: skip
-// pixels close to the window's white (they would only speckle the empty page).
-function scan(
+// pixels close to the window's white (they would only speckle the empty page). Also used by WorkSand.
+export function scan(
   width: number,
   height: number,
   paint: (ctx: CanvasRenderingContext2D) => void,
@@ -323,14 +330,14 @@ function scan(
 
 // Grains are paired from both sides roughly left to right, so they travel in one sweeping flow instead of
 // criss-crossing. The longer side sets the grain count; grains sharing a start or an end simply overlap there.
-const randomFrom = (start: number) => {
+export const randomFrom = (start: number) => {
   let seed = start;
   return () => (seed = (seed * 16807) % 2147483647) / 2147483647;
 };
 
 // Orders pixels left to right with a slight slant and some jitter. A bucket sort on whole-pixel keys: the lists run to
 // tens of thousands of pixels, where sorting with Array.sort held up the start of a hand-off.
-function order(list: Pixel[], random: () => number): Pixel[] {
+export function order(list: Pixel[], random: () => number): Pixel[] {
   const keys = new Int32Array(list.length);
   let top = 0;
   list.forEach((p, i) => {
@@ -410,15 +417,25 @@ function drawCanvas(ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement) {
     ctx.drawImage(canvas, box.left, box.top, box.width, box.height);
 }
 
-// Images inside `root` that are on screen, cropped the way their object-fit / object-position show them.
-function drawImages(
+// Images inside `root` that are on screen, cropped the way their object-fit / object-position show them. `dy` moves
+// everything down by that many px first (WorkSand reads parts that are not yet where they will be on screen).
+export function drawImages(
   ctx: CanvasRenderingContext2D,
   root: Element,
   width: number,
   height: number,
+  dy = 0,
 ) {
   root.querySelectorAll("img").forEach((img) => {
-    const box = img.getBoundingClientRect();
+    const rect = img.getBoundingClientRect();
+    const box = {
+      left: rect.left,
+      right: rect.right,
+      top: rect.top + dy,
+      bottom: rect.bottom + dy,
+      width: rect.width,
+      height: rect.height,
+    };
     if (
       !img.complete ||
       !img.naturalWidth ||
@@ -464,8 +481,12 @@ function drawImages(
 }
 
 // The text inside `element`, character by character where the browser has laid it out (so wrapping, letter spacing
-// and mixed fonts match), in each character's computed font and colour.
-function drawText(ctx: CanvasRenderingContext2D, element: Element) {
+// and mixed fonts match), in each character's computed font and colour. `dy` as in drawImages.
+export function drawText(
+  ctx: CanvasRenderingContext2D,
+  element: Element,
+  dy = 0,
+) {
   const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT);
   const range = document.createRange();
   ctx.textBaseline = "alphabetic";
@@ -483,15 +504,16 @@ function drawText(ctx: CanvasRenderingContext2D, element: Element) {
       if (!text[i].trim()) continue;
       range.setStart(node, i);
       range.setEnd(node, i + 1);
-      const box = range.getBoundingClientRect();
-      if (!box.width || box.bottom < 0 || box.top > window.innerHeight)
+      const box = range.getBoundingClientRect(),
+        top = box.top + dy;
+      if (!box.width || top + box.height < 0 || top > window.innerHeight)
         continue;
       const char = upper ? text[i].toUpperCase() : text[i];
       // The range box is the font's content area, so the baseline sits one font ascent below its top.
       ctx.fillText(
         char,
         box.left,
-        box.top + ctx.measureText(char).fontBoundingBoxAscent,
+        top + ctx.measureText(char).fontBoundingBoxAscent,
       );
     }
   }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, type CSSProperties } from "react";
+import { useEffect, useRef, type CSSProperties, type ReactNode } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import ProjectLinks from "@/components/ui/ProjectLinks";
@@ -8,6 +8,7 @@ import { scrollToY } from "@/components/layout/scrollLock";
 import { onScrollFrame } from "@/components/motion/scrollFrame";
 import { styleWriter } from "@/components/motion/styleWriter";
 import useSeam from "@/components/motion/useSeam";
+import WorkSand from "@/components/sections/WorkSand";
 import {
   mainProjects,
   sideProjects,
@@ -17,7 +18,7 @@ import {
 import { stages } from "@/data/stages";
 import styles from "./WorkStory.module.css";
 
-// BUILD.: the section heading and placeholder note on one window page, then the main projects on one pinned stage
+// BUILD.: the section heading and the list of main projects on the white stage, then the main projects on one pinned stage
 // (2026-10-13, user: no paper-like covering). The stage stays on screen while the track scrolls past; each project
 // has one segment of it. Moving to the next project, its panel fades in over the current one, so the background colour
 // turns smoothly from one project's accent to the next while the old project's words and screens fade out; within its
@@ -31,19 +32,96 @@ const clamp = (value: number) => Math.min(Math.max(value, 0), 1);
 const ramp = (value: number, from: number, to: number) =>
   clamp((value - from) / (to - from));
 const easeOut = (t: number) => 1 - Math.pow(1 - t, 3);
+// Gentle in and out (sine) for the colour change from one project to the next (2026-10-23, user: it flashed past).
+const easeSine = (t: number) => (1 - Math.cos(Math.PI * t)) / 2;
 const easeInOut = (t: number) =>
   t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 // Scroll per project, in stage heights, and the share of it spent fading over from the previous project. INTRO: stage
-// heights before the first project, where the heading holds the white stage and the first panel fades in over it.
+// heights before the first project, where the lead-in list holds the white stage and the first panel fades in over it.
+// The list is built on the stage first (2026-10-23, user: it just scrolled up and popped in): the about page above blows
+// away as sand and the grains form the heading and the names (WorkSand) by SAND_END, then from REST_FROM to BUILT the
+// dots pop and the taglines come; it holds until OPEN, then the first panel opens until INTRO.
 // At the end of the last segment the last panel's words go, then its colour field breaks into sand grains blown off to
 // the upper right (as in the opening's hand-off), uncovering the night colour of the side list that follows (2026-10-14,
 // user: a plain colour fade between such different colours looked forced). Tied to the scroll, so it plays backwards too.
+// TAIL: extra stage heights after the last segment, so the last panel holds, its words go (over 0.2) and its field
+// scatters over 0.95 stage heights (2026-10-23, user: the sand scatter flashed past in about half a screen).
 const SEGMENT = 1.5,
-  FADE = 0.3,
-  INTRO = 0.4;
+  FADE = 0.6,
+  TAIL = 0.9,
+  SAND_END = 1.1,
+  REST_FROM = 1.02,
+  BUILT = 1.45,
+  OPEN = 1.75,
+  INTRO = 2.65;
+const easeOutBack = (t: number) =>
+  1 + 2.70158 * Math.pow(t - 1, 3) + 1.70158 * Math.pow(t - 1, 2);
+
+// Scrolls to a main project's segment, where its panel has settled (reduced motion: to the panel itself, the panels
+// then lie one after another).
+function scrollToProject(root: HTMLElement, index: number) {
+  const track = root.querySelector<HTMLElement>("[data-track]"),
+    panel = root.querySelectorAll<HTMLElement>("[data-panel]")[index];
+  if (!track || !panel) return;
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    const chrome =
+      parseFloat(getComputedStyle(root).getPropertyValue("--chrome")) || 0;
+    scrollToY(
+      Math.round(panel.getBoundingClientRect().top + window.scrollY - chrome),
+    );
+    return;
+  }
+  const height = panel.offsetHeight,
+    top = track.getBoundingClientRect().top + window.scrollY;
+  scrollToY(Math.round(top + (INTRO + (index + 0.6) * SEGMENT) * height));
+}
+
+// One row of the lead-in list: the project name in big type with its accent dot, then the tagline and stack. The row
+// scrolls to that project's panel.
+function IntroRow({
+  project,
+  onSelect,
+}: {
+  project: Project;
+  onSelect: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      className={styles.introButton}
+      style={
+        { "--accent": project.accent ?? BUILD_ACCENT } as CSSProperties
+      }
+      onClick={onSelect}
+    >
+      <span className={styles.introName}>
+        {/* The name the sand grains form (WorkSand). */}
+        <span data-sand-target>{project.title}</span>
+        <span
+          className={styles.introDot}
+          data-intro-dot
+          aria-hidden="true"
+        />
+      </span>
+      <span
+        className={styles.introInfo}
+        data-intro-info
+      >
+        {project.tagline}
+        {project.stack.length > 0 && (
+          <span className={styles.introStack}>
+            {project.stack.join(" · ")}
+          </span>
+        )}
+      </span>
+    </button>
+  );
+}
 
 // One side project row: number, name, then the description and tags; the whole row links to the site when it has one.
 function SideRow({ project, index }: { project: SideProject; index: number }) {
+  // The Notion write-up first, then the site.
+  const href = project.notion?.trim() || project.url?.trim();
   const body = (
     <>
       <span
@@ -54,7 +132,7 @@ function SideRow({ project, index }: { project: SideProject; index: number }) {
       </span>
       <span className={styles.sideName}>
         {project.title}
-        {project.url && (
+        {href && (
           <span
             aria-hidden="true"
             className={styles.sideArrow}
@@ -78,18 +156,58 @@ function SideRow({ project, index }: { project: SideProject; index: number }) {
       </span>
     </>
   );
-  return project.url ? (
+  return href ? (
     <a
-      href={project.url}
+      href={href}
       target="_blank"
       rel="noopener noreferrer"
-      aria-label={`${project.title} 사이트 (새 탭)`}
+      aria-label={`${project.title} ${project.notion?.trim() ? "노션" : "사이트"} (새 탭)`}
       className={`${styles.sideRow} ${styles.sideLink}`}
     >
       {body}
     </a>
   ) : (
     <div className={styles.sideRow}>{body}</div>
+  );
+}
+
+// The screen images can be in place before the write-up is (placeholder still true), so the alt text follows the
+// image itself: the shared placeholder SVGs are /images/project-*-placeholder.svg.
+const isPlaceholderImage = (src: string) => src.endsWith("-placeholder.svg");
+
+// The project's write-up: its published Notion page in a new tab when it has one, otherwise the site's detail page.
+function DetailLink({
+  project,
+  label,
+  className,
+  children,
+}: {
+  project: Project;
+  label: string;
+  className?: string;
+  children: ReactNode;
+}) {
+  const notion = project.notion?.trim();
+  if (notion) {
+    return (
+      <a
+        href={notion}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label={`${label} (노션, 새 탭)`}
+        className={className}
+      >
+        {children}
+      </a>
+    );
+  }
+  return (
+    <Link
+      href={`/work/${project.slug}`}
+      className={className}
+    >
+      {children}
+    </Link>
   );
 }
 
@@ -134,9 +252,28 @@ function ProjectPanel({ project }: { project: Project }) {
           aria-hidden="true"
         >
           <div className={styles.tickerRow}>
-            {[0, 1, 2].map((copy) => (
-              <span key={copy}>{band} · </span>
-            ))}
+            {/* Two identical halves flow left forever (-50%); the time follows the text length so every band moves at
+                about the same speed. */}
+            <div
+              className={styles.tickerTrack}
+              data-ticker
+              style={
+                {
+                  "--ticker-time": `${(band.length * 0.7).toFixed(1)}s`,
+                } as CSSProperties
+              }
+            >
+              {[0, 1].map((half) => (
+                <div
+                  key={half}
+                  className={styles.tickerHalf}
+                >
+                  {[0, 1].map((copy) => (
+                    <span key={copy}>{band} · </span>
+                  ))}
+                </div>
+              ))}
+            </div>
           </div>
         </div>
         <div className={styles.meta}>
@@ -153,7 +290,10 @@ function ProjectPanel({ project }: { project: Project }) {
             id={titleId}
             className={styles.title}
           >
-            <Link href={`/work/${project.slug}`}>
+            <DetailLink
+              project={project}
+              label={project.title}
+            >
               <span className="sr-only">{project.title}</span>
               {lines.map((line) => (
                 <span
@@ -172,16 +312,17 @@ function ProjectPanel({ project }: { project: Project }) {
                   ))}
                 </span>
               ))}
-            </Link>
+            </DetailLink>
           </h3>
           <div className={styles.foot}>
             <p className={styles.tagline}>{project.tagline}</p>
-            <Link
-              href={`/work/${project.slug}`}
+            <DetailLink
+              project={project}
+              label={`${project.title} 상세 보기`}
               className={styles.detail}
             >
               상세 보기 <span aria-hidden="true">↗</span>
-            </Link>
+            </DetailLink>
             <ProjectLinks project={project} />
           </div>
           {project.featureTags.length > 0 && (
@@ -196,36 +337,91 @@ function ProjectPanel({ project }: { project: Project }) {
           )}
         </div>
         <div className={styles.devices}>
-          <span className={styles.desk}>
-            <Image
-              src={project.desktopImage || project.image}
-              alt={
-                project.placeholder
-                  ? `${project.title} PC 화면 등록 예정 — 자리 표시 이미지`
-                  : `${project.title} PC 화면`
-              }
-              fill
-              sizes="(min-width: 701px) 40vw, 64vw"
-              unoptimized
-              className={styles.screen}
-            />
-          </span>
-          {project.mobileImage && (
-            <span className={styles.phone}>
+          {project.desktopDevice === "monitor" ? (
+            <span className={styles.monitor}>
+              <span className={styles.monitorScreen}>
+                <Image
+                  src={project.desktopImage || project.image}
+                  alt={
+                    isPlaceholderImage(project.desktopImage || project.image)
+                      ? `${project.title} PC 화면 등록 예정 — 자리 표시 이미지`
+                      : `${project.title} PC 화면`
+                  }
+                  fill
+                  sizes="(min-width: 701px) 31vw, 49vw"
+                  unoptimized
+                  className={styles.screen}
+                />
+              </span>
               <Image
-                src={project.mobileImage}
+                src="/images/devices/desktop-monitor.png"
+                alt=""
+                aria-hidden="true"
+                fill
+                sizes="(min-width: 701px) 40vw, 64vw"
+                unoptimized
+                className={styles.monitorShell}
+              />
+            </span>
+          ) : (
+            <span className={styles.desk}>
+              <Image
+                src={project.desktopImage || project.image}
                 alt={
-                  project.placeholder
-                    ? `${project.title} 모바일 화면 등록 예정 — 자리 표시 이미지`
-                    : `${project.title} 모바일 화면`
+                  isPlaceholderImage(project.desktopImage || project.image)
+                    ? `${project.title} PC 화면 등록 예정 — 자리 표시 이미지`
+                    : `${project.title} PC 화면`
                 }
                 fill
-                sizes="(min-width: 701px) 11vw, 17vw"
+                sizes="(min-width: 701px) 40vw, 64vw"
                 unoptimized
                 className={styles.screen}
               />
             </span>
           )}
+          {project.mobileImage &&
+            (project.mobileDevice === "gold-phone" ? (
+              <span className={styles.goldPhone}>
+                <span className={styles.goldPhoneScreen}>
+                  <Image
+                    src={project.mobileImage}
+                    alt={
+                      isPlaceholderImage(project.mobileImage)
+                        ? `${project.title} 모바일 화면 등록 예정 — 자리 표시 이미지`
+                        : `${project.title} 모바일 화면`
+                    }
+                    fill
+                    sizes="(min-width: 701px) 20vw, 32vw"
+                    unoptimized
+                    className={styles.screen}
+                  />
+                </span>
+                <Image
+                  src="/images/devices/gold-smartphone.png"
+                  alt=""
+                  aria-hidden="true"
+                  fill
+                  sizes="(min-width: 701px) 31vw, 50vw"
+                  unoptimized
+                  className={styles.goldPhoneShell}
+                />
+              </span>
+            ) : (
+              <span className={styles.phone}>
+                <Image
+                  src={project.mobileImage}
+                  alt={
+                    isPlaceholderImage(project.mobileImage)
+                      ? `${project.title} 모바일 화면 등록 예정 — 자리 표시 이미지`
+                      : `${project.title} 모바일 화면`
+                  }
+                  fill
+                  sizes="(min-width: 701px) 11vw, 17vw"
+                  unoptimized
+                  className={styles.screen}
+                />
+              </span>
+            ))}
         </div>
       </div>
     </article>
@@ -250,9 +446,21 @@ export default function WorkStory() {
     const chars = panels.map((panel) =>
       Array.from(panel.querySelectorAll<HTMLElement>("[data-char]")),
     );
+    const tickers = panels.map((panel) =>
+      panel.querySelector<HTMLElement>("[data-ticker]"),
+    );
     const closer = root.querySelector<HTMLElement>("[data-closer]"),
       closerSpacer = root.querySelector<HTMLElement>("[data-closer-spacer]");
     const intro = root.querySelector<HTMLElement>("[data-intro]"),
+      introRows = Array.from(
+        root.querySelectorAll<HTMLElement>("[data-intro-row]"),
+      ).map((row) => ({
+        row,
+        dot: row.querySelector<HTMLElement>("[data-intro-dot]"),
+        info: row.querySelector<HTMLElement>("[data-intro-info]"),
+      })),
+      // The first project's accent dot: the first panel grows out of it.
+      introOrigin = root.querySelector<HTMLElement>("[data-intro-dot]"),
       dusk = root.querySelector<HTMLElement>("[data-dusk]");
     const scatter = root.querySelector<HTMLCanvasElement>("[data-scatter]"),
       sand = scatter?.getContext("2d");
@@ -351,8 +559,8 @@ export default function WorkStory() {
       byColor.forEach((members, color) => g.groups.push({ color, members }));
       return g;
     };
-    // s: 0 → 1 over the scatter; each grain flies for 0.45 of it after its delay, quickly shrinking from a tile of the
-    // field to a fine sand grain.
+    // s: 0 → 1 over the scatter; each grain flies for 0.45 of it after its delay, shrinking from a tile of the field to
+    // a fine sand grain.
     const drawScatter = (s: number) => {
       if (!grains || s === drawnAt) return;
       drawnAt = s;
@@ -365,7 +573,8 @@ export default function WorkStory() {
         for (const i of group.members) {
           const t = clamp((s - delay[i]) / 0.45);
           if (t >= 1) continue;
-          const grain = 2.2 + (size + 1 - 2.2) * Math.pow(1 - t, 4);
+          // Shrinks gently (sine) so the field thins out over the flight instead of vanishing as it starts.
+          const grain = size + 1 + (2.2 - size - 1) * easeSine(t);
           sand.fillRect(
             x[i] + t * t * wind[i],
             y[i] - t * lift[i] + Math.sin(phase[i] + t * 5) * 8 * t,
@@ -385,10 +594,16 @@ export default function WorkStory() {
       boxTop: 0,
       boxBottom: 0,
       closing: 0,
+      originX: 0,
+      originY: 0,
+      originR: 0,
     };
     const measure = () => {
       const height = panels[0].offsetHeight,
         box = root.getBoundingClientRect();
+      // The first panel grows out of the first project's dot in the lead-in list (2026-10-23, user).
+      const stage = panels[0].getBoundingClientRect(),
+        dot = introOrigin?.getBoundingClientRect();
       const closing = clamp(
         (height - closerSpacer.getBoundingClientRect().top) /
           closerSpacer.offsetHeight,
@@ -401,14 +616,13 @@ export default function WorkStory() {
         boxTop: box.top,
         boxBottom: box.bottom,
         closing,
+        originX: dot ? dot.left + dot.width / 2 - stage.left : stage.width / 2,
+        originY: dot ? dot.top + dot.height / 2 - stage.top : stage.height * 0.55,
+        originR: dot ? dot.width / 2 : 0,
       };
     };
     // Keyboard focus in a panel that is faded out brings its segment on screen.
-    const reveal = (index: number) => () => {
-      const height = panels[0].offsetHeight,
-        top = track.getBoundingClientRect().top + window.scrollY;
-      scrollToY(Math.round(top + (INTRO + (index + 0.6) * SEGMENT) * height));
-    };
+    const reveal = (index: number) => () => scrollToProject(root, index);
     const focusers = panels.map((panel, index) => {
       const go = reveal(index);
       panel.addEventListener("focusin", go);
@@ -426,13 +640,32 @@ export default function WorkStory() {
         last = panels.length - 1;
       const u = (index: number) => (p - INTRO) / SEGMENT - index;
       const fade = (index: number) =>
-        easeInOut(
-          index === 0 ? ramp(p, INTRO * 0.1, INTRO) : ramp(u(index), 0, FADE),
-        );
-      // The last panel's words go first (u 0.5 → 0.64), then its field scatters over the night (u 0.64 → 1).
-      const wordsOut = easeInOut(ramp(u(last), 0.5, 0.64)),
-        blown = ramp(u(last), 0.64, 1);
-      const lift = easeInOut(ramp(p, INTRO * 0.1, INTRO * 0.8));
+        index === 0
+          ? easeInOut(ramp(p, OPEN, INTRO))
+          : easeSine(ramp(u(index), 0, FADE));
+      // The last panel's words go first, then its field scatters over the night until the stage lets go (TAIL).
+      const tail = u(last) * SEGMENT;
+      const wordsOut = easeInOut(ramp(tail, 1.25, 1.45)),
+        blown = ramp(tail, 1.45, SEGMENT + TAIL);
+      // Lead-in list: the heading and the names are formed by the sand (WorkSand, by SAND_END); the rest is built from
+      // REST_FROM to BUILT (q 0 → 1): per row (each a little later) the dot pops and the tagline comes up.
+      const q = (p - REST_FROM) / (BUILT - REST_FROM);
+      introRows.forEach(({ dot, info }, index) => {
+        const start = index * 0.2;
+        const pop = ramp(q, start, start + 0.15);
+        if (dot) put(dot, "scale", pop < 1 ? easeOutBack(pop).toFixed(3) : "");
+        if (info) {
+          put(info, "--in", easeOut(ramp(q, start + 0.05, start + 0.35)).toFixed(3));
+        }
+      });
+      // Once it has held, the heading and the other rows fade first (--fade), then the first name (--lift) as the circle
+      // opens from it.
+      const opening = INTRO - OPEN;
+      const introFade = easeInOut(ramp(p, OPEN - 0.02, OPEN + opening * 0.45));
+      const lift = easeInOut(
+        ramp(p, OPEN + opening * 0.25, OPEN + opening * 0.9),
+      );
+      put(intro, "--fade", introFade.toFixed(3));
       put(intro, "--lift", lift.toFixed(3));
       if (!grains || grains.w !== view.stageWidth || grains.h !== height) {
         grains = buildGrains(view.stageWidth, height);
@@ -445,12 +678,23 @@ export default function WorkStory() {
         const d = ramp(u(index), index === 0 ? 0 : FADE * 0.5, 1);
         const out = index < last ? fade(index + 1) : wordsOut;
         if (index === 0) {
-          // The first panel opens from the middle as a soft-edged circle over the white heading (no grey mid-fade).
-          const reach = Math.hypot(width, height) / 2 + 200,
-            radius = a * reach;
+          // The first panel grows out of the first project's dot as a circle over the white lead-in (no grey mid-fade):
+          // it starts at the dot's size with a crisp edge, so the dot itself seems to grow, and the edge softens only
+          // as the circle nears the farthest corner of the stage.
+          const { originX: x, originY: y, originR } = view;
+          // Its size follows the scroll on a gentle curve (slow at first, faster only once it covers most of the screen)
+          // over 0.9 stage heights (2026-10-23, user: it grew too fast, the scroll felt touchy).
+          const grow = Math.pow(ramp(p, OPEN, INTRO), 1.6);
+          const soft = 1.5 + 160 * ramp(grow, 0.6, 1);
+          const reach =
+              Math.hypot(
+                Math.max(x, view.stageWidth - x),
+                Math.max(y, height - y),
+              ) + 160,
+            radius = grow > 0 ? originR + grow * (reach - originR) : 0;
           const mask =
-            a < 1
-              ? `radial-gradient(circle at 50% 55%, #000 ${Math.max(radius - 200, 0).toFixed(0)}px, transparent ${radius.toFixed(0)}px)`
+            grow < 1
+              ? `radial-gradient(circle at ${x.toFixed(1)}px ${y.toFixed(1)}px, #000 ${Math.max(radius - soft, 0).toFixed(1)}px, transparent ${radius.toFixed(1)}px)`
               : "";
           put(panel, "mask-image", mask);
           put(panel, "-webkit-mask-image", mask);
@@ -475,11 +719,17 @@ export default function WorkStory() {
           );
         });
         put(panel, "--meta", ramp(a, 0.7, 1).toFixed(3));
-        put(
-          panel,
-          "--band",
-          (ramp(d, 0.05, 0.25) * (1 - ramp(d, 0.85, 1))).toFixed(3),
-        );
+        const band = ramp(d, 0.05, 0.25) * (1 - ramp(d, 0.85, 1));
+        put(panel, "--band", band.toFixed(3));
+        // The band's endless flow runs only while it shows.
+        const ticker = tickers[index];
+        if (ticker) {
+          put(
+            ticker,
+            "animation-play-state",
+            band > 0 && out < 1 ? "running" : "paused",
+          );
+        }
         put(panel, "--band-x", `${(-d * (phone ? 900 : 1500)).toFixed(1)}px`);
         put(
           panel,
@@ -513,7 +763,7 @@ export default function WorkStory() {
       // mostly shrunk.
       document.documentElement.toggleAttribute(
         "data-on-dark",
-        -view.top / view.height > INTRO * 0.6 &&
+        -view.top / view.height > OPEN + (INTRO - OPEN) * 0.55 &&
           view.boxBottom > 80 &&
           view.closing < 0.4,
       );
@@ -538,10 +788,16 @@ export default function WorkStory() {
   if (!mainProjects.length) return null;
   return (
     <section
-      id="project"
       aria-labelledby="work-story-title"
       className={styles.section}
     >
+      {/* Menu target (#project): where the stage is pinned with the lead-in list built (BUILT). */}
+      <span
+        id="project"
+        className={styles.anchor}
+        style={{ "--built": BUILT } as CSSProperties}
+        aria-hidden="true"
+      />
       <div
         ref={build}
         className={styles.build}
@@ -551,9 +807,13 @@ export default function WorkStory() {
         <div
           className={styles.track}
           data-track
+          data-scroll-panels
+          data-scroll-intro={INTRO}
+          data-scroll-segment={SEGMENT}
           style={
             {
               "--count": mainProjects.length,
+              "--tail": TAIL,
               "--intro": INTRO,
             } as CSSProperties
           }
@@ -563,18 +823,33 @@ export default function WorkStory() {
               className={styles.intro}
               data-intro
             >
-              <h2
-                id="work-story-title"
-                className={styles.heading}
-              >
-                대표 프로젝트
-              </h2>
-              {mainProjects.some((project) => project.placeholder) && (
-                <p className={styles.note}>
-                  프로젝트 화면과 설명을 정리하고 있습니다. '작성 예시'로 표시된
-                  부분은 실제 작업 내용으로 채울 예정입니다.
-                </p>
-              )}
+              <div className={styles.introTop}>
+                <h2
+                  id="work-story-title"
+                  className={styles.heading}
+                  data-sand-target
+                >
+                  대표 프로젝트
+                </h2>
+              </div>
+              <ul className={styles.introList}>
+                {mainProjects.map((project, index) => (
+                  <li
+                    key={project.slug}
+                    className={styles.introRow}
+                    data-intro-row
+                  >
+                    <IntroRow
+                      project={project}
+                      onSelect={() => {
+                        if (build.current) {
+                          scrollToProject(build.current, index);
+                        }
+                      }}
+                    />
+                  </li>
+                ))}
+              </ul>
             </div>
             {mainProjects.map((project) => (
               <ProjectPanel
@@ -624,6 +899,11 @@ export default function WorkStory() {
           aria-hidden="true"
         />
       </div>
+      {/* The about page above blows away as sand into the heading and the names (screen-fixed canvas). */}
+      <WorkSand
+        root={build}
+        gatherEnd={SAND_END}
+      />
     </section>
   );
 }

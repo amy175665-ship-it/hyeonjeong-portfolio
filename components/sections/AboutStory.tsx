@@ -2,7 +2,6 @@ import Image from "next/image";
 import type { CSSProperties } from "react";
 import Reveal from "@/components/ui/Reveal";
 import { profile, vlog } from "@/data/profile";
-import HobbyFlow from "@/components/sections/HobbyFlow";
 import AboutCover from "@/components/sections/AboutCover";
 import { skills } from "@/data/skills";
 import styles from "./AboutStory.module.css";
@@ -245,8 +244,6 @@ export default function AboutStory() {
           </div>
         </div>
       </AboutCover>
-      {/* Hobbies: hover/focus/touch selects content in the left preview (HobbyFlow). */}
-      <HobbyFlow />
       {/* Vlog: one 16:9 video sized to fit the window page; hidden until a video file is added (data/profile.ts). */}
       {vlog.video && (
         <section

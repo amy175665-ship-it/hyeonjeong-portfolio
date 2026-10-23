@@ -421,6 +421,7 @@ export default function AboutCover({ className, labelledBy, children }: Props) {
         aria-labelledby={labelledBy}
         className={`${className} ${styles.stage}`}
         data-page
+        data-sand-source
       >
         <canvas
           ref={canvas}

@@ -13,37 +13,184 @@
 /* No section background: the GROW circle underneath shows around the last panel as it closes (the window is already
    near-white). */
 
-/* Lead-in: the section heading and the placeholder note on the white stage, which the first panel fades in over. */
+/* Menu target (#project): scrolled to under the title bar, it lands where the stage is pinned and the lead-in list is
+   built (--built, BUILT in WorkStory, stage heights past the pin). */
+.anchor {
+  position: absolute;
+  left: 0;
+  top: calc(var(--chrome, 0px) + var(--stage) * var(--built, 0));
+  width: 1px;
+  height: 1px;
+}
+
+/* WorkSand: the grains from the about page to the heading and names, fixed over the whole screen while they fly. */
+.sand {
+  position: fixed;
+  inset: 0;
+  z-index: 5;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Lead-in (2026-10-23, user-picked mockup artifacts/project-intro-20261023/ A): the heading, then the main projects as
+   full-width rows (big name, tagline and stack) filling the white stage, without lines or the placeholder note (user,
+   2026-10-23). It is built on the stage as it pins (user: it just scrolled up and popped in): the about page blows away
+   as sand that forms the heading and the names (WorkSand, which sets their opacity), then WorkStory sets --in (each
+   tagline) and each dot's scale. Then --fade (the heading and the other rows go first) and --lift (the first name goes
+   last) as the first panel opens as a circle from the first name. The defaults are the settled state. */
 .intro {
   position: absolute;
   inset: 0;
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
-  padding: calc(var(--chrome, 0px) + 16vh) 4.2% 0;
+  padding: calc(var(--chrome, 0px) + 4vh) 4.2% 5vh;
   background: var(--bg);
 }
-/* --lift (WorkStory): the words fade and lift away as the first panel opens; the white stays under the opening circle. */
-.intro > * {
-  opacity: calc(1 - var(--lift, 0));
-  translate: 0 calc(var(--lift, 0) * -40px);
+
+.introTop {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 32px;
+  padding-bottom: 2.4vh;
+  opacity: calc(1 - var(--fade, 0));
 }
+
 .heading {
   margin: 0;
   font:
-    600 clamp(40px, 5vw, 72px) / 1.1 var(--font-editorial),
-    var(--font-hangul-serif, serif),
-    Georgia,
-    serif;
-  letter-spacing: -0.02em;
+    800 clamp(30px, 3vw, 52px) / 1.1 var(--font-pretendard),
+    sans-serif;
+  letter-spacing: -0.04em;
 }
-.note {
-  max-width: 36em;
-  margin: 18px 0 0;
+
+.introList {
+  position: relative;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.introRow {
+  position: relative;
+  display: flex;
+  flex: 1;
+  opacity: calc(1 - var(--fade, 0));
+  translate: 0 calc(var(--fade, 0) * 24px);
+}
+
+/* The first row stays while the circle opens from its name: its tagline goes with the others. */
+.introRow:first-child {
+  opacity: 1;
+  translate: none;
+}
+
+.introRow:first-child .introName {
+  opacity: calc(1 - var(--lift, 0));
+}
+
+.introRow:first-child .introButton:hover .introInfo,
+.introRow:first-child .introButton:focus-visible .introInfo {
+  opacity: calc(var(--in, 1) * (1 - var(--fade, 0)));
+}
+
+.introButton {
+  position: relative;
+  display: grid;
+  flex: 1;
+  grid-template-columns: minmax(0, 1fr) minmax(0, min(340px, 26%));
+  align-items: center;
+  gap: 4vw;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  isolation: isolate;
+}
+
+/* Hover: the project's accent fills the row from the left, out to the window edges. */
+.introButton::before {
+  content: "";
+  position: absolute;
+  inset: 0 -4.6vw;
+  z-index: -1;
+  background: var(--accent);
+  opacity: 0.14;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.introButton:hover::before,
+.introButton:focus-visible::before {
+  transform: scaleX(1);
+}
+
+.introButton:focus-visible {
+  outline: 3px solid var(--ink);
+  outline-offset: -3px;
+}
+
+.introName {
+  display: inline-flex;
+  align-items: center;
+  justify-self: start;
+  gap: 0.3em;
+  font:
+    900 clamp(52px, 7.4vw, 140px) / 1 var(--font-pretendard),
+    sans-serif;
+  letter-spacing: -0.055em;
+  white-space: nowrap;
+  transition: translate 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.introButton:hover .introName,
+.introButton:focus-visible .introName {
+  translate: 0.12em 0;
+}
+
+.introDot {
+  width: 0.14em;
+  height: 0.14em;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+.introInfo {
+  display: grid;
+  gap: 10px;
+  opacity: 0;
+  visibility: hidden;
+  translate: 0 8px;
   color: var(--muted);
   font-size: 15px;
-  line-height: 1.7;
+  line-height: 1.6;
   word-break: keep-all;
+  transition:
+    opacity 0.24s ease,
+    translate 0.24s ease,
+    visibility 0.24s;
+}
+
+.introButton:hover .introInfo,
+.introButton:focus-visible .introInfo {
+  opacity: var(--in, 1);
+  visibility: visible;
+  translate: 0 0;
+}
+
+.introStack {
+  color: #8b9198;
+  font-size: 13px;
+  font-weight: 600;
 }
 
 /* One pinned stage for the main projects: the track is the stage plus 1.5 stage heights per project (SEGMENT in
@@ -55,7 +202,9 @@
 }
 .track {
   position: relative;
-  height: calc(var(--stage) * (1 + var(--intro, 0) + 1.5 * var(--count, 3)));
+  height: calc(
+    var(--stage) * (1 + var(--intro, 0) + 1.5 * var(--count, 3) + var(--tail, 0))
+  );
 }
 .pin {
   position: sticky;
@@ -173,6 +322,35 @@
   padding-right: 0.3em;
 }
 
+/* Endless flow to the left (2026-10-23, user request), on top of the scroll drift (--band-x). WorkStory pauses it
+   while the band is hidden. */
+.tickerTrack {
+  display: flex;
+  animation: tickerFlow var(--ticker-time, 40s) linear infinite;
+  animation-play-state: paused;
+}
+
+.tickerHalf {
+  display: flex;
+  flex-shrink: 0;
+}
+
+@keyframes tickerFlow {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tickerTrack {
+    animation: none;
+  }
+}
+
 .meta {
   position: absolute;
   z-index: 3;
@@ -270,7 +448,7 @@
   right: 6%;
   bottom: 10%;
   width: 40%;
-  aspect-ratio: 16 / 10;
+  aspect-ratio: 1584 / 993;
   pointer-events: none;
   opacity: clamp(0, 1 - var(--out) * 1.8, 1);
 }
@@ -285,6 +463,52 @@
   inset: 0;
   border-radius: 10px;
   transform: translateY(var(--desk-y));
+}
+.monitor {
+  position: absolute;
+  inset: 0;
+  transform: translateY(var(--desk-y));
+}
+.monitorScreen {
+  position: absolute;
+  left: 12.44%;
+  top: 8.05%;
+  width: 75.19%;
+  height: 64.25%;
+  overflow: hidden;
+  background: #090a0c;
+}
+.monitorShell {
+  object-fit: contain;
+  pointer-events: none;
+}
+.phone {
+  position: absolute;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 0 30px 60px -24px rgb(0 0 0 / 0.55);
+}
+.goldPhone {
+  position: absolute;
+  right: -6%;
+  bottom: -12%;
+  width: 31%;
+  aspect-ratio: 986 / 1596;
+  transform: translateY(var(--phone-y));
+}
+.goldPhoneScreen {
+  position: absolute;
+  left: 17.95%;
+  top: 7.52%;
+  width: 65.31%;
+  height: 86.47%;
+  overflow: hidden;
+  border-radius: 8% / 4%;
+  background: #08090b;
+}
+.goldPhoneShell {
+  object-fit: contain;
+  pointer-events: none;
 }
 .phone {
   right: -6%;
@@ -426,8 +650,37 @@
 
 @media (max-width: 899px) {
   .intro {
-    padding: calc(var(--chrome, 0px) + 12vh) 24px 0;
+    padding: calc(var(--chrome, 0px) + 3vh) 24px 4vh;
   }
+
+  .introTop {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .introButton {
+    grid-template-columns: minmax(0, 1fr);
+    align-content: center;
+    gap: 6px;
+  }
+
+  .introButton::before {
+    inset: 0 -24px;
+  }
+
+  .introName {
+    font-size: 11vw;
+  }
+
+  .introInfo {
+    font-size: 13px;
+  }
+
+  .introStack {
+    display: none;
+  }
+
   .side {
     padding: 104px 24px 64px;
   }
@@ -512,8 +765,18 @@
     position: relative;
     inset: auto;
     min-height: var(--page-h, 600px);
-    justify-content: center;
-    padding-top: 0;
+    padding-top: 4vh;
+  }
+
+  /* No pinned stage: the menu jump lands with the lead-in under the title bar. */
+  .anchor {
+    top: 0;
+  }
+
+  .introButton::before,
+  .introName,
+  .introInfo {
+    transition: none;
   }
   .dusk,
   .scatter {

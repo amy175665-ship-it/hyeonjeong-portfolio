@@ -1,0 +1,668 @@
+<!doctype html>
+<html lang="ko" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>대표 프로젝트 도입 시안</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@600&display=swap">
+<style>
+  @font-face {
+    font-family: Pretendard;
+    src: url("assets/PretendardVariable.woff2") format("woff2");
+    font-weight: 100 900;
+  }
+
+  @font-face {
+    font-family: "DM Serif Display";
+    src: url("assets/DMSerifDisplay-Regular.ttf");
+  }
+
+  :root {
+    --bg: #fcfcfb;
+    --ink: #202731;
+    --muted: #58636e;
+    --line: #e6e6e2;
+    --coral: #e96b5a;
+    --green: #7f9657;
+    --yellow: #e9a33a;
+    --chrome: 96px;
+    --stage: max(600px, 100svh);
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  html,
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: Pretendard, sans-serif;
+  }
+
+  /* 시안 전환 버튼 (시안 확인용, 실제 화면에는 없음) */
+  .switch {
+    position: fixed;
+    right: 16px;
+    bottom: 16px;
+    z-index: 50;
+    display: flex;
+    gap: 4px;
+    padding: 4px;
+    border-radius: 999px;
+    background: rgb(32 39 49 / 0.88);
+    box-shadow: 0 8px 24px rgb(0 0 0 / 0.2);
+  }
+
+  .switch button {
+    padding: 8px 14px;
+    border: 0;
+    border-radius: 999px;
+    background: transparent;
+    color: #fff;
+    font: 600 13px Pretendard, sans-serif;
+    cursor: pointer;
+  }
+
+  .switch button[aria-pressed="true"] {
+    background: #fff;
+    color: var(--ink);
+  }
+
+  /* 실제 사이트의 PC 캡슐 헤더 흉내 */
+  .capsule {
+    position: fixed;
+    top: 22px;
+    left: 50%;
+    z-index: 40;
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    height: 54px;
+    padding: 0 22px;
+    border-radius: 999px;
+    background: rgb(240 240 237 / 0.9);
+    box-shadow: 0 6px 20px rgb(0 0 0 / 0.08);
+    translate: -50% 0;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--muted);
+  }
+
+  .capsule img {
+    width: 34px;
+  }
+
+  .capsule .dots {
+    display: flex;
+    gap: 7px;
+  }
+
+  .capsule .dots i {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+  }
+
+  .capsule .on {
+    padding: 6px 12px;
+    border-radius: 20px;
+    background: #fff;
+    color: var(--ink);
+  }
+
+  /* 앞 파트(브이로그) 끝 자리 */
+  .before {
+    display: grid;
+    place-items: center;
+    height: 60svh;
+    color: #b6bbc0;
+    font-size: 14px;
+  }
+
+  .after {
+    display: grid;
+    place-items: center;
+    height: 50svh;
+    background: #121b33;
+    color: #8790a8;
+    font-size: 14px;
+  }
+
+  /* 고정 무대 */
+  .track {
+    position: relative;
+    height: calc(var(--stage) * 2.8);
+  }
+
+  .track[hidden] {
+    display: none;
+  }
+
+  .pin {
+    position: sticky;
+    top: 0;
+    height: var(--stage);
+    overflow: hidden;
+  }
+
+  .intro {
+    position: absolute;
+    inset: 0;
+    background: var(--bg);
+  }
+
+  /* 첫 패널: 원으로 열림 (--r, --x, --y는 스크립트) */
+  .panel {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+      radial-gradient(circle at 70% 30%, rgb(255 255 255 / 0.28), transparent 45%),
+      linear-gradient(115deg, #7f9657, #4f6534);
+    color: #fff;
+    -webkit-mask-image: radial-gradient(circle at var(--x, 50%) var(--y, 50%), #000 calc(var(--r, 0px) - 60px), transparent var(--r, 0px));
+    mask-image: radial-gradient(circle at var(--x, 50%) var(--y, 50%), #000 calc(var(--r, 0px) - 60px), transparent var(--r, 0px));
+  }
+
+  .panel h3 {
+    position: absolute;
+    left: 4.2%;
+    bottom: 12%;
+    margin: 0;
+    font: 900 clamp(64px, 10.5vw, 176px) / 0.9 Pretendard, sans-serif;
+    letter-spacing: -0.06em;
+    text-shadow: 0 6px 40px rgb(0 0 0 / 0.25);
+    scale: calc(1.22 - var(--open, 0) * 0.22);
+    transform-origin: left bottom;
+  }
+
+  .panel p {
+    position: absolute;
+    left: 4.2%;
+    bottom: 7%;
+    margin: 0;
+    font-size: 16px;
+    opacity: 0.85;
+  }
+
+  .note {
+    position: absolute;
+    left: 4.2%;
+    bottom: 32px;
+    max-width: 420px;
+    margin: 0;
+    color: #8b9198;
+    font-size: 13px;
+    line-height: 1.6;
+  }
+
+  .heading {
+    margin: 0;
+    font:
+      600 clamp(40px, 5vw, 72px) / 1.1 "DM Serif Display",
+      "Noto Serif KR",
+      serif;
+    letter-spacing: -0.02em;
+  }
+
+  /* 글자가 흐려지며 올라감 (--lift) */
+  .lifts {
+    opacity: calc(1 - var(--lift, 0));
+    translate: 0 calc(var(--lift, 0) * -40px);
+  }
+
+  /* ---------- A안: 프로젝트 목록 (화면 전체 폭의 행) ---------- */
+  .a .intro {
+    display: flex;
+    flex-direction: column;
+    padding: calc(var(--chrome) + 4vh) 4.2% 5vh;
+  }
+
+  .a .top {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 32px;
+    padding-bottom: 2.4vh;
+    opacity: calc(1 - var(--fade, 0));
+  }
+
+  .a .heading {
+    font:
+      800 clamp(30px, 3vw, 52px) / 1.1 Pretendard,
+      sans-serif;
+    letter-spacing: -0.04em;
+  }
+
+  .a .note {
+    position: static;
+    word-break: keep-all;
+    max-width: 360px;
+    text-align: right;
+  }
+
+  .names {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    margin: 0;
+    padding: 0;
+    border-bottom: 1px solid var(--line);
+    list-style: none;
+  }
+
+  .names li {
+    display: flex;
+    flex: 1;
+    border-top: 1px solid var(--line);
+  }
+
+  .names a {
+    position: relative;
+    display: grid;
+    flex: 1;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 340px);
+    align-items: center;
+    gap: 4vw;
+    color: var(--ink);
+    text-decoration: none;
+    isolation: isolate;
+  }
+
+  /* 호버하면 프로젝트 accent 색이 행 왼쪽부터 차오름 */
+  .names a::before {
+    content: "";
+    position: absolute;
+    inset: 0 -4.6vw;
+    z-index: -1;
+    background: var(--accent);
+    opacity: 0.14;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  .names a:hover::before,
+  .names a:focus-visible::before {
+    transform: scaleX(1);
+  }
+
+  .names a:focus-visible {
+    outline: 3px solid var(--ink);
+    outline-offset: -3px;
+  }
+
+  .name {
+    display: inline-flex;
+    justify-self: start;
+    align-items: center;
+    gap: 0.3em;
+    font: 900 clamp(52px, 8vw, 150px) / 1 Pretendard, sans-serif;
+    letter-spacing: -0.055em;
+    white-space: nowrap;
+    transition: translate 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  .names a:hover .name,
+  .names a:focus-visible .name {
+    translate: 0.12em 0;
+  }
+
+  .name .dot {
+    width: 0.14em;
+    height: 0.14em;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+
+  .info {
+    display: grid;
+    word-break: keep-all;
+    gap: 10px;
+    color: var(--muted);
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  .stack {
+    color: #8b9198;
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  /* 나머지 행은 첫 행보다 먼저 흐려짐 */
+  .names li:not(:first-child),
+  .names li:first-child .info {
+    opacity: calc(1 - var(--fade, 0));
+  }
+
+  .names li:not(:first-child) {
+    translate: 0 calc(var(--fade, 0) * 24px);
+  }
+
+  .names li:first-child .name {
+    opacity: calc(1 - var(--lift, 0));
+  }
+
+  .names {
+    border-bottom-color: rgb(230 230 226 / calc(1 - var(--fade, 0)));
+  }
+
+  .names li:first-child {
+    border-top-color: rgb(230 230 226 / calc(1 - var(--fade, 0)));
+  }
+
+  /* 무대에 들어오면 행이 차례로 올라옴 */
+  .names li > a {
+    opacity: 0;
+    translate: 0 40px;
+    transition:
+      opacity 0.7s ease,
+      translate 0.9s cubic-bezier(0.2, 0.8, 0.2, 1);
+    transition-delay: calc(var(--i) * 0.12s + 0.15s);
+  }
+
+  .shown .names li > a {
+    opacity: 1;
+    translate: 0 0;
+  }
+
+  /* ---------- B안: 큰 BUILD. ---------- */
+  .b .intro {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: var(--chrome) 4.2% 0;
+  }
+
+  .b .heading {
+    margin-bottom: 1vw;
+  }
+
+  .big {
+    margin: 0 0 6svh -0.04em;
+    color: var(--ink);
+    font: 900 clamp(120px, 21vw, 380px) / 0.82 Pretendard, sans-serif;
+    letter-spacing: -0.07em;
+    mix-blend-mode: multiply;
+    translate: 0 calc(var(--fade, 0) * 30%);
+    opacity: calc(1 - var(--fade, 0));
+  }
+
+  .big .period {
+    color: var(--green);
+  }
+
+  .big span {
+    display: inline-block;
+    opacity: 0;
+    translate: 0 30%;
+    transition:
+      opacity 0.6s ease,
+      translate 0.9s cubic-bezier(0.2, 0.8, 0.2, 1);
+    transition-delay: calc(var(--i) * 0.07s + 0.1s);
+  }
+
+  .shown .big span {
+    opacity: 1;
+    translate: 0 0;
+  }
+
+  .b .note {
+    left: auto;
+    right: 4.2%;
+    top: calc(var(--chrome) + 24px);
+    bottom: auto;
+    text-align: right;
+  }
+
+  @media (max-width: 899px) {
+    :root {
+      --chrome: 120px;
+    }
+
+    .capsule {
+      display: none;
+    }
+
+    .a .intro {
+      padding-left: 24px;
+      padding-right: 24px;
+    }
+
+    .a .top {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 8px;
+    }
+
+    .a .note {
+      text-align: left;
+    }
+
+    .names a {
+      grid-template-columns: 1fr;
+      align-content: center;
+      gap: 6px;
+    }
+
+    .name {
+      font-size: 11vw;
+    }
+
+    .info {
+      font-size: 13px;
+    }
+
+    .stack {
+      display: none;
+    }
+
+    .b .intro {
+      padding-left: 24px;
+      padding-right: 24px;
+    }
+
+    .big {
+      font-size: 27vw;
+      margin-bottom: 18svh;
+    }
+
+    .b .note {
+      top: auto;
+      bottom: 32px;
+      left: 24px;
+      right: 24px;
+      text-align: left;
+    }
+
+    .note {
+      left: 24px;
+      right: 24px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .names li > a,
+    .big span {
+      transition-duration: 0s;
+      transition-delay: 0s;
+    }
+  }
+</style>
+</head>
+<body>
+
+<header class="capsule" aria-hidden="true">
+  <span class="dots"><i style="background: var(--coral)"></i><i style="background: var(--yellow)"></i><i style="background: var(--green)"></i></span>
+  <img src="assets/logo.png" alt="">
+  <span>ABOUT</span>
+  <span class="on">PROJECTS</span>
+  <span>DESIGN</span>
+  <span>CONTACT</span>
+</header>
+
+<div class="switch" role="group" aria-label="시안 선택">
+  <button type="button" data-show="a" aria-pressed="true">A안 · 프로젝트 목록</button>
+  <button type="button" data-show="b" aria-pressed="false">B안 · 큰 BUILD.</button>
+</div>
+
+<div class="before">↑ 브이로그 끝 · 아래로 스크롤하세요</div>
+
+<!-- A안 -->
+<section class="track a" data-variant="a" aria-label="대표 프로젝트 (A안)">
+  <div class="pin">
+    <div class="intro">
+      <div class="top">
+        <h2 class="heading">대표 프로젝트</h2>
+        <p class="note">프로젝트 화면과 설명을 정리하고 있습니다. '작성 예시'로 표시된 부분은 실제 작업 내용으로 채울 예정입니다.</p>
+      </div>
+      <ul class="names">
+        <li>
+          <a href="#a-panel" style="--accent: #7f9657; --i: 0">
+            <span class="name" data-origin>HODUIT<span class="dot"></span></span>
+            <span class="info">디저트 커뮤니티 — Figma 디자인부터 퍼블리싱까지 직접 만든 프로젝트<span class="stack">Figma · HTML · CSS · JavaScript</span></span>
+          </a>
+        </li>
+        <li>
+          <a href="#a-panel" style="--accent: #e96b5a; --i: 1">
+            <span class="name">JAJAK<span class="dot"></span></span>
+            <span class="info">전통주 큐레이션 쇼핑몰 — React 팀 프로젝트<span class="stack">React · Git · GSAP</span></span>
+          </a>
+        </li>
+        <li>
+          <a href="#a-panel" style="--accent: #e9a33a; --i: 2">
+            <span class="name">DEEPFINE COPY<span class="dot"></span></span>
+            <span class="info">웹사이트 클론 — HTML/SCSS로 원본 디자인을 반응형으로 재현<span class="stack">HTML · SCSS · JavaScript</span></span>
+          </a>
+        </li>
+      </ul>
+    </div>
+    <div class="panel" aria-hidden="true">
+      <h3>HODUIT</h3>
+    </div>
+  </div>
+</section>
+
+<!-- B안 -->
+<section class="track b" data-variant="b" aria-label="대표 프로젝트 (B안)" hidden>
+  <div class="pin">
+    <div class="intro">
+      <h2 class="heading lifts">대표 프로젝트</h2>
+      <p class="big" aria-hidden="true" data-origin><span style="--i: 0">B</span><span style="--i: 1">U</span><span style="--i: 2">I</span><span style="--i: 3">L</span><span style="--i: 4">D</span><span class="period" style="--i: 5">.</span></p>
+      <p class="note lifts">프로젝트 화면과 설명을 정리하고 있습니다. '작성 예시'로 표시된 부분은 실제 작업 내용으로 채울 예정입니다.</p>
+    </div>
+    <div class="panel" aria-hidden="true">
+      <h3>HODUIT</h3>
+    </div>
+  </div>
+</section>
+
+<div class="after">↓ 이어지는 프로젝트 패널 (생략)</div>
+
+<script>
+  const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const ramp = (v, a, b) => Math.min(1, Math.max(0, (v - a) / (b - a)));
+  const ease = (t) => (t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2);
+
+  const tracks = [...document.querySelectorAll(".track")];
+
+  // 무대가 화면에 들어오면 등장 모션
+  const seen = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("shown");
+        }
+      });
+    },
+    { threshold: 0.35 }
+  );
+
+  tracks.forEach((track) => {
+    seen.observe(track.querySelector(".pin"));
+  });
+
+  function update() {
+    tracks.forEach((track) => {
+      if (track.hidden) {
+        return;
+      }
+
+      const box = track.getBoundingClientRect();
+      const stageH = track.querySelector(".pin").offsetHeight;
+      const p = -box.top / stageH;
+
+      // 0~0.3: 나머지가 흐려짐 / 0.15~0.6: 원이 열림 / 0.3~0.7: 남은 글자가 흐려짐
+      const fade = ease(ramp(p, 0, 0.3));
+      const open = ease(ramp(p, 0.15, 0.85));
+      const lift = ease(ramp(p, 0.3, 0.7));
+
+      const pin = track.querySelector(".pin");
+      const origin = track.querySelector("[data-origin]").getBoundingClientRect();
+      const pinBox = pin.getBoundingClientRect();
+      const x = origin.left + origin.width / 2 - pinBox.left;
+      const y = origin.top + origin.height / 2 - pinBox.top;
+      const far = Math.hypot(Math.max(x, pinBox.width - x), Math.max(y, pinBox.height - y)) + 80;
+
+      pin.style.setProperty("--fade", fade.toFixed(3));
+      pin.style.setProperty("--lift", lift.toFixed(3));
+      pin.style.setProperty("--open", open.toFixed(3));
+
+      const panel = track.querySelector(".panel");
+      panel.style.setProperty("--x", x + "px");
+      panel.style.setProperty("--y", y + "px");
+      panel.style.setProperty("--r", (open * far).toFixed(1) + "px");
+    });
+  }
+
+  let queued = false;
+  addEventListener(
+    "scroll",
+    () => {
+      if (!queued) {
+        queued = true;
+        requestAnimationFrame(() => {
+          queued = false;
+          update();
+        });
+      }
+    },
+    { passive: true }
+  );
+  addEventListener("resize", update);
+  update();
+
+  // 이름을 누르면 패널이 다 열린 지점으로
+  document.querySelectorAll(".names a").forEach((link) => {
+    link.addEventListener("click", (event) => {
+      event.preventDefault();
+      const track = link.closest(".track");
+      const stageH = track.querySelector(".pin").offsetHeight;
+      const top = track.getBoundingClientRect().top + scrollY;
+      scrollTo({ top: top + stageH * 0.95, behavior: reduced ? "auto" : "smooth" });
+    });
+  });
+
+  // 시안 전환
+  document.querySelectorAll(".switch button").forEach((button) => {
+    button.addEventListener("click", () => {
+      document.querySelectorAll(".switch button").forEach((other) => {
+        other.setAttribute("aria-pressed", String(other === button));
+      });
+      tracks.forEach((track) => {
+        track.hidden = track.dataset.variant !== button.dataset.show;
+        track.querySelector(".pin").classList.remove("shown");
+      });
+      const shownTrack = tracks.find((track) => !track.hidden);
+      seen.unobserve(shownTrack.querySelector(".pin"));
+      seen.observe(shownTrack.querySelector(".pin"));
+      update();
+    });
+  });
+</script>
+</body>
+</html>

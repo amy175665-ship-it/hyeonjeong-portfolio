@@ -63,8 +63,8 @@
   --p: 0;
   position: absolute;
   z-index: 2;
-  left: 4.2%;
-  top: 16%;
+  left: 6%;
+  top: 19%;
   margin: 0;
   font:
     700 clamp(28px, 3.2vw, 60px) / 1.35 var(--font-pretendard),
