@@ -27,16 +27,17 @@ README는 프로젝트 소개와 개발 안내, 이 문서는 에이전트의 �
 | --- | --- |
 | 전체 페이지 구성 | `app/page.tsx` → `components/sections/concept/ConceptScenes.tsx` → `WindowFrame.tsx` |
 | 첫 화면·3D 얼굴 | `components/sections/hero/Hero.tsx` → `GrowthScene.tsx`, `HeroAvatar.tsx` → `AvatarCanvas.tsx` |
-| 선인장·모래 전환 | `components/sections/concept/scenes.ts` → `ConceptScenes.tsx` → `CactusScene.tsx`, `PollenGrow.tsx`, `SandHandoff.tsx` |
+| 선인장·모래 전환 | `components/sections/concept/scenes.ts` → `ConceptScenes.tsx` → `CoverSand.tsx`, `CactusScene.tsx`, `PollenGrow.tsx`, `SandHandoff.tsx` |
 | 헤더·탭·메뉴 이동 | `components/layout/SiteNav.tsx`, `components/sections/concept/WindowFrame.tsx` + `data/navigation.ts`, `data/stages.ts` |
 | 스크롤·헤더 상태 | `components/layout/SmoothScroll.tsx`, `scrollLock.ts` + `components/stage/windowState.ts`, `components/motion/scrollFrame.ts`, `useScrollDirection.ts` |
 | 소개·취미·기술 | `components/sections/AboutStory.tsx` → `AboutCover.tsx`, `HobbyFlow.tsx` + `data/profile.ts`, `data/skills.ts` |
-| 프로젝트·상세 | `data/projects.ts` → `components/sections/WorkStory.tsx`, `app/work/[slug]/page.tsx` + `components/ui/ProjectLinks.tsx`, `ProjectTags.tsx` |
+| 프로젝트·상세 | `data/projects.ts` → `components/sections/WorkStory.tsx`(소개→프로젝트 모래 전환은 `WorkSand.tsx`), `app/work/[slug]/page.tsx` + `components/ui/ProjectLinks.tsx`, `ProjectTags.tsx` |
 | 디자인·연락처 | `data/design.ts`, `data/contact.ts` → `components/sections/GrowStory.tsx`, `DesignStory.tsx`, `ContactStory.tsx`, `components/layout/SiteFooter.tsx` |
 | 폰트·전역 스타일·커서 | `app/layout.tsx`, `app/globals.css` + `components/ui/CustomCursor.tsx` |
 
 - 파일 탐색에는 `rg --files`, 참조 검색에는 `rg -n`을 사용하고, 우선 `app/`, `components/`, `data/` 안에서 범위를 좁힙니다. `.next/`, `node_modules/`와 시안 전체를 처음부터 읽지 않습니다.
 - 스타일 문제는 해당 CSS Module, 인라인 스타일·CSS 변수, 전역 스타일 순서로 영향을 확인합니다. 임의의 `!important`나 전역 덮어쓰기로 원인을 숨기지 않습니다.
+- 정지점(스냅, `components/layout/SmoothScroll.tsx`): 오프닝 몇 곳, 메뉴 위치(#about·#project·#design·#contact), 각 프로젝트 패널, 사이드 목록, GROW 단계에 정지점이 있습니다. 휠·터치를 멈춘 자리가 진행 방향의 다음 정지점 0.25화면 이내일 때만 그 방향으로 붙고(거리에 비례해 1화면당 1.4초 속도), 그 밖에서는 멈춘 자리에 그대로 둡니다. 뒤로 끌어당기지 않고 연출을 빨리 감지 않게 하려는 것입니다(2026-10-23 사용자: "슉 지나간다"; 이전에는 72% 넘으면 0.62초 만에 다음 정지점으로, 못 미치면 뒤로 되돌림). 키보드(방향키·스페이스·PageDown)는 브라우저 기본 스크롤입니다.
 - 스크롤에 묶인 처리는 `window`에 scroll 리스너를 따로 달지 않고 `components/motion/scrollFrame.ts`의 `onScrollFrame({ read, write })`에 등록합니다. 레이아웃 읽기(getBoundingClientRect, offsetHeight, scrollY, getComputedStyle)는 read에, 스타일·속성 쓰기는 write에만 둡니다(write 안의 읽기 하나가 다른 파트가 쓴 스타일을 그 자리에서 다시 계산시킴). 매 프레임 쓰는 스타일은 `components/motion/styleWriter.ts`의 `styleWriter()`로 값이 바뀔 때만 씁니다(같은 값도 다시 쓰면 스타일 재계산이 일어남). Lenis가 페이지를 움직인 같은 프레임에 실행되므로 transform으로 붙잡는 요소가 한 프레임씩 밀려 튀지 않습니다. 화면 밖에서 계속 도는 CSS 애니메이션(특히 var()를 쓰는 키프레임처럼 메인 스레드에서 도는 것)은 `animation-play-state: paused`로 멈춥니다(히어로 단어는 `[data-paused]`, 기술 띠는 AboutCover의 `data-offscreen`, 연락처 별은 ContactStory의 `data-offscreen`).
 - 상태·이벤트를 수정할 때는 값을 쓰는 곳과 읽는 곳, 이벤트를 보내는 곳과 받는 곳을 모두 찾습니다. 특히 창 전환은 `ConceptScenes`·`WindowFrame`·`SiteNav`·`scrollLock`·`windowState`의 연결을 확인합니다.
 
@@ -58,11 +59,11 @@ README는 프로젝트 소개와 개발 안내, 이 문서는 에이전트의 �
   - 4단계(2026-10-13): ABSORB 표지가 소개 페이지로 바뀌는 장면(AboutCover, 아래 "ABSORB 표지 → 소개"). 뿌리 전환은 넣지 않음.
   - 5단계(2026-10-13): GROW 모래 원(GrowStory, 아래 "GROW 원")과 BLOOM(ContactStory, 아래 "연락처").
   - 다음 후보: 6단계 모션 감소판·접근성·성능 점검. 세부 순서는 11장 "남은 작업"을 따릅니다.
-- 오프닝(히어로, 3D 얼굴, 모래 덮기, 선인장 이야기, 모래 전환)은 그대로 유지합니다.
+- 오프닝(히어로, 3D 얼굴, 첫 모래 전환, 선인장 이야기, 모래 전환)은 그대로 유지합니다. 첫 모래 전환은 2026-10-22에 "모래 이미지가 올라와 덮었다 내려감"에서 "히어로가 모래알로 흩어졌다 사막 언덕으로 모임"으로 바꿨습니다(아래 "컨셉 장면"의 cover).
 
 ## 3. 페이지 구성
 
-`app/page.tsx`: ConceptScenes(히어로 + 모래 덮기 + 선인장 이야기 + 모래 전환) 뒤에 브라우저 창(WindowFrame)이 이어지고, 창 안에 AboutStory → WorkStory → GrowStory → ContactStory가 차례로 들어갑니다. GROW 원(GrowStory)이 디자인 파트(DESIGN 탭)이고, 끝에 고리가 화면에 머물며 그 위에 디자인 작업(DesignStory, GrowStory 무대 위 레이어)이 뜹니다. #design은 GrowStory 안의 표시입니다. 헤더 메뉴에 HOW I WORK 같은 항목을 넣지 않습니다(사용자: DESIGN 자리에 디자인 작업을 넣음). 창의 최상위 자식 하나가 이야기 한 단계입니다(about=ABSORB, project=BUILD, design=GROW, contact=BLOOM, `data/stages.ts`).
+`app/page.tsx`: ConceptScenes(히어로 + 첫 모래 전환 + 선인장 이야기 + 모래 전환) 뒤에 브라우저 창(WindowFrame)이 이어지고, 창 안에 AboutStory → WorkStory → GrowStory → ContactStory가 차례로 들어갑니다. GROW 원(GrowStory)이 디자인 파트(DESIGN 탭)이고, 끝에 고리가 화면에 머물며 그 위에 디자인 작업(DesignStory, GrowStory 무대 위 레이어)이 뜹니다. #design은 GrowStory 안의 표시입니다. 헤더 메뉴에 HOW I WORK 같은 항목을 넣지 않습니다(사용자: DESIGN 자리에 디자인 작업을 넣음). 창의 최상위 자식 하나가 이야기 한 단계입니다(about=ABSORB, project=BUILD, design=GROW, contact=BLOOM, `data/stages.ts`).
 
 - 이전 구성 컴포넌트(ScrollHero, PinnedBrowser, HeroBrowserDemo, ProjectCarousel, About, Skills, WorkGrid, SideProjects, DesignGallery, VoiceIntro)와 페이지 플래그(showConceptIntro, showLowerSections)는 사용자 승인으로 1단계에서 지웠습니다(쓰는 곳이 없음을 확인하고, About·Skills 안의 데이터는 `data/`로 옮김). 옛 코드가 필요하면 git 기록에서 찾습니다.
 - 헤더 메뉴의 ABOUT(#about)·PROJECTS(#project)·DESIGN(#design)·CONTACT(#contact)는 모두 브라우저 창 안의 해당 위치로 이동합니다.
@@ -77,20 +78,20 @@ components/
 ├─ motion/                 SplitText(글자·단어 쪼개기), RollingWord(글자가 굴러 바뀌는 단어), useScrollDirection, scrollFrame(스크롤 연동 읽기→쓰기 묶음), useSeam(파트 경계의 들어옴·나감 값), styleWriter(바뀐 스타일 값만 쓰기)
 ├─ stage/                  windowState(지금 단계와 창이 풀렸는지를 헤더 등에 알림)
 ├─ sections/
-│  ├─ AboutStory, AboutCover, HobbyFlow, WorkStory, GrowStory, DesignStory, ContactStory   창 안의 소개(ABSORB 표지), 취미, 대표 프로젝트, GROW 원, 디자인, 연락처
+│  ├─ AboutStory, AboutCover, HobbyFlow, WorkStory, WorkSand, GrowStory, DesignStory, ContactStory   창 안의 소개(ABSORB 표지), 취미, 대표 프로젝트(WorkSand: 소개→프로젝트 모래 전환), GROW 원, 디자인, 연락처
 │  ├─ hero/                Hero, GrowthScene, HeroAvatar/AvatarCanvas, SandStream
-│  └─ concept/             ConceptScenes, scenes.ts, CactusScene, WindGust, PollenGrow, SandHandoff(모래알 전환), WindowFrame(브라우저 창)
+│  └─ concept/             ConceptScenes, scenes.ts, CoverSand(첫 모래 전환), CactusScene, WindGust, PollenGrow, SandHandoff(모래알 전환), WindowFrame(브라우저 창)
 └─ ui/                     Reveal, ProjectLinks, ProjectTags, CustomCursor
 data/                      profile(소개·취미·브이로그), skills, contact, projects, design, navigation, stages(이야기 단계), workStyle(GROW 원의 세 단어)
-assets/                    원본 디자인 소스(커서·모래 PNG). 배포되지 않으며 화면에서 쓰지 않음
-public/                    화면에 쓰는 정적 파일(이미지 WebP, 폰트, models/avatar6.glb, 로고)
+assets/                    원본 디자인 소스(커서·모래 PNG, 기기 목업). 배포되지 않음
+public/                    화면에 쓰는 정적 파일(이미지 WebP·투명 PNG, 폰트, models/avatar6.glb, 로고)
 artifacts/                 사용자에게 보여 줄 시안·승인된 시안(사진·영상은 git 제외)
 ```
 
 - 여러 섹션에서 쓰는 요소는 `ui/`, 히어로 전용은 `sections/hero/`, 사막 이후 컨셉 장면은 `sections/concept/`에 둡니다.
 - 폴더를 넘는 참조는 `@/components/...`를 씁니다. 파일을 옮기면 import와 README 경로를 함께 고칩니다.
 - 섹션 ID(#about, #project)와 상세 경로(/work/[slug])를 임의로 바꾸지 않습니다.
-- 원본 이미지는 `assets/`, 화면용 변환본은 `public/`에 둡니다. 원본을 교체하면 변환본(WebP)도 다시 만듭니다.
+- 원본 이미지는 `assets/`, 화면용 파일은 `public/`에 둡니다. 투명 기기 목업처럼 WebP 변환 시 투명도나 가장자리가 달라질 수 있는 파일은 PNG를 그대로 복사해 사용합니다.
 
 ### 폴더 정리와 파일 이동 기준
 
@@ -167,12 +168,12 @@ artifacts/                 사용자에게 보여 줄 시안·승인된 시안(�
 하나의 고정 트랙(3.8화면, sticky 무대 높이 max(600px, 100svh), 고정된 동안 2.8화면 스크롤)에서 진행합니다. 구간은 `scenes.ts`의 SCENES(cover 0~0.27 / build 0.27~0.54 / adapt 0.54~0.76 / grow 0.76~1)이며, 모든 장면은 진행률(story)을 따릅니다.
 
 - cover만 스크롤로 움직입니다. 고정 스크롤의 앞 2화면(`COVER_SCROLL` 2/2.8)을 `useSpring(stiffness 55, damping 22)`로 부드럽게 따라갑니다.
-- 모래가 수평선에 자리 잡으면 build → adapt → grow가 `PLAY_SECONDS`(7초, 2026-10-16에 11초에서 줄임) 동안 시간 기반으로 재생됩니다(playhead). 재생하는 동안에는 `components/layout/scrollLock.ts`로 스크롤을 cover 끝 위치에 고정합니다(휠·터치·스크롤 키 차단, 스크롤바 이동은 되돌림, Lenis stop). 재생이 끝나면 풀리고, 링크를 누르면 바로 풀려 메뉴 이동은 동작합니다. 재생 중이거나 끝난 뒤 cover 끝보다 조금(`REWIND_FROM`, 트랙 진행률 0.01) 위로 올라가면 선인장·꽃가루·문구가 0.35초 동안 사라진 뒤(outro) 처음 상태로 돌아가고, 다시 내려오면 처음부터 재생됩니다. 남은 0.8화면은 모래 전환이 끝나는 자리입니다. 창으로 넘어갈 때는 아래 "모래 전환"을 따릅니다.
+- 마지막 모래알 한 줌이 선인장 자리로 모일 때(cover 진행 0.906, `COVER_SAND.play`, cover가 완전히 멈추기를 기다리지 않음) build → adapt → grow가 `PLAY_SECONDS`(7초, 2026-10-16에 11초에서 줄임) 동안 시간 기반으로 재생됩니다(playhead). 재생하는 동안에는 `components/layout/scrollLock.ts`로 스크롤을 cover 끝 위치에 고정합니다(휠·터치·스크롤 키 차단, 스크롤바 이동은 되돌림, Lenis stop). 재생이 끝나면 풀리고, 링크를 누르면 바로 풀려 메뉴 이동은 동작합니다. 재생 중이거나 끝난 뒤 선인장이 돋은 지점보다 조금(`REWIND_FROM`, cover 진행 0.876) 위로 올라가면 선인장·꽃가루·문구가 0.35초 동안 사라진 뒤(outro) 처음 상태로 돌아가고, 다시 내려오면 처음부터 재생됩니다. 이야기가 시작된 뒤에는 cover 화면(`coverShown`)이 뒤로 가지 않아 조금 올라가도 선인장 아래 언덕이 부서지지 않고, outro 동안 지금 스크롤 위치의 cover로 부드럽게 돌아갑니다. 남은 0.8화면은 모래 전환이 끝나는 자리입니다. 창으로 넘어갈 때는 아래 "모래 전환"을 따릅니다.
 - 모션 감소 설정에서는 시간 재생 없이 cover가 끝나면 바로 완성된 장면(grow 끝)을 보여 주고, 스크롤을 고정하지 않습니다.
 - 재생 중에는 오른쪽 아래 SKIP 버튼(2026-10-13 정식 유지 결정)이 재생을 끝으로 넘깁니다. 첫 화면 왼쪽 아래에는 "프로젝트 바로 보기 ↓" 알약 링크(/#project, SKIP과 같은 모양)가 있어 오프닝을 건너뛰고 프로젝트로 갑니다. 모래가 올라오기 시작하면(cover 진행 12%) 사라지고 클릭도 막히며, 키보드 포커스 시에는 보입니다.
 - 홈에서 Tab을 처음 누르면 헤더보다 먼저 "본문 바로가기"(components/layout/SkipLink, globals.css `.skip-link`, 포커스 전에는 화면 밖)가 나오고 #about으로 갑니다.
 - 이야기 구간 높이(`.storyTrack`·`.track`의 3.8)와 `COVER_SCROLL`은 함께 고칩니다. 진행률은 `.storyTrack` 기준이고, `.track`은 창틀이 풀리는 구간(`DISSOLVE_SCREENS` 0.9화면, `scenes.ts`, CSS `--dissolve`)만큼 더 깁니다. 무대(`.stage`)는 이 구간 끝까지 고정됩니다.
-- 로고(홈 링크)를 이 페이지에서 누르면 바로 맨 위로 점프하지 않습니다. 이야기를 끝난 상태로 두고(재생 중이면 멈춤), 창이 내려가며 cover 끝으로 이동한 뒤 `RETURN_SECONDS`(3초) 동안 ease-in-out으로 맨 위까지 미끄러지듯 올라갑니다. 그래서 모래가 천천히 올라와 덮었다가 천천히 내려가며 첫 화면이 드러납니다(`glideTo`, 이동 중 입력 무시). `scrollToY`·`glideTo`는 이동 전에 Lenis 높이를 다시 재서, 창 내용만큼 길어진 페이지 끝이 잘리지 않게 합니다. 이야기 구간에 들어가기 전(첫 화면·모래가 올라오는 중)에 로고를 누르면 이야기를 끝난 상태로 만들지 않고 처음 상태로 둔 채 올라가며, 맨 위에 도착하면 스크롤 위치에 맞게 이야기 상태를 다시 맞춥니다(2026-10-14 수정: 메뉴를 연 뒤 첫 화면에서 로고를 누르면 완성된 선인장 장면이 첫 화면 위에 남던 문제).
+- 로고(홈 링크)를 이 페이지에서 누르면 바로 맨 위로 점프하지 않습니다. 이야기를 끝난 상태로 두고(재생 중이면 멈춤), 창이 내려가며 cover 끝으로 이동한 뒤 `RETURN_SECONDS`(3초) 동안 ease-in-out으로 맨 위까지 미끄러지듯 올라갑니다. 그래서 사막 언덕이 모래알로 흩어졌다가 첫 화면의 언덕과 글자로 다시 모입니다(`glideTo`, 이동 중 입력 무시). `scrollToY`·`glideTo`는 이동 전에 Lenis 높이를 다시 재서, 창 내용만큼 길어진 페이지 끝이 잘리지 않게 합니다. 이야기 구간에 들어가기 전(첫 화면·모래가 올라오는 중)에 로고를 누르면 이야기를 끝난 상태로 만들지 않고 처음 상태로 둔 채 올라가며, 맨 위에 도착하면 스크롤 위치에 맞게 이야기 상태를 다시 맞춥니다(2026-10-14 수정: 메뉴를 연 뒤 첫 화면에서 로고를 누르면 완성된 선인장 장면이 첫 화면 위에 남던 문제).
 
 #### 브라우저 창 (WindowFrame, 소개·취미·프로젝트·디자인·연락처가 들어 있음)
 
@@ -189,16 +190,18 @@ artifacts/                 사용자에게 보여 줄 시안·승인된 시안(�
 - 한 화면 = 한 섹션: 창 안의 각 `[data-page]`(소개, 취미, 프로젝트 1·2·3, 디자인, 연락처)는 창 높이(`--page-h` = `max(600px, 100svh)` − `--chrome`) 이상입니다. `--chrome`은 위쪽 막대·떠 있는 헤더가 가리는 높이(PC 96px, 1023px 이하 120px)이고 창 내용 맨 위에 그만큼 여백이 있습니다. 헤더 메뉴로 이동하면 섹션 윗선이 `--chrome` 아래에 맞아 그 섹션 하나만 잘림 없이 보입니다(`scrollToY(위치 − chrome)`).
 - 같은 페이지의 #about·#project·#design·#contact 링크(헤더 메뉴·탭)는 기본 이동을 막고 창 안 해당 위치로 스크롤합니다. 이때 이야기는 바로 끝난 상태가 되고, 모래 전환도 다시 재생하지 않고 사막 상태로 맞춘 뒤 창이 바로 올라온 상태가 됩니다(enterWindow). 주소에 해시가 있으면 처음 열 때도 이동하고, 이야기 중에 창 안으로 키보드 포커스가 가면 창을 올리고 그 요소를 화면 위쪽 1/3 지점으로 가져옵니다.
 
-- cover: 모래(`public/images/hero/hero-sand-bg.webp`)가 히어로의 원래 언덕 위치에서 올라와 화면을 덮고(COVER.risen), 덮인 동안 히어로를 숨겨 하늘 배경으로 바꾼 뒤(COVER.swap), 모래 윗선이 무대 62%에 올 때까지 내려갑니다.
-- cover 중 헤더(coverHeader): 올라오는 능선 뒤로 가려지고, 덮인 동안 숨겨지며, 내려가는 능선을 따라 다시 드러납니다. CREST_PROFILE(모래 이미지 가로 11지점의 능선 높이)로 clip-path를 만듭니다. cover 구간이 끝나면(local ≥ 1) 인라인 스타일을 모두 지웁니다. 능선이 헤더에 닿기 전에는 clip-path를 걸지 않아 모바일 메뉴 패널이 잘리지 않습니다.
+- cover(`CoverSand.tsx`, 2026-10-22, 승인 시안 `artifacts/mockup-opening-sand-20261022/`): 모래 이미지(`public/images/hero/hero-sand-bg.webp`)는 움직이지 않습니다. 스크롤을 시작하면 히어로의 언덕과 ABSORB.·BUILD.·GROW.(`data-cover-scatter`, 흩어지는 동안 `.hero[data-scattered]`로 숨김)가 모래알이 되어 왼쪽부터 바람에 오른쪽 위로 날리고, 3D 얼굴·햇살 등 히어로 전체는 흐려집니다(cover 0.03~0.44). 모래알은 왼쪽부터 내려앉아 사막 언덕(이미지 윗선이 무대 62%)이 되고, 다 모이면 실제 이미지가 나타나며 모래알이 사라집니다(0.84~0.95). 마지막 한 줌(1,400개)은 선인장 밑동 자리(`.cactus` 상자의 49.3%·77.7%, 화면 크기와 상관없이 같음, `CACTUS_FOOT`)로 모이고, 그때 선인장 재생이 시작되며 한 줌이 새싹 속으로 사라집니다. 모든 모래알 위치는 cover 진행만의 함수라 거꾸로도 그대로 재생됩니다. 시간표는 `CoverSand.tsx`의 `T`(3.2초 길이로 짜고 스크롤로 진행)와 `COVER_SAND`입니다.
+- 모래알: 3px 격자에 하나(2560×1440보다 크면 4px), 3×3 블록으로 그림. 1440×900에서 약 55,000개. 사막 쪽(언덕)은 페이지를 연 뒤 한가할 때 미리 읽어 두고(requestIdleCallback), 히어로 쪽은 글자가 둥둥 떠 있으므로 cover가 시작될 때 읽습니다(단어의 기울기까지 반영, 숨은 글자도 읽음). 자료는 속성마다 한 줄의 숫자 배열(typed array)이고, 날아가기 전·내려앉은 뒤에는 흩어짐 계산을 건너뛰며, 모래알이 있는 줄 범위만 지우고 캔버스에 보냅니다. 측정(프로덕션 빌드, 1440×900, 2026-10-22): 이 PC 그대로는 이전과 차이 없음. CPU 4배 느림에서는 이전보다 무거움(같은 시간에 그린 프레임 약 250 → 173~187, 33ms 넘는 프레임 8~15 → 51~53, 시작할 때 긴 작업 약 100~140ms). 1/3 크기 캔버스로 그리면 모래알이 격자에 맞춰 움직여 모자이크처럼 보여서 쓰지 않았습니다.
+- cover 동안 헤더는 그대로 보입니다(이전의 능선 모양으로 가리던 `coverHeader`는 없앰).
+- 모션 감소: 모래알 없이 히어로가 흐려지고(cover 0.35~0.5) 언덕 이미지가 첫 화면 자리에서 사막 자리로 엇갈려 바뀝니다. 선인장은 이야기가 시작되기 전(playhead −1)에는 숨깁니다(모션 감소에서는 처음부터 다 자란 모습으로 그려져 첫 화면 위에 보이던 문제).
 - build: CactusScene(R3F 로우폴리 선인장)이 새싹 → 마디 4개 → 윗머리 → 양팔 순서로 자랍니다. WindGust(가로 모래바람, PC는 마우스 가로 이동으로 강화)에 살짝 휘었다 돌아옵니다. 문구 "직접 만들고".
 - adapt: 하늘이 노을 → 밤(별 70개) → 새벽으로 바뀌고, 3D 조명이 돌며 그림자가 회전합니다. 문구 "표면을 설계하고, / 경험을 짓다."(첫 줄 차콜·밤에는 아이보리, 둘째 줄 아이보리).
 - grow: 꽃이 피고 PollenGrow가 위에서 떨어지는 모래알로 "GROW."를 왼쪽부터 쌓습니다. 쌓인 모래알은 짙은 모래색 4가지(#A8763F·#B8864C·#946233·#C4955A), G와 마침표는 노랑(#E9A33A)입니다. 아래에 "웬만해선 시들지 않습니다."와 "선인장처럼, 어떤 환경에서도 생각보다 잘 자라는 사람입니다."(선생님 추천 문구)가 이어집니다.
 - 마무리 신호: 재생이 끝나 스크롤 고정이 풀리면 0.3초 뒤 화면 아래 가운데에 가는 세로선과 그 위를 떨어지는 모래알(.scrollCue, 글자 없음, aria-hidden)이 나타나고, 다시 스크롤하면 사라집니다. 모션 감소 설정에서는 시간 재생이 없으므로 나타나지 않습니다.
 - 배치: PC 선인장은 오른쪽 70%에 고정(1.18배, 4svh 아래), 모바일은 가운데. 장면 문구는 왼쪽 15vw·높이 26%(모바일 왼쪽 24px·높이 18~20%). GROW. 블록은 무대 33%(모바일 30%) 기준선이며 PollenGrow baseline과 `.closing` top을 함께 고칩니다.
 - 전환: 재생의 마지막 15% 동안 무대 하단이 모래색으로 흐려지고(.groundFade, 선인장 뒤), 이어서 스크롤하면 모래 전환으로 브라우저 창이 나타납니다(위 "모래 전환" 참고). 이전의 모래색→크림색 띠(.handoff)는 없앴습니다.
-- 층 순서: 하늘(+시간대 층) < 히어로 < 모래 < 색조 < 바닥 흐림 < 선인장 < 모래바람 < 꽃가루 < 문구 < 브라우저 창. 모래 전환 중에는 흰 덮개(.handoffWhite)가 무대 맨 위(11)에, 모래알 캔버스(.sandHandoff)는 무대와 창 위에 옵니다.
-- 성능: 히어로가 덮이면 `[data-pause-scope]`에 `data-paused`를 붙여 AvatarCanvas(frameloop never)와 SandStream을 멈춥니다. 선인장 3D는 모래가 내려가기 시작한 뒤, 무대가 화면에 있을 때만 그립니다.
+- 층 순서: 하늘(+시간대 층) < 히어로 < 모래 < 색조·바닥 흐림·첫 전환 모래알(.coverSand) < 선인장 < 모래바람 < 꽃가루 < 문구 < 브라우저 창. 모래 전환 중에는 흰 덮개(.handoffWhite)가 무대 맨 위(11)에, 모래알 캔버스(.sandHandoff)는 무대와 창 위에 옵니다.
+- 성능: 히어로가 다 흐려지면 `[data-pause-scope]`에 `data-paused`를 붙여 AvatarCanvas(frameloop never)와 SandStream을 멈춥니다. 선인장 3D는 cover 진행 0.6부터(돋아나기 전에 첫 그리기 준비), 무대가 화면에 있을 때만 그립니다.
 - 스크린리더 순서: 직접 만들고 → 표면을 설계하고, 경험을 짓다. → GROW.(sr-only) → 웬만해선 시들지 않습니다. → 설명.
 
 ### 소개 (AboutStory, #about)
@@ -215,14 +218,14 @@ artifacts/                 사용자에게 보여 줄 시안·승인된 시안(�
 ### 대표 프로젝트 (WorkStory, #project)
 
 - AboutStory·취미 다음, 같은 브라우저 창 안. 3단계 전면 패널(2026-10-13 구현, 승인 시안 `artifacts/project-panels-20261013/`, 원본은 리디자인 시안의 BUILD).
-- 제목 "대표 프로젝트"(본명조 40~72px)와 자리 표시 안내 문구(예시가 있을 때만)는 따로 페이지가 없고 고정 무대 맨 아래 흰 층(`.intro`, 위쪽 막대 아래 16vh 지점)입니다(2026-10-14 사용자 요청: 화면 전환에 빈 구간·막힘이 없게). 작은 "BUILD." 표시와 "01 / 03" 순번은 없앴습니다.
-- 그 뒤 메인 프로젝트는 하나의 고정 무대(2026-10-13 사용자 요청: 종이처럼 덮지 않고 배경색이 자연스럽게 바뀌며 전환): 트랙 높이 = 무대 × (1 + INTRO 0.4 + 1.5 × 프로젝트 수), 무대(`.pin`)가 sticky이고 제목 층·패널·밤색 층(`.dusk`)이 그 안에 겹쳐 있습니다. 무대가 고정된 뒤 0.4화면 동안(2026-10-14 0.6에서 줄임) 제목 글자가 흐려지며 올라가고(`--lift`, 흰 바탕은 남음) 첫 패널이 가운데서 가장자리가 부드러운 원으로 번지듯 열립니다(radial mask, 투명도로 겹치면 회색으로 탁해져서 바꿈). 프로젝트마다 1.5화면(SEGMENT)이고, 그 앞 30%(FADE) 동안 다음 패널이 위에서 서서히 나타나(opacity) 배경색이 이전 accent에서 다음 accent로 바뀌고, 이전 패널의 글자·정보·화면·띠는 --out으로 더 빨리(×1.8) 흐려집니다. 각 패널 안 연출은 그대로: 첫 패널은 원이 열리며 1.22배에서 자리 잡음, 큰 제목이 한 글자씩 흐림에서 올라옴 → 정보·설명 → 기능 띠가 흐르고 PC·모바일 화면이 아래에서 올라옴. 흐려진 패널 안 링크에 키보드 포커스가 가면 그 프로젝트 구간으로 스크롤합니다. 모션 감소는 고정 없이 패널이 차례로 한 화면씩.
-- 패널 구성: 바탕은 프로젝트 `accent`(없으면 BUILD 초록) 그라데이션과 밝은 원. 실제 프로젝트(`placeholder: false`)는 desktopImage를 화면 가득 깝니다. 왼쪽 아래 큰 제목(Pretendard 900, clamp(64px, 10.5vw, 176px), 모바일 16vw)은 `headline`(줄마다 한 항목, 없으면 title)이고 스크린리더는 title 전체를 읽습니다. 아래에 tagline·"상세 보기"·ProjectLinks. 오른쪽 위에 "작성 예시"(예시일 때)·기술 스택·categoryTags. 기능 띠는 categoryTags 첫 항목 + featureTags(장식, aria-hidden, 같은 기능은 sr-only 목록으로 한 번 읽힘). 오른쪽 아래 PC(16:10)·모바일(9:19) 화면, 700px 이하는 화면 가운데 위쪽으로.
+- 도입 화면(2026-10-23, 승인 시안 `artifacts/project-intro-20261023/`의 A안): 고정 무대 맨 아래 흰 층(`.intro`)에 위쪽 "대표 프로젝트"(Pretendard 800, 30~52px), 그 아래 메인 프로젝트가 화면 폭 전체의 줄로 화면 높이를 채웁니다(구분선과 자리 표시 안내 문구는 2026-10-23 사용자 요청으로 없앰). 줄마다 큰 이름(Pretendard 900, clamp(52px, 7.4vw, 140px))과 accent 점, 오른쪽에 tagline·stack(899px 이하는 이름 아래 tagline만). 줄은 버튼이라 누르면 그 프로젝트 구간으로 이동하고(`scrollToProject`), 호버·포커스하면 accent 색이 왼쪽부터 차오릅니다. 목록은 무대 위에서 지어집니다(2026-10-23 사용자: "그냥 내려가서 뚱 하고 뜨는 느낌"). 소개 페이지가 고정에서 풀리는 순간부터 모래알로 부서져 왼쪽부터 오른쪽 위로 날리고, 그 모래알이 왼쪽 글자부터 "대표 프로젝트" 제목과 프로젝트 이름으로 모여 실제 글자로 바뀝니다(`components/sections/WorkSand.tsx`, 승인 시안 `artifacts/about-to-project-sand-20261023/`의 A "바람", 오프닝 모래 전환과 같은 움직임). 진행은 소개 페이지가 풀리는 스크롤(0)부터 무대 고정 뒤 1.1화면(`SAND_END`, 1)까지(1440×900에서 약 2.1화면)의 스크롤만의 함수라 거꾸로도 재생됩니다. 흩어짐·모임은 사인 곡선(천천히 시작해 천천히 멈춤)이고, 그 사이 모래 구름은 오른쪽으로 천천히 흐르며 흔들립니다(2026-10-23 사용자: 초록 원만큼 부드럽게, 이전 약 1.35화면·급가속 곡선). 출발은 소개 페이지(`[data-sand-source]`, AboutCover의 고정 페이지)의 사진·글자, 도착은 `[data-sand-target]`(제목·이름)이고, 읽기는 `SandHandoff.tsx`에서 내보낸 `scan`·`drawImages`·`drawText`(세로 보정 `dy`)·`order`를 씁니다. 소개 페이지가 풀리기 직전(t −0.25~0) 한가할 때 양쪽을 미리 읽고(requestIdleCallback), 그러지 못했으면(창 크기 변경, 중간으로 바로 이동) 그때 읽습니다. 모래알은 PC 최대 3만 개·좁은 화면 1만 개, 2×2px, 화면 고정 캔버스(`.sand`). 전환 중에는 소개 페이지를 숨기고(visibility), 제목·이름은 t 0.9~0.97에 나타나며 캔버스는 0.93~1에 사라집니다. 이어서 1.02~1.45화면(`REST_FROM`~`BUILT`) 동안 줄마다 조금씩 늦게 점이 톡 커지고(scale, easeOutBack) 설명이 올라옵니다(`--in`). 측정(개발 서버, 1440×900, 실제 GPU): 휠로 전환을 지나는 동안 긴 작업 0개, 33ms 넘는 프레임 0개. 1.75(`OPEN`)까지 머문 뒤 제목·안내·나머지 줄이 먼저 흐려지고(`--fade`) 첫 이름이 마지막으로 흐려지며(`--lift`) 첫 패널의 원이 첫 프로젝트의 점(`[data-intro-dot]` 첫 번째)에서 커집니다. #project는 섹션 안 `.anchor`(위쪽 막대 높이 + 무대 × `BUILT`, 모션 감소에서는 0)라 메뉴로 오면 목록이 다 지어진 화면에 도착합니다. 모션 감소에서는 모래 전환 없이 소개 다음에 완성된 목록이 이어집니다. 이전 제목(본명조, 위쪽 막대 아래 16vh)은 바꿨고, 작은 "BUILD." 표시와 "01 / 03" 순번은 없앴습니다.
+- 그 뒤 메인 프로젝트는 하나의 고정 무대(2026-10-13 사용자 요청: 종이처럼 덮지 않고 배경색이 자연스럽게 바뀌며 전환): 트랙 높이 = 무대 × (1 + INTRO 2.65 + 1.5 × 프로젝트 수 + TAIL 0.9), 무대(`.pin`)가 sticky이고 제목 층·패널·밤색 층(`.dusk`)이 그 안에 겹쳐 있습니다. 도입 목록이 지어지고 머문 뒤(아래 도입 화면) 1.75~2.65화면(`OPEN`~`INTRO`) 동안 첫 패널이 HODUIT 옆 초록 점에서 또렷한 원으로 커지며 열리고(2026-10-23 사용자 요청, 점 크기에서 시작해 화면 끝에 가까워질 때만 가장자리가 부드러워짐. 반지름은 진행의 1.6제곱이라 처음엔 천천히 커짐, 사용자: "너무 빨라 스크롤이 예민함"으로 0.4→0.9화면)(radial mask, 투명도로 겹치면 회색으로 탁해져서 바꿈). 프로젝트마다 1.5화면(SEGMENT)이고, 그 앞 60%(FADE, 0.9화면, 사인 곡선. 2026-10-23 사용자: 30%·급가속 곡선일 때 색이 한 번에 휙 바뀜) 동안 다음 패널이 위에서 서서히 나타나(opacity) 배경색이 이전 accent에서 다음 accent로 바뀌고, 이전 패널의 글자·정보·화면·띠는 --out으로 더 빨리(×1.8) 흐려집니다. 각 패널 안 연출은 그대로: 첫 패널은 원이 열리며 1.22배에서 자리 잡음, 큰 제목이 한 글자씩 흐림에서 올라옴 → 정보·설명 → 기능 띠가 흐르고 PC·모바일 화면이 아래에서 올라옴. 흐려진 패널 안 링크에 키보드 포커스가 가면 그 프로젝트 구간으로 스크롤합니다. 모션 감소는 고정 없이 패널이 차례로 한 화면씩.
+- 패널 구성: 바탕은 프로젝트 `accent`(없으면 BUILD 초록) 그라데이션과 밝은 원. 실제 프로젝트(`placeholder: false`)는 desktopImage를 화면 가득 깝니다. 왼쪽 아래 큰 제목(Pretendard 900, clamp(64px, 10.5vw, 176px), 모바일 16vw)은 `headline`(줄마다 한 항목, 없으면 title)이고 스크린리더는 title 전체를 읽습니다. 아래에 tagline·"상세 보기"·ProjectLinks. 오른쪽 위에 "작성 예시"(예시일 때)·기술 스택·categoryTags. 기능 띠는 categoryTags 첫 항목 + featureTags(장식, aria-hidden, 같은 기능은 sr-only 목록으로 한 번 읽힘). 띠는 같은 묶음 두 벌을 이어 왼쪽으로 끝없이 흐르고(2026-10-23 사용자 요청, `.tickerTrack` -50%, 시간은 글자 수 × 0.7초라 띠마다 속도가 비슷함, PC 약 170px/초), 스크롤에 따른 이동(`--band-x`)은 그 위에 더해집니다. 띠가 보이지 않으면 멈추고, 모션 감소에서는 흐르지 않습니다. 오른쪽 아래 PC(16:10)·모바일(9:19) 화면, 700px 이하는 화면 가운데 위쪽으로.
 - 모션 감소: 움직임 없이 완성 상태(CSS 기본값)로 보입니다.
-- 마지막 패널 구간 끝: 글자·화면이 먼저 빠지고(u 0.5~0.64) 패널 바탕이 모래알(PC 8px·모바일 6px 격자, 바람·떠오름은 무대 크기에 비례, 패널 accent 115° 그라데이션과 위아래 그늘 색을 계산)로 부서져 왼쪽부터 오른쪽 위로 날아가며 작은 모래알로 줄어들고, 그 아래 밤색(#121b33, `.dusk`)이 드러납니다(u 0.64~1, 캔버스 `.scatter`, 스크롤 진행만의 함수라 거꾸로도 재생; 2026-10-14 사용자 요청: 금색→남색을 투명도로 바꾸면 억지스러움). 사이드 목록은 무대가 풀리기 0.6화면 전부터(모래가 부서지기 시작할 때 제목이 아래에서 올라와 날아가는 모래알 사이로 들어옴) 겹쳐 시작하고 그 부분 바탕은 투명→밤색 그라데이션이라, 직선 경계 없이 목록 글자가 어두워진 무대 위로 올라옵니다(`useSeam`).
+- 마지막 패널 구간 끝(마지막 구간 1.5화면 뒤에 `TAIL` 0.9화면을 더함, 2026-10-23 사용자: 모래 흩어짐이 반 화면 만에 휙 지나감): 마지막 패널이 나타난 뒤 약 0.35화면 머물고, 글자·화면이 먼저 빠지고(마지막 구간 시작부터 1.25~1.45화면) 패널 바탕이 0.95화면 동안 모래알(조각은 날아가며 사인 곡선으로 천천히 작아짐, PC 8px·모바일 6px 격자, 바람·떠오름은 무대 크기에 비례, 패널 accent 115° 그라데이션과 위아래 그늘 색을 계산)로 부서져 왼쪽부터 오른쪽 위로 날아가며 작은 모래알로 줄어들고, 그 아래 밤색(#121b33, `.dusk`)이 드러납니다(마지막 구간 시작부터 1.45~2.4화면, 캔버스 `.scatter`, 스크롤 진행만의 함수라 거꾸로도 재생; 2026-10-14 사용자 요청: 금색→남색을 투명도로 바꾸면 억지스러움). 사이드 목록은 무대가 풀리기 0.6화면 전부터(모래가 부서지기 시작할 때 제목이 아래에서 올라와 날아가는 모래알 사이로 들어옴) 겹쳐 시작하고 그 부분 바탕은 투명→밤색 그라데이션이라, 직선 경계 없이 목록 글자가 어두워진 무대 위로 올라옵니다(`useSeam`).
 - 마지막 메인 패널 뒤(2026-10-13 사용자 요청 순서): 사이드 프로젝트 목록(`data/projects.ts`의 `sideProjects`, 별도 타입 SideProject: title·description·tags·url·placeholder)이 밤색 바탕으로 마지막 패널 위로 올라옵니다. 줄마다 (01) / 이름(굵은 고딕) / 설명 + 회색 #태그, 사이 구분선, 899px 이하는 번호 옆에 이름·설명. url이 있으면 줄 전체가 새 탭 링크(호버 시 이름 노랑, ↗), 상세 페이지 없음. 지금은 "작성 예시" 자리 표시 4개(MORPH·NODE·CHAMVERSE·UI LAB, 주소 없음, 클릭 안 됨). 그다음 같은 밤색 화면(`.closer`, sticky + 한 화면 간격)이 원으로 줄어 GROW 원이 됩니다(아래 "GROW 원"). closer는 목록의 마지막 0.6화면 아래에 겹쳐 시작하고(음수 여백, 목록이 z-index 1로 위), 그 부분의 목록 바탕은 투명이라 마지막 줄들이 화면 위쪽에 있을 때 이미 원이 닫히기 시작하며 목록 글자는 올라가며 흐려집니다(`--seam-out`; 2026-10-14 사용자 요청: 목록 끝과 원 사이의 빈 밤색 화면 없앰). 이전의 "이전 작업" 페이지는 없앴습니다.
 - 패널·목록이 화면 위를 덮는 동안(closer가 40% 진행되기 전까지) `html[data-on-dark]`가 붙어 모바일 떠 있는 헤더의 단계 단어와 햄버거가 흰색이 됩니다.
-- 제목·"상세 보기"는 /work/[slug]로 연결됩니다(메인 프로젝트만).
+- 제목·"상세 보기"는 /work/[slug]로 연결됩니다(메인 프로젝트만). 프로젝트에 `notion`(웹에 게시한 노션 주소, `data/projects.ts`)이 있으면 대신 노션을 새 탭으로 엽니다(`DetailLink`, 2026-10-23). 지금은 JAJAK이 노션 JAJAK 페이지로 연결됩니다(주소 끝의 `?source=copy_link`는 뺌). 사이드 프로젝트도 `notion`이 있으면 줄 전체가 노션 새 탭 링크입니다(url보다 우선, 지금은 NODE).
 
 ### GROW 원 (GrowStory, DESIGN 파트)
 
@@ -317,9 +320,11 @@ artifacts/                 사용자에게 보여 줄 시안·승인된 시안(�
 ## 8. 이미지와 데이터
 
 - 화면에 쓰는 데이터는 모두 `data/`에서 관리합니다(profile·skills·contact·projects·design·navigation·stages). 컴포넌트 안에 데이터를 두지 않습니다. 상세 페이지는 대표 프로젝트만 대상으로 하며, 보조 프로젝트에 상세 링크를 넣기 전에 라우트 지원을 확인합니다.
+- 프로젝트 화면 원본은 `assets/projects/<slug>/desktop.jpg`·`mobile.jpg`(PC 1440×900·모바일 390×844 첫 화면 캡처 권장, 화면 틀이 위쪽 기준으로 자름), 변환본은 `public/images/projects/<slug>/desktop.webp`·`mobile.webp`입니다. 이 환경에는 WebP 변환 도구가 없어 Playwright 브라우저의 canvas `toDataURL("image/webp", 0.86)`으로 원래 크기 그대로 변환했습니다(2026-10-23, JAJAK 화면 갱신: 1274×798 109KB·368×665 29KB). 화면 틀의 대체 텍스트는 `placeholder`가 아니라 이미지가 자리 표시 SVG인지로 정하므로, 글이 작성 예시인 채로 화면만 먼저 넣을 수 있습니다(패널 배경 전체에 까는 것은 `placeholder: false`일 때만).
 - 프로젝트 교체: `public/images/projects/<slug>/`에 데스크톱·모바일 화면(WebP)을 넣고 `data/projects.ts`의 `image`·`desktopImage`·`mobileImage`를 바꾼 뒤, 글을 실제 경험으로 고치고 `placeholder: false`로 둡니다. `accent`는 3단계 전면 프로젝트 패널의 색입니다(없으면 단계 색).
+- 재사용 기기 목업 원본은 `assets/devices/`, 웹 사용본은 `public/images/devices/`에 영문 파일명으로 둡니다. `desktopDevice: "monitor"`는 `desktop-monitor.png`, `mobileDevice: "gold-phone"`은 `gold-smartphone.png`를 화면 위에 겹칩니다. 두 목업은 JAJAK에 연결되어 있습니다.
 - 이 환경에는 sharp가 없어 Next 이미지 최적화가 큰 PNG에서 멈춥니다. 큰 이미지는 미리 WebP로 변환하고 `unoptimized`로 불러옵니다(모래, 커서).
-- 모래 이미지를 교체하면 WebP 재생성, 능선 높이(35%, CREST_PROFILE), 전환 모래색(#E3BF91)을 다시 확인합니다.
+- 모래 이미지를 교체하면 WebP 재생성, 능선 높이(35%, `CREST`), 전환 모래색(#E3BF91)을 다시 확인합니다.
 - 이미지가 바뀌지 않으면 실제 파일, 참조 경로, 브라우저 요청 주소와 로딩 상태를 확인합니다. 캐시 문제로 단정하거나 생성물을 먼저 지우지 않습니다.
 - 이미지 교체 후 비율, 잘림, 대체 텍스트를 확인합니다.
 
@@ -380,6 +385,23 @@ artifacts/                 사용자에게 보여 줄 시안·승인된 시안(�
 2026-10-16 기준 우선순위입니다(사용자와 정함: 보는 사람이 체감하는 것 → 큰 디자인 작업 → 자료·결정이 필요한 것 → 마무리). 각 항목은 시작 전에 사용자에게 확인받고 하나씩 진행합니다. 결과는 작업 브랜치에 커밋·push하고, `main`(공개 주소)에는 사용자가 "보여 줄 버전"으로 확인한 뒤에만 올립니다(위 "배포").
 
 성능 항목은 고치기 전후를 같은 조건으로 재서 비교합니다. Playwright로 휠 스크롤하며 rAF 프레임 간격·긴 작업·CDP 프로파일(가만히 있을 때의 `Performance.getMetrics` TaskDuration 포함)을 기록하고, 그 PC 그대로와 CPU 4배 느림(`Emulation.setCPUThrottlingRate`)을 둘 다 잽니다. headless 브라우저는 `--enable-gpu --use-angle=d3d11 --ignore-gpu-blocklist`로 실제 GPU를 씁니다(기본 SwiftShader에서는 숨겨진 3D 캔버스를 처음 읽는 데 1초가 넘게 걸리는 등 실제와 다름, `d3d11`은 Windows용). 사용자 개발 서버와 `.next/`가 겹치지 않게 프로덕션 빌드는 세션 임시 폴더의 작업 복사본에서 만들고(`node_modules`는 원본에 연결, 지울 때는 연결부터 끊음), 스크립트는 저장소에 넣지 않습니다. 가만히 있을 때의 4배 수치는 측정마다 흔들려 비교 근거로 쓰지 않습니다.
+
+### 이어서 할 일 (2026-10-23 작업 끝, 다음 날 이어서)
+
+스크롤 속도 다듬기를 진행 중입니다(사용자: "스크롤할 때 슉 지나가거나 더딘 곳", 기준은 초록 점이 커지는 HODUIT 전환의 부드러움). 1/8화면씩 캡처해 앞 장면과 바뀐 픽셀 비율을 재는 방법으로 찾았습니다(1440×900, 계속 흐르는 CSS 애니메이션은 멈추고 측정, 날아가는 모래알이 많은 장면은 숫자가 체감보다 높게 나오므로 캡처로 함께 판단). 기준: 부드러운 곳은 한 칸에 20~30%.
+
+- 끝낸 것(오늘, 커밋 안 함)
+  - 1번 프로젝트 패널 사이 색 전환: `FADE` 0.3 → 0.6(0.9화면), 사인 곡선. HODUIT→JAJAK 한 칸 89% → 18~22%.
+  - 2번 마지막 패널 → 밤색 모래: 마지막 패널 뒤 `TAIL` 0.9화면 추가, 모래 흩어짐 0.54 → 0.95화면, 조각이 천천히 작아짐.
+  - 자석 스냅 수정(`SmoothScroll.tsx`): 뒤로 끌어당김·0.62초 빨리 감기 없앰, 정지점 0.25화면 이내에서만 진행 방향으로 붙음, 키보드는 기본 스크롤.
+  - 그 전에: 소개→대표 프로젝트 모래 전환(`WorkSand.tsx`, 약 2.1화면·사인 곡선), 초록 점에서 원이 커지는 HODUIT 전환(0.9화면), 도입 목록의 가로선·안내 문구 삭제, 기능 띠 자동 흐름, 노션 연결(JAJAK·NODE), JAJAK 화면 이미지 등록.
+- 다음에 할 것(순서대로, 하나씩 사용자 확인)
+  3. 빠른 곳 남은 세 군데: 사이드 목록 → GROW 원으로 남색 원이 줄어드는 곳(closer, 한 칸 44%), 디자인 고리 → 연락처 밤 원(한 칸 64%, ContactStory `--enter`), 연락처 끝 모래가 덮는 곳(한 칸 53%, ContactStory 0.8~1). 구간을 늘리고 사인 곡선으로.
+  4. 더딘 곳 줄이기: 대표 프로젝트 목록 완성 뒤 초록 점이 커지기까지(측정 당시 약 1화면 정지, 그 뒤 모래 구간을 늘려 값이 바뀌었으니 다시 잴 것, `BUILT`·`OPEN`), 연락처 BLOOM. 완성 뒤 끝 모래까지 약 1화면 정지, GROW 원 세 단어 약 0.9화면 정지, 소개 ABSORB. 표지 처음 약 0.75화면. 빠른 곳을 늘린 만큼 여기서 줄여 전체 길이를 맞춤.
+  5. 다 고친 뒤 처음부터 끝까지 같은 방법으로 다시 재서 비교. 휴대폰(390)도. 스냅이 정지점 앞에서 붙는 체감도 확인.
+- 확인 못 한 것: 프로덕션 빌드(개발 서버가 `.next`를 쓰고 있어 세션 임시 폴더의 작업 복사본에서 해야 함), CPU 4배 느림 측정, 오늘 바꾼 것 대부분의 휴대폰 화면.
+- 정해 주셔야 할 것(대기): 기기 목업을 실제 사이트에 넣을지(시안 `artifacts/device-mockup-20261023/`, 3D 노트북·티타늄 휴대폰), JAJAK `placeholder`를 끌지(끄면 패널 배경이 화면 이미지로 바뀜), 상세 페이지 캡션 "실제 화면 준비 중", 챔버스·MORPH 노션 카드 주소, NODE·CHAMVERSE 태그와 "작성 예시" 표시. HODUIT·DEEPFINE COPY 화면 이미지(`assets/projects/<slug>/desktop.jpg`·`mobile.jpg`).
+- 참고: 오늘 작업과 별개로 작업 트리에 다른 변경이 있습니다(`assets/devices/`, `public/images/devices/`, `SmoothScroll.tsx`의 스냅 원본, `WorkStory.tsx`의 `OPEN` 1.15 조정 등). 누가 넣었는지 확인하고 커밋 범위를 정할 것. 오늘 변경은 아무것도 커밋하지 않았습니다.
 
 ### 수정할 것 (순서대로)
 

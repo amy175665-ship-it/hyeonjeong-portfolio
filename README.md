@@ -36,8 +36,8 @@
 | 순서 | 영역 | 내용 |
 | --- | --- | --- |
 | 1 | 첫 화면 | 햇살 배경, 마우스를 따라보는 3D 얼굴, 모래 언덕. PC에서는 ABSORB. BUILD. GROW. 세리프 단어가 비대칭으로 떠다니고, 글자에 마우스를 올리면 초록색으로 바뀌며 기울어집니다. ABSORB.의 S 위에서 모래가 바람에 휘며 흘러내립니다. |
-| 2 | 모래 전환 | 모래가 올라와 첫 화면을 덮었다가 내려가며 사막 장면이 드러납니다. 로고·메뉴도 모래 능선 뒤로 가려졌다가 다시 나타납니다. |
-| 3 | 컨셉 장면 | 새싹이 선인장으로 자라며 모래바람을 버티고("직접 만들고"), 하늘이 노을·밤·새벽으로 바뀌는 동안 계속 자란 뒤("표면을 설계하고, 경험을 짓다."), 꽃이 피고 모래가 내려앉아 GROW.가 됩니다("웬만해선 시들지 않습니다."). 모래가 내려간 뒤부터는 스크롤하지 않아도 약 7초 동안 저절로 재생되며, 재생하는 동안에는 화면이 고정됩니다. |
+| 2 | 모래 전환 | 스크롤하면 첫 화면의 글자와 모래 언덕이 모래알로 부서져 바람에 날리고, 3D 얼굴은 흐려집니다. 모래알은 다시 내려앉아 사막 언덕이 되고, 마지막 한 줌이 모인 자리에서 선인장이 돋아납니다. 위로 스크롤하면 거꾸로 재생됩니다. |
+| 3 | 컨셉 장면 | 새싹이 선인장으로 자라며 모래바람을 버티고("직접 만들고"), 하늘이 노을·밤·새벽으로 바뀌는 동안 계속 자란 뒤("표면을 설계하고, 경험을 짓다."), 꽃이 피고 모래가 내려앉아 GROW.가 됩니다("웬만해선 시들지 않습니다."). 선인장이 돋아난 뒤부터는 스크롤하지 않아도 약 7초 동안 저절로 재생되며, 재생하는 동안에는 화면이 고정됩니다. |
 | 4 | 소개·기술 (ABSORB.) | 이야기가 끝나고 휠을 한 번 내리면 선인장·GROW.·문구가 모래알로 부서져 바람에 흩어지고, 사막이 흰색으로 바뀐 뒤 모래알이 다시 모여 브라우저 창의 소개 페이지가 됩니다(약 2.2초, 도중에 스크롤하면 바로 끝남, 위로 스크롤하면 거꾸로). 이후 창 안에서 이어집니다. 창 안은 섹션마다 한 화면 높이이고 스크롤은 자유롭게 움직이며, 메뉴로 이동하면 섹션 하나가 화면에 딱 맞게 보입니다. 소개는 왼쪽 사진·이름·연락처, 오른쪽 소개 문장과 교육 목록(연도 / 항목 / 보조정보), 아래쪽에 끝없이 흐르는 기술 아이콘 띠. 소개는 ABSORB 표지로 시작합니다(선인장 모래알이 모래알 초상화와 큰 ABSORB.로 모이고, 왼쪽 위에 소개 문장이 크게 차오른 뒤, 모래알이 사진 칸으로 모여 실제 사진이 되며 문장이 제자리로 줄어들고 소개 페이지가 완성됨). 다음 페이지는 취미 타일 그리드(전시·카페·음악·여행·봉사 / 보드게임 / 러닝)로, 항목에 호버하거나 키보드·터치로 선택하면 왼쪽 큰 박스에 그룹 단어(ABSORB. / BUILD. / GROW.)와 뜻이 표시됩니다. 사진 슬라이드는 박스 안에서 재생되며 전체 화면으로 확대되지 않습니다. 그다음 브이로그 영상 자리 |
 | 5 | 대표 프로젝트 (BUILD.) | 창 위쪽 탭(ABOUT·PROJECTS·DESIGN·CONTACT)으로 넘어갑니다. 흰 무대의 제목 위로 첫 프로젝트가 가운데서 번지듯 열리고, 예시 프로젝트 3개가 화면 전체 패널로 배경색이 바뀌며 이어지고(끝에서 밤색으로 어두워져 사이드 목록으로), 큰 제목·기능 띠·PC와 모바일 화면이 스크롤에 맞춰 나타나고 상세 페이지로 연결 |
 | 6 | 디자인 (GROW.) | GROW 원의 끝에서 모래 고리가 화면에 머물고, 그 고리 위에 작업물 7개가 행성처럼 돕니다. 호버·포커스·탭하면 가운데에 나타나고 클릭하면 크게 봅니다(현재 "작성 예시" 자리 표시) |
@@ -113,11 +113,11 @@ components/
 ├─ sections/
 │  ├─ AboutStory, AboutCover, HobbyFlow, WorkStory, GrowStory, DesignStory, ContactStory   브라우저 창 안의 소개·취미, 대표 프로젝트, 디자인, 연락처
 │  ├─ hero/                   Hero, GrowthScene(PC 타이포), HeroAvatar·AvatarCanvas(3D 얼굴), SandStream(모래 줄기)
-│  └─ concept/                ConceptScenes(모래 덮기·컨셉 장면), scenes.ts, CactusScene, WindGust, PollenGrow, SandHandoff(모래알 전환), WindowFrame(브라우저 창)
+│  └─ concept/                ConceptScenes(컨셉 장면), scenes.ts, CoverSand(첫 모래 전환), CactusScene, WindGust, PollenGrow, SandHandoff(모래알 전환), WindowFrame(브라우저 창)
 └─ ui/                        Reveal, ProjectLinks, ProjectTags, CustomCursor
 data/                         소개·취미(profile), 기술(skills), 연락처(contact), 프로젝트, 디자인, 메뉴, 이야기 단계(stages), GROW 원의 세 단어(workStyle)
-assets/                       원본 디자인 소스(커서·모래 PNG). 배포되지 않으며 화면에서 쓰지 않음
-public/                       화면에 쓰는 정적 파일(이미지 WebP, 로고, 3D 모델, 글꼴)
+assets/                       원본 디자인 소스(커서·모래 PNG, 기기 목업). 배포되지 않음
+public/                       화면에 쓰는 정적 파일(이미지 WebP, 로고, 3D 모델, 글꼴, 기기 목업)
 artifacts/                    시안과 승인된 시안(사진·영상은 git 제외)
 ```
 
@@ -181,7 +181,7 @@ artifacts/                    시안과 승인된 시안(사진·영상은 git �
 - `categoryTags`, `featureTags`, `stack`: 분류, 구현 기능, 사용 기술을 표시합니다.
 - `challenges`: 실제로 겪은 문제와 해결 방법을 `problem` / `solution`으로 기록합니다.
 - `links.website`, `links.github`, `links.figma`: 실제 주소가 있는 링크만 표시합니다.
-- `image`, `desktopImage`, `mobileImage`: 프로젝트 이미지는 `public/images/`에 두고 경로를 지정합니다. 목록은 desktopImage(없으면 image)를 16:10 PC 화면으로, mobileImage를 9:19 모바일 화면으로 오른쪽 아래에 겹쳐 보여 줍니다. 작은 화면에서는 이미지 묶음 아래로 설명이 이어집니다.
+- `image`, `desktopImage`, `mobileImage`: 프로젝트 이미지는 `public/images/`에 두고 경로를 지정합니다. `desktopDevice: "monitor"`를 지정하면 `public/images/devices/desktop-monitor.png`, `mobileDevice: "gold-phone"`을 지정하면 `public/images/devices/gold-smartphone.png` 목업에 화면을 맞춥니다. JAJAK에 두 목업을 연결했습니다. 작은 화면에서는 이미지 묶음 아래로 설명이 이어집니다.
 - `size`: 이전 카드 목록에서 쓰던 필드로, 현재 화면 배치에는 영향이 없습니다.
 
 `/work/[slug]` 상세 페이지는 대표 프로젝트 데이터를 기준으로 구성됩니다.
