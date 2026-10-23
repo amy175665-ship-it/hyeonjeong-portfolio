@@ -240,18 +240,21 @@ export default function GrowthScene() {
       <div
         className={styles.absorb}
         aria-hidden="true"
+        data-cover-scatter
       >
         <HoverLetters text="ABSORB." />
       </div>
       <div
         className={styles.build}
         aria-hidden="true"
+        data-cover-scatter
       >
         <HoverLetters text="BUILD." />
       </div>
       <div
         className={styles.grow}
         aria-hidden="true"
+        data-cover-scatter
       >
         <HoverLetters text="GROW." />
       </div>

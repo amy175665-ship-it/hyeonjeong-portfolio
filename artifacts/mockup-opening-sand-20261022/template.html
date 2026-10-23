@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>오프닝 모래 전환 시안</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@600&display=swap" rel="stylesheet">
+<style>
+  html, body { margin: 0; height: 100%; background: #1b1d20; overflow: hidden; }
+  /* The 1440×900 capture is scaled to fit the browser window. */
+  .stage { position: absolute; left: 50%; top: 50%; width: 1440px; height: 900px; transform-origin: 0 0; background: #f7fbfe; overflow: hidden; }
+  .layer { position: absolute; inset: 0; width: 100%; height: 100%; display: block; pointer-events: none; }
+  #face { transform-origin: 1250px 400px; }
+  #cactus { position: absolute; left: 740px; top: 300px; width: 480px; height: 600px; transform-origin: 323px 542px; }
+  .phrase { position: absolute; left: 216px; top: 234px; margin: 0; color: #202731; font: 600 63px/1.2 "Noto Serif KR", serif; letter-spacing: -0.035em; opacity: 0; }
+  .hint { position: fixed; left: 50%; bottom: 14px; transform: translateX(-50%); color: #c9ccd1; font: 13px/1.5 system-ui, sans-serif; text-align: center; pointer-events: none; }
+  .controls { position: fixed; right: 14px; top: 14px; display: flex; gap: 6px; }
+  .controls button { font: 13px system-ui, sans-serif; padding: 6px 12px; border: 0; border-radius: 6px; background: #ffffffd9; color: #202731; cursor: pointer; }
+  .status { position: fixed; left: 14px; top: 14px; color: #c9ccd1; font: 12px/1.6 ui-monospace, monospace; pointer-events: none; }
+  .meter { width: 160px; height: 4px; background: #ffffff26; border-radius: 2px; overflow: hidden; }
+  .meter i { display: block; height: 100%; width: 0; background: #e3bf91; }
+</style>
+</head>
+<body>
+<div class="stage" id="stage">
+  <img class="layer" id="heroSky" alt="" src="%%HERO_SKY%%">
+  <img class="layer" id="desertSky" alt="" src="%%DESERT_SKY%%" style="opacity:0">
+  <img class="layer" id="face" alt="" src="%%HERO_FACE%%">
+  <img class="layer" id="desertSand" alt="" src="%%DESERT_SAND%%" style="opacity:0">
+  <img class="layer" id="heroFg" alt="" src="%%HERO_FG%%">
+  <img id="cactus" alt="" src="" style="opacity:0">
+  <canvas class="layer" id="sand" width="1440" height="900"></canvas>
+  <p class="phrase" id="phrase">직접 만들고</p>
+  <img class="layer" alt="" src="%%HEADER%%">
+</div>
+<div class="status"><div id="label">히어로</div><div class="meter"><i id="meter"></i></div></div>
+<div class="controls"><button id="play">▶ 처음부터 재생</button><button id="slow">느리게 ×1</button></div>
+<div class="hint">아래로 스크롤 = 진행 · 위로 스크롤 = 되돌아감<br>모래가 다 모이면 선인장이 바로 돋아나고, 그 동안만 스크롤이 잠깁니다</div>
+<script>
+(() => {
+  const W = 1440, H = 900, STEP = 3;
+  const CACTUS = %%CACTUS%%;                  // { clip, times, frames: [data uri] } — the real 3D cactus, captured while growing
+  const BUILD_END = 2.45;                       // seconds of the build scene (sprout → arms); the frames after it are dusk
+  const SPROUT = [1063, 840];                   // where the cactus stands on the dunes
+  const SAND = [[168, 118, 63], [184, 134, 76], [148, 98, 51], [196, 149, 90], [227, 191, 145]];
+  // Cover timeline in seconds-equivalent; the scroll moves through it (COVER = the whole scroll part).
+  const T = {
+    scatterSpread: 0.6,                         // left to right, the gust takes this long to cross the screen
+    face: [0.1, 0.9],                           // the 3D face fades and drifts back
+    sky: [0.4, 1.6],                            // hero sky → desert sky
+    gather: 1.0, gatherSpread: 0.6, gatherTime: 1.0, // grains land on the desert dunes, left first (with the wind)
+    sprout: [2.2, 0.3, 0.7],                    // a handful of grains gathers on the cactus spot: start, spread, duration
+    settle: [2.7, 3.05],                        // the real dune image takes over from the grains
+    end: 3.2,
+  };
+  const PLAY_FROM = 3.0;                        // the cactus starts while the last grains are still landing
+  const SCROLL_PX = 1800;                       // wheel distance for the whole cover (about two screens, like the site)
+
+  const stage = document.getElementById("stage");
+  const fit = () => {
+    const s = Math.min(innerWidth / W, innerHeight / H);
+    stage.style.transform = `scale(${s}) translate(-50%, -50%)`;
+  };
+  fit(); addEventListener("resize", fit);
+  const $ = id => document.getElementById(id);
+  const load = img => img.complete ? Promise.resolve() : new Promise(r => img.onload = r);
+  const pixels = img => {
+    const c = document.createElement("canvas"); c.width = W; c.height = H;
+    const x = c.getContext("2d"); x.drawImage(img, 0, 0, W, H);
+    return x.getImageData(0, 0, W, H).data;
+  };
+  const rand = (() => { let s = 7; return () => (s = (s * 16807) % 2147483647) / 2147483647; })();
+  const clamp = v => v < 0 ? 0 : v > 1 ? 1 : v;
+  const smooth = (a, b, v) => { const k = clamp((v - a) / (b - a)); return k * k * (3 - 2 * k); };
+  const ease = k => k < .5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;
+  const mix = (a, b, k) => a + (b - a) * k;
+
+  const frames = CACTUS.frames.map(src => { const i = new Image(); i.src = src; return i; });
+  const ids = ["heroSky", "desertSky", "face", "desertSand", "heroFg"];
+  Promise.all(ids.map(id => load($(id)))).then(() => {
+    // Sources: the hero words and dunes. Targets: the desert dunes.
+    const src = [], dst = [];
+    const fp = pixels($("heroFg")), dp = pixels($("desertSand"));
+    for (let y = 0; y < H; y += STEP) for (let x = 0; x < W; x += STEP) {
+      const i = (y * W + x) * 4;
+      if (fp[i + 3] > 40) src.push([x, y, fp[i], fp[i + 1], fp[i + 2], fp[i + 3]]);
+      if (dp[i + 3] > 40) dst.push([x, y, dp[i], dp[i + 1], dp[i + 2], 255]);
+    }
+    // Pair roughly left to right so the grains sweep in one flow instead of criss-crossing.
+    const key = p => p[0] + p[1] * 0.35 + rand() * 260;
+    src.forEach(p => p.k = key(p)); dst.forEach(p => p.k = key(p));
+    src.sort((a, b) => a.k - b.k); dst.sort((a, b) => a.k - b.k);
+    const N = Math.max(src.length, dst.length), P = [];
+    const grain = (s, d, g, sprout) => ({
+      sx: s[0], sy: s[1], sc: s.slice(2, 6), t: d, sand: SAND[Math.floor(rand() * SAND.length)],
+      d: (s[0] / W) * T.scatterSpread + rand() * 0.2,
+      vx: 90 + rand() * 220, vy: -30 - rand() * 130, ax: 60 + rand() * 160,
+      wob: 6 + rand() * 22, ph: rand() * 6.28, f: 2 + rand() * 3, g, sprout,
+    });
+    for (let n = 0; n < N; n++) {
+      const s = src[Math.floor(n * src.length / N)], d = dst[Math.floor(n * dst.length / N)];
+      P.push(grain(s, d, T.gather + (d[0] / W) * T.gatherSpread + rand() * 0.25, false));
+    }
+    // A handful of grains from across the scene end on the cactus spot (and become the sprout).
+    for (let n = 0; n < 1400; n++) {
+      const s = src[Math.floor(rand() * src.length)], a = rand() * 6.28, r = Math.sqrt(rand()) * 14;
+      const d = [SPROUT[0] + Math.cos(a) * r * 1.6, SPROUT[1] + Math.sin(a) * r * 0.5, 120, 104, 58, 255];
+      P.push(grain(s, d, T.sprout[0] + rand() * T.sprout[1], true));
+    }
+
+    const canvas = $("sand"), ctx = canvas.getContext("2d");
+    const image = ctx.createImageData(W, H), buf = new Uint32Array(image.data.buffer);
+    const drawCover = time => {
+      buf.fill(0);
+      const settle = smooth(T.settle[0], T.settle[1], time);
+      if (time > 0 && time < T.end) for (const p of P) {
+        const ts = Math.max(0, time - p.d);
+        let x = p.sx + p.vx * ts + 0.5 * p.ax * ts * ts, y = p.sy + p.vy * ts + Math.sin(p.ph + ts * p.f) * p.wob * Math.min(ts, 1);
+        const dusty = clamp(ts / 0.45);
+        let r = mix(p.sc[0], p.sand[0], dusty), g = mix(p.sc[1], p.sand[1], dusty), b = mix(p.sc[2], p.sand[2], dusty), a = mix(p.sc[3], 235, dusty);
+        const k = ease(clamp((time - p.g) / (p.sprout ? T.sprout[2] : T.gatherTime)));
+        x = mix(x, p.t[0], k); y = mix(y, p.t[1], k);
+        const c = k * k;
+        r = mix(r, p.t[2], c); g = mix(g, p.t[3], c); b = mix(b, p.t[4], c);
+        // Dune grains hand over to the dune image; sprout grains sink into the sprout as it appears.
+        a = p.sprout ? mix(a, 255, c) * (1 - smooth(PLAY_FROM, PLAY_FROM + 0.25, time)) : mix(a, 255, c) * (1 - settle);
+        if (a < 4) continue;
+        const px = x | 0, py = y | 0;
+        if (px < 0 || py < 0 || px >= W - 3 || py >= H - 3) continue;
+        const color = (a << 24) | (b << 16) | (g << 8) | r;
+        let i = py * W + px;
+        for (let row = 0; row < STEP; row++, i += W) buf[i] = buf[i + 1] = buf[i + 2] = color;
+      }
+      ctx.putImageData(image, 0, 0);
+      $("heroFg").style.opacity = time > 0 ? 0 : 1;
+      const f = smooth(T.face[0], T.face[1], time);
+      $("face").style.opacity = 1 - f;
+      $("face").style.transform = `scale(${1 - 0.06 * f})`;
+      $("face").style.filter = `blur(${f * 6}px)`;
+      $("desertSky").style.opacity = smooth(T.sky[0], T.sky[1], time);
+      $("desertSand").style.opacity = settle;
+    };
+
+    // The cactus plays on its own clock once the sand has (almost) landed; scrolling back above PLAY_FROM fades it out.
+    const cactus = $("cactus"), phrase = $("phrase");
+    let play = -1, outro = 1;
+    const frameAt = t => {
+      let n = 0;
+      while (n + 1 < frames.length && CACTUS.times[n + 1] <= Math.min(t, BUILD_END)) n++;
+      return frames[n];
+    };
+    const drawStory = () => {
+      if (play < 0) { cactus.style.opacity = 0; phrase.style.opacity = 0; return; }
+      const img = frameAt(play);
+      if (cactus.src !== img.src) cactus.src = img.src;
+      const sprout = smooth(0, 0.35, play);
+      cactus.style.opacity = outro * Math.min(1, sprout * 1.5);
+      cactus.style.transform = `scale(${0.6 + 0.4 * sprout}, ${sprout})`;
+      const enter = clamp((play - 0.45) / 0.31);
+      phrase.style.opacity = outro * enter;
+      phrase.style.transform = `translateY(${(1 - enter) * 14}px)`;
+    };
+
+    // Scroll: the wheel moves a target; the cover trails it softly (like the site's spring).
+    let target = 0, cover = 0, speed = 1, last = performance.now(), auto = false;
+    const locked = () => play >= 0 && play < BUILD_END && outro === 1;
+    addEventListener("wheel", e => {
+      auto = false;
+      if (locked() && e.deltaY > 0) return;     // held while the cactus grows (scrolling up still rewinds)
+      target = Math.min(Math.max(target + e.deltaY / SCROLL_PX, 0), 1);
+    }, { passive: true });
+    addEventListener("keydown", e => {
+      const step = { ArrowDown: 0.06, PageDown: 0.25, " ": 0.25, ArrowUp: -0.06, PageUp: -0.25 }[e.key];
+      if (step && !(locked() && step > 0)) { auto = false; target = Math.min(Math.max(target + step, 0), 1); }
+    });
+    $("play").onclick = () => { target = cover = 0; play = -1; outro = 1; auto = true; };
+    const slow = $("slow");
+    slow.onclick = () => { speed = speed === 1 ? 0.4 : 1; slow.textContent = speed === 1 ? "느리게 ×1" : "느리게 ×0.4"; };
+
+    const tick = now => {
+      const dt = Math.min((now - last) / 1000, 0.05) * speed; last = now;
+      if (auto) target = Math.min(1, target + dt / T.end);
+      cover += (target - cover) * (1 - Math.exp(-dt * 6));
+      if (Math.abs(target - cover) < 1e-4) cover = target;
+      const time = cover * T.end;
+      if (time >= PLAY_FROM && play < 0) { play = 0; outro = 1; }
+      if (time < PLAY_FROM - 0.05 && play >= 0 && outro === 1) outro = 0.999;   // start the quick fade-out
+      if (outro < 1) { outro = Math.max(0, outro - dt / 0.35); if (outro === 0) { play = -1; outro = 1; } }
+      else if (play >= 0) play += dt;
+      drawCover(time);
+      drawStory();
+      $("meter").style.width = `${cover * 100}%`;
+      $("label").textContent = play >= 0 && outro === 1
+        ? (play < BUILD_END ? `선인장 재생 중 ${play.toFixed(1)}s (스크롤 잠김)` : "여기서부터는 지금 사이트와 같음 (노을 → 밤 → 꽃)")
+        : time <= 0 ? "히어로" : time < T.gather ? "흩어짐" : "모래가 모여 사막이 됨";
+      requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+    window.__seek = (c, p = -1) => { target = cover = c; play = p; outro = 1; auto = false; };
+    window.__info = { src: src.length, dst: dst.length, grains: P.length };
+  });
+})();
+</script>
+</body>
+</html>

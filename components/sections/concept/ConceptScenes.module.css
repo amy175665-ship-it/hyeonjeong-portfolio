@@ -38,7 +38,7 @@
 .stage[data-handoff] > * {
   visibility: hidden;
 }
-/* Layers: sky (+ time-of-day layers) < hero (until the swap) < sand < tint < cactus < gust < pollen < text. */
+/* Layers: sky (+ time-of-day layers) < hero (until it fades) < sand < tint, cover grains < cactus < gust < pollen < text. */
 .hero {
   position: absolute;
   inset: 0;
@@ -64,6 +64,19 @@
   pointer-events: none;
   user-select: none;
   will-change: transform;
+}
+/* Opening cover (CoverSand): the hero words and dunes scatter into grains that settle as the desert dunes. The grains
+   stand in for the words from the first step of the cover, so the words hide at once. */
+.hero[data-scattered] [data-cover-scatter] {
+  visibility: hidden;
+}
+.coverSand {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
 }
 /* Cactus stands on the dunes, in front of the sand. The wrapper hides it while the hand-off's grains stand in for it. */
 .cactusWrap {
@@ -344,42 +357,9 @@
 .skip:hover {
   background: #fffaf2;
 }
-/* Shortcut to the projects on the opening screen (same pill as SKIP, bottom left); --fade from ConceptScenes. */
-.jump {
-  position: absolute;
-  left: 32px;
-  bottom: 28px;
-  z-index: 8;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  min-height: 44px;
-  padding: 0 20px;
-  border: 1px solid #20273133;
-  border-radius: 999px;
-  background: #fffaf2cc;
-  color: #202731;
-  font:
-    600 14px/1 var(--font-pretendard),
-    sans-serif;
-  text-decoration: none;
-  backdrop-filter: blur(6px);
-  opacity: var(--fade, 1);
-  transition: background-color 0.2s;
-}
-.jump:hover {
-  background: #fffaf2;
-}
-.jump:focus-visible {
-  opacity: 1;
-}
 @media (max-width: 1023px) {
   .skip {
     right: 20px;
-    bottom: 20px;
-  }
-  .jump {
-    left: 20px;
     bottom: 20px;
   }
 }

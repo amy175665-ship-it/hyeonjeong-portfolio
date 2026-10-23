@@ -1,5 +1,5 @@
 // Story ranges (0..1 progress of the concept story).
-// cover: the sand rises over the hero, holds while the backdrop swaps to the desert stage, then sinks to the horizon.
+// cover: the hero's words and dunes scatter into sand that settles as the desert dunes (CoverSand).
 // "cover" follows the scroll; build → adapt → grow then play on their own (see COVER_SCROLL, PLAY_SECONDS).
 export const SCENES = {
   cover: [0, 0.27],
@@ -7,9 +7,6 @@ export const SCENES = {
   adapt: [0.54, 0.76],
   grow: [0.76, 1],
 } as const;
-
-// Inside "cover": rise until this local point, hold (backdrop swaps at the middle), then sink from COVER.sink.
-export const COVER = { risen: 0.45, swap: 0.5, sink: 0.55 };
 
 // The track is 3.8 screens tall (ConceptScenes.module.css .track), so it scrolls 2.8 screens while pinned.
 // "cover" uses the first 2 screens; at its end the page is held while the other scenes play over PLAY_SECONDS,

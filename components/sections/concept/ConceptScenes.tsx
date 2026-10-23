@@ -18,7 +18,6 @@ import {
   useTransform,
   motion,
   type AnimationPlaybackControls,
-  type MotionStyle,
 } from "framer-motion";
 import sandImage from "@/public/images/hero/hero-sand-bg.webp";
 import {
@@ -31,8 +30,9 @@ import WindGust from "./WindGust";
 import PollenGrow from "./PollenGrow";
 import WindowFrame from "./WindowFrame";
 import SandHandoff, { HANDOFF } from "./SandHandoff";
+import CoverSand, { COVER_SAND, type CoverScene } from "./CoverSand";
+import { styleWriter } from "@/components/motion/styleWriter";
 import {
-  COVER,
   COVER_SCROLL,
   DISSOLVE_SCREENS,
   PLAY_SECONDS,
@@ -46,9 +46,9 @@ import styles from "./ConceptScenes.module.css";
 
 const CactusScene = dynamic(() => import("./CactusScene"), { ssr: false });
 
-// One pinned scroll track for the hero and the concept story: the sand rises over the hero (children),
-// the backdrop swaps to the desert stage while it is covered, the sand sinks to the horizon (all with the scroll),
-// then the scenes play on their own while the stage stays pinned a little longer.
+// One pinned scroll track for the hero and the concept story: the hero's words and dunes scatter into sand that settles
+// as the desert dunes (CoverSand, with the scroll), then the scenes play on their own while the stage stays pinned a
+// little longer.
 // SCENE 2 builds the cactus in the wind, SCENE 3 turns the sky from day to night to dawn, SCENE 4 blooms into "GROW.".
 // Seeded so the server and client render the same stars.
 const STARS = (() => {
@@ -61,18 +61,17 @@ const STARS = (() => {
     glow: 0.45 + random() * 0.55,
   }));
 })();
-const HORIZON = 0.62; // dune crest height (fraction of the stage) once the sand has sunk back down
+const HORIZON = 0.62; // dune crest height (fraction of the stage) on the desert stage
 const CREST = 0.35; // the dune crest sits 35% down the sand image (on average)
-// Crest height (fraction of the image height) at 11 evenly spaced points across the sand image, left to right.
-const CREST_PROFILE = [
-  0.369, 0.343, 0.35, 0.358, 0.365, 0.375, 0.36, 0.343, 0.345, 0.322, 0.331,
-];
-const COVERED = 0.4; // image offset (fraction of its height) above the stage top that hides the hero completely
-// The cactus is first seen when the sand starts to sink; its 3D canvas only renders from there on.
+// Where the cactus stands on the sand, as a fraction of its box (.cactus), the same on every screen size (measured).
+const CACTUS_FOOT = [0.493, 0.777];
+// The cactus's 3D canvas starts rendering while the grains are still in the air (its first frame takes a moment), so it
+// is ready when the cactus sprouts at COVER_SAND.play.
 const CACTUS_FROM =
-  SCENES.cover[0] + (SCENES.cover[1] - SCENES.cover[0]) * COVER.sink;
-// Scrolling back up this far above the cover end (a wheel notch or so) rewinds a started story.
-const REWIND_FROM = COVER_SCROLL - 0.01;
+  SCENES.cover[0] + (SCENES.cover[1] - SCENES.cover[0]) * 0.6;
+// Scrolling back up this far above where the cactus sprouted (a wheel notch or so) rewinds a started story.
+const REWIND_FROM = COVER_SCROLL * (COVER_SAND.play - 0.03);
+const put = styleWriter(); // writes only changed values (see styleWriter)
 // Logo click on this page: seconds for the slow glide from the end of the cover back to the top.
 const RETURN_SECONDS = 3;
 // Hand-off from the story to the browser window (teacher's feedback): the last scene scatters into sand and the sand
@@ -137,8 +136,9 @@ export default function ConceptScenes({
     mass: 0.8,
     restDelta: 0.0005,
   });
-  // -1 until the cover has finished, then 0..1 through build → adapt → grow. It plays over PLAY_SECONDS
-  // (with reduced motion it follows the hold scroll instead), so nobody has to keep scrolling to see the cactus grow.
+  // -1 until the cactus sprouts near the end of the cover (COVER_SAND.play), then 0..1 through build → adapt → grow.
+  // It plays over PLAY_SECONDS (with reduced motion it follows the hold scroll instead), so nobody has to keep
+  // scrolling to see the cactus grow.
   const playhead = useMotionValue(-1);
   const playback = useRef<AnimationPlaybackControls | null>(null);
   const story = useTransform(
@@ -146,9 +146,28 @@ export default function ConceptScenes({
     ([cover, play]: number[]) =>
       play < 0 ? cover : SCENES.cover[1] + (1 - SCENES.cover[1]) * play,
   );
-  // Scrolling back up above the cover end quickly fades the cactus, pollen and text out (1 → 0) before the story
-  // resets, instead of leaving them standing until the sand has risen over them.
+  // Scrolling back up above where the cactus sprouted quickly fades the cactus, pollen and text out (1 → 0) before the
+  // story resets, instead of leaving them standing over the scattering sand.
   const outro = useMotionValue(1);
+  const rewinding = useRef(false);
+  const rewindFrom = useRef(0);
+  // The cover as shown (0 hero .. 1 desert, see CoverSand). Once the story has started it only moves on, so scrolling
+  // back up a little does not break the dunes under the standing cactus; while the story fades out (rewind) it eases
+  // back to the scroll, and follows it again from there.
+  const coverShown = useMotionValue(0);
+  const showCover = () => {
+    const local = sceneProgress(sandProgress.get(), "cover");
+    if (rewinding.current)
+      coverShown.set(
+        rewindFrom.current + (local - rewindFrom.current) * (1 - outro.get()),
+      );
+    else if (playhead.get() >= 0)
+      coverShown.set(Math.max(local, coverShown.get()));
+    else coverShown.set(local);
+  };
+  useMotionValueEvent(sandProgress, "change", showCover);
+  useMotionValueEvent(playhead, "change", showCover);
+  useMotionValueEvent(outro, "change", showCover);
   // The browser window (0 below the stage .. 1 in place). It does not follow the scroll: one wheel step after the
   // story rises it in a single glide, one step up from the top of its content lowers it again (see setRaised).
   const raise = useMotionValue(0);
@@ -159,7 +178,12 @@ export default function ConceptScenes({
   const textFade = useTransform([outro, raise], ([fade, up]: number[]) =>
     up <= 0 ? fade : 0,
   );
-  const cactusFade = textFade;
+  // The cactus also waits for the story to start (with reduced motion it is drawn fully grown from the start, and the
+  // hero is no longer covered by sand).
+  const cactusFade = useTransform(
+    [textFade, playhead],
+    ([fade, play]: number[]) => (play < 0 ? 0 : fade),
+  );
   const handoffWhite = useTransform(raise, (up) =>
     smooth(ramp(up, HANDOFF.white)),
   );
@@ -167,7 +191,6 @@ export default function ConceptScenes({
   const barIn = useTransform(raise, (up) => smooth(ramp(up, HANDOFF.bar)));
   const pageIn = useTransform(raise, (up) => smooth(ramp(up, HANDOFF.settle)));
   const windowClip = useMotionValue(HIDDEN_CLIP);
-  const rewinding = useRef(false);
   // Once the story has finished and the page is free again, a small falling-grain cue at the bottom says "keep going";
   // it fades away as soon as the page scrolls on.
   const cueIn = useMotionValue(0);
@@ -179,14 +202,6 @@ export default function ConceptScenes({
   const [skippable, setSkippable] = useState(false);
   useMotionValueEvent(playhead, "change", (value) =>
     setSkippable(value >= 0 && value < 1),
-  );
-  // "프로젝트 바로 보기" on the opening screen fades out as soon as the sand starts to rise (keyboard focus shows it).
-  const jumpFade = useTransform(
-    coverScroll,
-    (value) => 1 - Math.min(value / (SCENES.cover[1] * 0.12), 1),
-  );
-  const jumpPointer = useTransform(jumpFade, (value) =>
-    value < 0.05 ? "none" : "auto",
   );
   const skip = () => {
     playback.current?.stop();
@@ -211,7 +226,7 @@ export default function ConceptScenes({
   };
   const buildText = usePhrase("build", 0.18); // with the first cactus segment
   const adaptText = usePhrase("adapt", 0.1);
-  const finalText = usePhrase("grow", 0.7, true); // after "GROW." has formed
+  const finalText = usePhrase("grow", 0.42, true); // appears while the final growth scene is still unfolding
   const sunset = useTransform(story, (value) => skyAt(value).sunset);
   const night = useTransform(story, (value) => skyAt(value).night);
   const dawn = useTransform(story, (value) => skyAt(value).dawn);
@@ -241,94 +256,75 @@ export default function ConceptScenes({
     };
   }, []);
 
-  // Viewport y of the dune crest at viewport x, following the image's ridge line.
-  const crestLine = (sandBox: DOMRect) => (x: number) => {
-    const t =
-      Math.min(Math.max((x - sandBox.left) / sandBox.width, 0), 1) *
-      (CREST_PROFILE.length - 1);
-    const i = Math.min(Math.floor(t), CREST_PROFILE.length - 2);
-    return (
-      sandBox.top +
-      sandBox.height *
-        (CREST_PROFILE[i] + (CREST_PROFILE[i + 1] - CREST_PROFILE[i]) * (t - i))
-    );
-  };
-
-  // The fixed header belongs to the scene: the rising dune ridge hides it from the bottom up, it stays hidden
-  // while the screen is covered, and the sinking ridge uncovers it again from the top down.
-  const coverHeader = (local: number, sandBox: DOMRect) => {
-    const header = document.querySelector<HTMLElement>("header");
-    if (!header) return;
-    const clear = () => {
-      header.style.clipPath = "";
-      header.style.pointerEvents = "";
-    };
-    // Only during the cover transition: afterwards the dunes scroll up with the stage and must not clip the header.
-    if (local >= 1) {
-      clear();
-      return;
-    }
-    if (local >= COVER.risen && local < COVER.sink) {
-      header.style.clipPath = "inset(0 0 100% 0)";
-      header.style.pointerEvents = "none";
-      return;
-    }
-    const box = header.getBoundingClientRect();
-    const crestAt = crestLine(sandBox);
-    const margin = 60; // the logo overflows the header box
-    const xs = Array.from(
-      { length: 25 },
-      (_, i) => box.left - margin + ((box.width + margin * 2) * i) / 24,
-    );
-    const crests = xs.map(crestAt);
-    // Untouched while the ridge is below the header, so the open mobile menu panel is never clipped.
-    if (Math.min(...crests) >= box.bottom + margin) {
-      clear();
-      return;
-    }
-    header.style.pointerEvents = Math.max(...crests) <= box.top ? "none" : "";
-    const ridge = xs
-      .map(
-        (x, i) =>
-          `${(x - box.left).toFixed(1)}px ${(crests[i] - box.top).toFixed(1)}px`,
-      )
-      .reverse();
-    header.style.clipPath = `polygon(${-margin}px ${-margin}px, ${box.width + margin}px ${-margin}px, ${ridge.join(", ")})`;
-  };
-  useEffect(
-    () => () => {
-      const header = document.querySelector<HTMLElement>("header");
-      if (header) {
-        header.style.clipPath = "";
-        header.style.pointerEvents = "";
-      }
-    },
-    [],
-  );
-
-  // Cover transition: start where the hero's own dunes sit (crest at 87% / 80%), rise until the hero is hidden,
-  // swap the backdrop, then sink until the crest sits on the horizon line.
-  const placeSand = (value: number) => {
+  // Where the dune image lies (its top, in stage px): on the hero (crest at 87% / 80%) and on the desert horizon.
+  const duneLevels = () => {
     const image = sand.current,
       box = stage.current;
-    if (!image || !box) return;
+    if (!image || !box) return null;
     const height = box.clientHeight,
       imageHeight = image.clientHeight;
-    const rest = height * (desktop ? 0.87 : 0.8) - imageHeight * CREST;
-    const covered = -imageHeight * COVERED;
-    const horizon = height * HORIZON - imageHeight * CREST;
-    const local = sceneProgress(value, "cover");
-    const ease = smooth;
-    const y =
-      local < COVER.risen
-        ? rest + (covered - rest) * ease(local / COVER.risen)
-        : local < COVER.sink
-          ? covered
-          : covered +
-            (horizon - covered) * ease((local - COVER.sink) / (1 - COVER.sink));
-    image.style.transform = `translate(-50%, ${y}px)`;
-    const sandBox = image.getBoundingClientRect();
-    coverHeader(local, sandBox);
+    return {
+      rest: height * (desktop ? 0.87 : 0.8) - imageHeight * CREST,
+      horizon: height * HORIZON - imageHeight * CREST,
+    };
+  };
+  // What the cover's grains need (CoverSand): the dune image at both ends, the hero words and the cactus's spot.
+  const coverScene = (): CoverScene | null => {
+    const image = sand.current,
+      box = stage.current,
+      levels = duneLevels();
+    if (!image || !box || !levels) return null;
+    const origin = box.getBoundingClientRect(),
+      imageBox = image.getBoundingClientRect(),
+      cactus = cactusWrap.current?.firstElementChild?.getBoundingClientRect();
+    return {
+      stage: box,
+      dunes: image,
+      left: imageBox.left - origin.left,
+      width: imageBox.width,
+      height: imageBox.height,
+      rest: levels.rest,
+      horizon: levels.horizon,
+      words: [
+        ...(hero.current?.querySelectorAll("[data-cover-scatter]") ?? []),
+      ],
+      sprout:
+        cactus && cactus.width
+          ? [
+              cactus.left + cactus.width * CACTUS_FOOT[0] - origin.left,
+              cactus.top + cactus.height * CACTUS_FOOT[1] - origin.top,
+            ]
+          : null,
+    };
+  };
+
+  // Cover: the dunes lie on the hero until the cover starts. From then on the grains stand in for them and the hero
+  // words (CoverSand), the hero fades away behind the flying sand, and the dune image waits on the horizon, fading in
+  // as the grains settle there. With reduced motion there are no grains: the dunes and the hero simply cross-fade.
+  const placeSand = () => {
+    const image = sand.current,
+      box = stage.current,
+      levels = duneLevels();
+    if (!image || !box || !levels) return;
+    const local = coverShown.get(),
+      started = local > 0;
+    const y = reduced
+      ? local < 0.5
+        ? levels.rest
+        : levels.horizon
+      : started
+        ? levels.horizon
+        : levels.rest;
+    const shown = reduced
+      ? Math.min(Math.abs(local - 0.5) / 0.15, 1)
+      : started
+        ? smooth(ramp(local, COVER_SAND.settle))
+        : 1;
+    const heroOut = reduced
+      ? ramp(local, [0.35, 0.5])
+      : smooth(ramp(local, COVER_SAND.heroOut));
+    put(image, "transform", `translate(-50%, ${y.toFixed(1)}px)`);
+    put(image, "opacity", shown.toFixed(3));
     // The window waits behind the stage, hidden until the hand-off has turned the screen white; from then on the stage
     // steps aside (data-handoff) so the window shows under the gathering grains, and once it is fully up it comes in
     // front of the stage (data-up).
@@ -337,21 +333,24 @@ export default function ConceptScenes({
     box.toggleAttribute("data-handoff", up >= HANDOFF.shown);
     scenes.current?.toggleAttribute("data-up", up >= 1);
     if (hero.current) {
-      const hidden = local >= COVER.swap;
-      hero.current.style.visibility = hidden ? "hidden" : "visible";
-      // Tells the hero's avatar and sand stream to stop rendering while they are covered.
+      const hidden = heroOut >= 1;
+      put(hero.current, "opacity", (1 - heroOut).toFixed(3));
+      put(hero.current, "visibility", hidden ? "hidden" : "visible");
+      // Tells the hero's avatar and sand stream to stop rendering once they have faded.
       hero.current.toggleAttribute("data-paused", hidden);
+      hero.current.toggleAttribute("data-scattered", !reduced && started);
     }
   };
-  useMotionValueEvent(sandProgress, "change", placeSand);
-  useMotionValueEvent(raise, "change", () => placeSand(sandProgress.get()));
+  useMotionValueEvent(coverShown, "change", placeSand);
+  useMotionValueEvent(raise, "change", placeSand);
   useMotionValueEvent(story, "change", (value) =>
     setCactusActive(value >= CACTUS_FROM),
   );
-  // Starts the story once the sand has settled on the horizon; scrolling back up until the sand rises over the
-  // cactus again resets it, so it plays again on the way down. A started playback keeps going even off screen.
+  // Starts the story as the last grains land on the cactus's spot (COVER_SAND.play), without waiting for the cover to
+  // come to rest; scrolling back up into the flying sand resets it, so it plays again on the way down. A started
+  // playback keeps going even off screen.
   const syncPlayback = () => {
-    const cover = sandProgress.get();
+    const cover = sceneProgress(sandProgress.get(), "cover");
     // Resets on the real scroll, not the trailing spring, so a jump into the window (menu, link with a hash) that the
     // spring follows up from the top does not undo the skipped story; nor while the window is up (a menu jump settles
     // the spring before the page has scrolled down).
@@ -363,14 +362,19 @@ export default function ConceptScenes({
       unlockScroll();
       return;
     }
-    if (cover < SCENES.cover[1] - 0.003 || rewinding.current) return;
+    if (rewinding.current) return;
     if (reduced) {
+      if (cover < 0.99) return;
       // No timed playback with reduced motion: the finished scene shows at once (the hold scroll raises the window,
       // or straight away if the page has already scrolled past the cover before the spring settled).
       if (playhead.get() < 1) playhead.set(1);
       if (!raised.current && scrollYProgress.get() > COVER_SCROLL + 0.005)
         setRaised(true, false);
-    } else if (playhead.get() < 0 && scrollYProgress.get() >= REWIND_FROM) {
+    } else if (
+      cover >= COVER_SAND.play &&
+      playhead.get() < 0 &&
+      scrollYProgress.get() >= REWIND_FROM
+    ) {
       playhead.set(0);
       playback.current = animate(playhead, 1, {
         duration: PLAY_SECONDS,
@@ -384,6 +388,7 @@ export default function ConceptScenes({
   // Not with reduced motion, where the hold scroll itself moves the scenes.
   const rewind = () => {
     rewinding.current = true;
+    rewindFrom.current = coverShown.get();
     playback.current?.stop();
     playback.current = null;
     unlockScroll();
@@ -391,10 +396,10 @@ export default function ConceptScenes({
       duration: 0.35,
       ease: "easeOut",
       onComplete: () => {
+        rewinding.current = false;
         playhead.set(-1);
         outro.set(1);
         cueIn.set(0);
-        rewinding.current = false;
       },
     });
   };
@@ -498,9 +503,9 @@ export default function ConceptScenes({
     setRaised(false, true);
   };
   // The logo (a link to "/") on this page: instead of jumping to the top, the window drops away and the page glides up
-  // slowly, so the sand rises over the scene, holds, and sinks back to the hero in one smooth move.
+  // slowly, so the desert breaks back into sand that gathers into the hero in one smooth move.
   const returnHome = () => {
-    // Not into the story yet (the hero, or the sand still rising): nothing to wind back, so the story stays at its
+    // Not into the story yet (the hero, or the sand still flying): nothing to wind back, so the story stays at its
     // start. Ending it here would leave the finished scene over the hero, as no scroll change would reset it.
     if (coverScroll.get() < CACTUS_FROM && !raised.current) {
       playback.current?.stop();
@@ -590,8 +595,9 @@ export default function ConceptScenes({
     ([shown, up, fade]: number[]) => shown * fade * Math.max(0, 1 - up / 0.12),
   );
   useEffect(() => {
-    placeSand(sandProgress.get());
-    const resize = new ResizeObserver(() => placeSand(sandProgress.get()));
+    showCover();
+    placeSand();
+    const resize = new ResizeObserver(() => placeSand());
     if (stage.current) resize.observe(stage.current);
     return () => resize.disconnect();
   });
@@ -606,6 +612,8 @@ export default function ConceptScenes({
         <div
           ref={storyTrack}
           className={styles.storyTrack}
+          data-scroll-story
+          data-scroll-story-screens="3.8"
           aria-hidden="true"
         />
         <div
@@ -659,6 +667,11 @@ export default function ConceptScenes({
             className={styles.sand}
             unoptimized
             priority
+          />
+          <CoverSand
+            progress={coverShown}
+            scene={coverScene}
+            enabled={!reduced}
           />
           {/* Dims and warms the dunes with the sky; the cactus sits above it and is lit by its own 3D light. */}
           <motion.div
@@ -752,19 +765,6 @@ export default function ConceptScenes({
               SKIP
             </button>
           )}
-          {/* Shortcut past the opening straight to the project panels (WindowFrame handles the #project link). */}
-          <motion.a
-            href="/#project"
-            className={styles.jump}
-            style={
-              {
-                "--fade": jumpFade,
-                pointerEvents: jumpPointer,
-              } as unknown as MotionStyle
-            }
-          >
-            프로젝트 바로 보기 <span aria-hidden="true">↓</span>
-          </motion.a>
           <motion.div
             className={styles.handoffWhite}
             style={{ opacity: handoffWhite }}
